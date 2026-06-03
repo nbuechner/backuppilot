@@ -1,0 +1,28 @@
+[package]
+name = "backuppilot-gui"
+description = "BackupPilot GNOME desktop application (GTK4 / Libadwaita)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "backuppilot"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+chrono.workspace = true
+backuppilot-core = { path = "../backuppilot-core" }
+backuppilot-i18n = { path = "../backuppilot-i18n" }
+gtk = { package = "gtk4", version = "0.9", features = ["v4_16"] }
+gdk-pixbuf = "0.20"
+libadwaita = { version = "0.7", features = ["v1_6"] }
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+zbus.workspace = true
+ksni = "0.3"
+tokio = { workspace = true, features = ["rt"] }

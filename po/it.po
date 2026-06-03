@@ -1,0 +1,2910 @@
+# Italian translations for PACKAGE package.
+# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-03 13:41+0200\n"
+"PO-Revision-Date: 2026-05-23 10:56+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:212
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:660
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:72
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:106
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:118
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:32
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:58
+msgid "BackupPilot"
+msgstr "BackupPilot"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:254
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:723
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:72
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:100
+msgid "Overview"
+msgstr "Panoramica"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:255
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:511
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:101
+msgid "Profiles"
+msgstr "Profili"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:256
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:577
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:102
+msgid "Restore"
+msgstr "Ripristinare"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:257
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:524
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:103
+msgid "Encryption"
+msgstr "Crittografia"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:258
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:537
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:104
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:259
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:550
+msgid "Log"
+msgstr "Tronco d'albero"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:260
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:563
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:105
+msgid "About"
+msgstr "Di"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:348
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:109
+msgid "Loading…"
+msgstr "Caricamento…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:594
+msgid "Backup jobs"
+msgstr "Lavori di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:604
+msgid "Recent activity"
+msgstr "Attività recente"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:605
+msgid "Latest backup events. Click a row for details."
+msgstr "Ultimi eventi di backup. Fare clic su una riga per i dettagli."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:608
+msgid "View all"
+msgstr "Visualizza tutto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1009
+msgid ""
+"No backup activity yet. Once a backup runs, you will see a short summary "
+"here."
+msgstr ""
+"Nessuna attività di backup ancora. Una volta eseguito il backup, vedrai un "
+"breve riepilogo qui."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1032
+msgid "Daemon not reachable: {err}"
+msgstr "Demone non raggiungibile: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1066
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1164
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:111
+msgid "No backup profiles configured yet."
+msgstr "Nessun profilo di backup ancora configurato."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1093
+msgid "Cancel all running backups"
+msgstr "Annulla tutti i backup in esecuzione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1094
+msgid "Stops every active backup immediately and frees network bandwidth."
+msgstr ""
+"Interrompe immediatamente ogni backup attivo e libera larghezza di banda "
+"della rete."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1120
+msgid "Backup in progress ({duration}): {detail}"
+msgstr "Backup in corso ({duration}): {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1124
+msgid "Backup in progress: {detail}"
+msgstr "Backup in corso: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1129
+msgid "Backup in progress ({duration})"
+msgstr "Backup in corso ({duration})"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1134
+msgid "Backup in progress…"
+msgstr "Backup in corso..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1151
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:460
+msgid "Cancel backup"
+msgstr "Annulla il backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1174
+msgid "Disabled , scheduled backups are paused"
+msgstr "Disabilitato, i backup pianificati vengono sospesi"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1179
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:393
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:147
+msgid "No backup run yet"
+msgstr "Nessun backup ancora eseguito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1204
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:232
+msgid "pending"
+msgstr "in attesa di"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1205
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:233
+msgid "running"
+msgstr "corsa"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1206
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:234
+msgid "successful"
+msgstr "riuscito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1207
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:235
+msgid "failed"
+msgstr "fallito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1208
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:236
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:134
+msgid "skipped"
+msgstr "saltato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1209
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:237
+msgid "cancelled"
+msgstr "annullato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1320
+msgid "Scheduled backups are paused"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1321
+msgid "Automatic backups will not start until you resume them in Settings."
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1345
+msgid ""
+"Based on the warning and critical thresholds in each profile. Check the jobs "
+"below, run a backup, or adjust thresholds in Settings."
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1353
+msgid "{critical} critically overdue, {warn} need attention"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1368
+msgid "{count} backup job(s) critically overdue"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1379
+msgid "{count} backup job(s) need attention"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1414
+msgid "Application update available"
+msgstr "Aggiornamento dell'applicazione disponibile"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/window.rs:1416
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:48
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:96
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:171
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:196
+msgid "Version {version} is available."
+msgstr "La versione {version} è disponibile."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:76
+msgid "Show sidebar"
+msgstr "Mostra barra laterale"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:112
+msgid "Status and recent backup activity"
+msgstr "Stato e attività di backup recente"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:113
+msgid "Configure backup profiles and schedules"
+msgstr "Configura profili e pianificazioni di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:114
+msgid "Browse snapshots and restore files"
+msgstr "Sfoglia le istantanee e ripristina i file"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:115
+msgid "Create and manage backup encryption keys"
+msgstr "Crea e gestisci le chiavi di crittografia di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:116
+msgid "Application preferences"
+msgstr "Preferenze dell'applicazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/shell.rs:117
+msgid "Version, updates and support"
+msgstr "Versione, aggiornamenti e supporto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:75
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:182
+msgid "Copy to clipboard"
+msgstr "Copia negli appunti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:113
+msgid "Type: system event ({kind})"
+msgstr "Tipo: evento di sistema ({kind})"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:121
+msgid "Profile: {name} (id {id})"
+msgstr "Profilo: {name} (id {id})"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:126
+msgid "Run id: {id}"
+msgstr "ID esecuzione: {id}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:128
+msgid "Status: {status}"
+msgstr "Stato: {status}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:132
+msgid "Started (UTC): {ts}"
+msgstr "Iniziato (UTC): {ts}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:137
+msgid "Finished (UTC): {ts}"
+msgstr "Finito (UTC): {ts}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:141
+msgid "Duration: {secs} s"
+msgstr "Durata: {secs} s"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:145
+msgid "Bytes uploaded: {bytes}"
+msgstr "Byte caricati: {bytes}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:150
+msgid "Snapshot id: {snap}"
+msgstr "ID istantanea: {snap}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:155
+msgid "Error / details:"
+msgstr "Errore/dettagli:"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:171
+msgid "Log entry"
+msgstr "Voce di registro"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:198
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/run_history.rs:130
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:296
+msgid "Close"
+msgstr "Vicino"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:243
+msgid "Copied to clipboard"
+msgstr "Copiato negli appunti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:245
+msgid "Could not copy to clipboard"
+msgstr "Impossibile copiare negli appunti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:272
+msgid "Proxmox Backup Client installed successfully"
+msgstr "Client di backup Proxmox installato correttamente"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:273
+msgid "Proxmox Backup Client installation failed"
+msgstr "L'installazione del client di backup Proxmox non è riuscita"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:274
+msgid "Proxmox Backup Client installation in progress"
+msgstr "Installazione del client di backup Proxmox in corso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:275
+msgid "Proxmox Backup Client installation skipped"
+msgstr "L'installazione del client di backup Proxmox è stata saltata"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:276
+msgid "Proxmox Backup Client installation pending"
+msgstr "Installazione del client di backup Proxmox in sospeso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:277
+msgid "Proxmox Backup Client installation cancelled"
+msgstr "Installazione del client di backup Proxmox annullata"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:280
+msgid "Backup mounted read-only in file manager"
+msgstr "Backup montato in sola lettura nel file manager"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:281
+msgid "Backup mount failed"
+msgstr "Montaggio del backup non riuscito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:282
+msgid "Backup mount"
+msgstr "Supporto di riserva"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:285
+msgid "Backup mount disconnected"
+msgstr "Montaggio di backup disconnesso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:286
+msgid "Backup mount disconnect failed"
+msgstr "Disconnessione del montaggio del backup non riuscita"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:287
+msgid "Backup mount disconnect"
+msgstr "Disconnessione del supporto di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:289
+msgid "File restore started"
+msgstr "È iniziato il ripristino del file"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:291
+msgid "File restore completed"
+msgstr "Ripristino del file completato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:292
+msgid "File restore failed"
+msgstr "Ripristino del file non riuscito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:293
+msgid "File restore"
+msgstr "Ripristino file"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:309
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:369
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:376
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:383
+msgid "{when} , {reason}"
+msgstr "{when}, {reason}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:322
+msgid "Backup «{name}» completed successfully"
+msgstr "Backup «__PH0__» completato correttamente"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:325
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:154
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1046
+msgid "Backup «{name}» failed"
+msgstr "Backup «__PH0__» non riuscito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:326
+msgid "Backup «{name}» was skipped"
+msgstr "Il backup «__PH0__» è stato saltato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:327
+msgid "Backup «{name}» was cancelled"
+msgstr "Il backup «__PH0__» è stato annullato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:328
+msgid "Backup «{name}» is running"
+msgstr "Il backup «__PH0__» è in esecuzione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:329
+msgid "Backup «{name}» is starting"
+msgstr "Il backup «__PH0__» sta iniziando"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:340
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:347
+msgid "{status}, {when} , {msg}"
+msgstr "{status}, {when}, {msg}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:342
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:349
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:360
+msgid "{status}, {when}"
+msgstr "{status}, {when}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:353
+msgid "{status}, {when} , {size}"
+msgstr "{status}, {when}, {size}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:378
+msgid "{when} , not started (preflight or schedule)"
+msgstr "{when}, non avviato (preflight o pianificazione)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:391
+msgid "{size} saved to backup server"
+msgstr "{size} salvato sul server di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:399
+msgid "{when} , snapshot {snap}"
+msgstr "{when}, istantanea {snap}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:402
+msgid "{when} , {size_part}, snapshot {snap}"
+msgstr "{when}, {size_part}, istantanea {snap}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:407
+msgid "{when} , {size_part}"
+msgstr "{when}, {size_part}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:421
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:250
+msgid "Today at {time}"
+msgstr "Oggi alle {time}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/activity_log.rs:423
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:252
+msgid "Yesterday at {time}"
+msgstr "Ieri alle {time}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:45
+msgid "Add profile"
+msgstr "Aggiungi profilo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:51
+msgid "Import profile from YAML"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:233
+msgid "Modern backup. Without compromise."
+msgstr "Backup moderno. Senza compromessi."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:234
+msgid ""
+"Proxmox Backup as a Service , hosted in Switzerland, operated by experts."
+msgstr "Proxmox Backup as a Service, ospitato in Svizzera, gestito da esperti."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:240
+msgid "Backup as a Service by OneSystems GmbH"
+msgstr "Backup come servizio di OneSystems GmbH"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:303
+msgid "Error: {err}"
+msgstr "Errore: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:315
+msgid "No profiles yet. Click + to create your first backup profile."
+msgstr ""
+"Nessun profilo ancora. Fai clic su + per creare il tuo primo profilo di "
+"backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:388
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:142
+msgid "Last run: {label} , {msg}"
+msgstr "Ultima esecuzione: {label}, {msg}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:390
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:144
+msgid "Last run: {label}"
+msgstr "Ultima esecuzione: {label}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:399
+msgid "Enabled"
+msgstr "Abilitato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:400
+msgid "Disabled"
+msgstr "Disabilitato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:402
+msgid "Encrypted"
+msgstr "Crittografato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:403
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1309
+msgid "Not encrypted"
+msgstr "Non crittografato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:435
+msgid "Export profile to YAML"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:441
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:115
+msgid "Edit profile"
+msgstr "Modifica profilo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:447
+msgid "Backup history"
+msgstr "Cronologia del backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:453
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:95
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:201
+msgid "Start backup"
+msgstr "Avvia il backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:541
+msgid "Backup encryption is active for this profile"
+msgstr "La crittografia del backup è attiva per questo profilo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/mod.rs:546
+msgid "Backups from this profile are not encrypted"
+msgstr "I backup da questo profilo non sono crittografati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:116
+msgid "New profile"
+msgstr "Nuovo profilo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:169
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1110
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:264
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:321
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:474
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:695
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:2002
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:450
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:130
+msgid "Cancel"
+msgstr "Cancellare"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:170
+msgid "Save"
+msgstr "Salva"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:177
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1111
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:696
+msgid "Delete"
+msgstr "Eliminare"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:264
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:287
+msgid "Could not save"
+msgstr "Impossibile salvare"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:284
+msgid "Failed to save profile: {err}"
+msgstr "Impossibile salvare il profilo: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:303
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:335
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:491
+msgid "Name"
+msgstr "Nome"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:308
+msgid "Active"
+msgstr "Attivo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:309
+msgid "Back up automatically on a schedule"
+msgstr "Esegui il backup automaticamente in base a una pianificazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:328
+msgid "Server address"
+msgstr "Indirizzo del server"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:333
+msgid "Username"
+msgstr "Nome utente"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:343
+msgid "API token"
+msgstr "Token API"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:346
+msgid "Datastore"
+msgstr "Archivio dati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:354
+msgid "Namespace (optional)"
+msgstr "Spazio dei nomi (facoltativo)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:362
+msgid "Server TLS fingerprint (optional)"
+msgstr "Impronta TLS del server (facoltativo)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:375
+msgid "Name on the backup server"
+msgstr "Nome sul server di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:397
+msgid "Time of day"
+msgstr "Ora del giorno"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:411
+msgid "Cron schedule"
+msgstr "Programma Cron"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:429
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:148
+msgid "Only on AC power"
+msgstr "Solo con alimentazione CA"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:430
+msgid "Skip backup on battery power."
+msgstr "Salta il backup con alimentazione a batteria."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:438
+msgid "Only when VPN is active"
+msgstr "Solo quando la VPN è attiva"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:439
+msgid "Requires an active VPN connection in NetworkManager."
+msgstr "Richiede una connessione VPN attiva in NetworkManager."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:444
+msgid "PBS must be reachable"
+msgstr "PBS deve essere raggiungibile"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:445
+msgid "DNS, port, and login are checked before each backup."
+msgstr "DNS, porta e accesso vengono controllati prima di ogni backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:458
+msgid "Warning after (days)"
+msgstr "Avviso dopo (giorni)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:471
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:182
+msgid "Critical after (days)"
+msgstr "Critico dopo (giorni)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:480
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:45
+msgid "Encryption key required for restore"
+msgstr "Chiave di crittografia richiesta per il ripristino"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:481
+msgid ""
+"Without this key and its password, encrypted backups cannot be restored , "
+"not even by server administrators. Store a backup copy under Encryption in "
+"the sidebar."
+msgstr ""
+"Senza questa chiave e la relativa password, i backup crittografati non "
+"possono essere ripristinati, nemmeno dagli amministratori del server. "
+"Archivia una copia di backup in Crittografia nella barra laterale."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:537
+msgid "Desktop (background service)"
+msgstr "Desktop (servizio in background)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:538
+msgid "Host CLI (backuppilot-cli)"
+msgstr "CLI host (backuppilot-cli)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:558
+msgid ""
+"Install backuppilot-cli on the host to enable privileged or unattended "
+"backups."
+msgstr ""
+"Installare backuppilot-cli sull'host per abilitare backup privilegiati o non "
+"presidiati."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:562
+msgid ""
+"Use Host CLI for paths outside your user account or systemd/cron schedules."
+msgstr ""
+"Usare la CLI host per percorsi fuori dal proprio account utente o "
+"pianificazioni systemd/cron."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:572
+msgid "Execution"
+msgstr "Esecuzione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:610
+msgid "General"
+msgstr "Generale"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:616
+msgid "How backups run"
+msgstr "Come vengono eseguiti i backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:618
+msgid ""
+"Desktop uses the BackupPilot background service. Host CLI runs via "
+"backuppilot-cli on the system (for root paths or scheduled jobs without a "
+"logged-in session)."
+msgstr ""
+"Desktop usa il servizio in background di BackupPilot. La CLI host viene "
+"eseguita tramite backuppilot-cli sul sistema (percorsi root o job "
+"pianificati senza sessione utente)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:624
+msgid "Backup server"
+msgstr "Server di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:626
+msgid ""
+"Connection to PBS. For self-signed TLS, enter the fingerprint from proxmox-"
+"backup-manager cert info on the server."
+msgstr ""
+"Connessione a PBS. Per TLS autofirmato, inserire l'impronta da proxmox-"
+"backup-manager cert info sul server."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:640
+msgid "This computer"
+msgstr "Questo computer"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:641
+msgid ""
+"How this PC appears in the backup. Leave empty to use the computer name."
+msgstr ""
+"Come appare questo PC nel backup. Lasciare vuoto per utilizzare il nome del "
+"computer."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:646
+msgid "Folders to back up"
+msgstr "Cartelle di cui eseguire il backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:647
+msgid "Directories on this computer that are sent to PBS."
+msgstr "Directory su questo computer inviate a PBS."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:655
+msgid "Skip these files"
+msgstr "Salta questi file"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:656
+msgid "Files matching these patterns are not included in the backup."
+msgstr "I file che corrispondono a questi modelli non sono inclusi nel backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:664
+msgid "When to back up"
+msgstr "Quando eseguire il backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:672
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:336
+msgid "Backup conditions"
+msgstr "Condizioni di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:673
+msgid "When this profile may run automatically."
+msgstr "Quando questo profilo può essere eseguito automaticamente."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:682
+msgid "Backup encryption"
+msgstr "Crittografia del backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:683
+msgid ""
+"Encrypt new backups with a PBS key. Existing snapshots stay as they are."
+msgstr ""
+"Crittografa i nuovi backup con una chiave PBS. Gli snapshot esistenti "
+"rimangono così come sono."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:689
+msgid "Backup health"
+msgstr "Backup dell'integrità"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:690
+msgid "When to show warning or critical status on the dashboard."
+msgstr "Quando mostrare un avviso o uno stato critico sul dashboard."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:777
+msgid "Test connection"
+msgstr "Testare la connessione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:778
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1059
+msgid "Check whether login details work."
+msgstr "Controlla se i dettagli di accesso funzionano."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:779
+msgid "Test…"
+msgstr "Test…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:799
+msgid "PBS hostname is required."
+msgstr "Il nome host PBS è obbligatorio."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:804
+msgid "PBS username is required."
+msgstr "Il nome utente PBS è obbligatorio."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:809
+msgid "Datastore is required."
+msgstr "L'archivio dati è obbligatorio."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:812
+msgid "Datastore name must be at least 3 characters (required by PBS)."
+msgstr ""
+"Il nome del datastore deve contenere almeno 3 caratteri (richiesto da PBS)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:859
+msgid "API token is required."
+msgstr "È richiesto il token API."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:867
+msgid "Profile name is required."
+msgstr "Il nome del profilo è obbligatorio."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:884
+msgid "At least one backup path is required."
+msgstr "È richiesto almeno un percorso di backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:911
+msgid "Cron schedule is required for advanced mode."
+msgstr "Per la modalità avanzata è necessaria la pianificazione Cron."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:922
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:759
+msgid ""
+"Critical threshold must be greater than or equal to the warning threshold."
+msgstr "La soglia critica deve essere maggiore o uguale alla soglia di avviso."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:935
+msgid ""
+"Host CLI is not installed. Install backuppilot-cli on the system or choose "
+"Desktop execution."
+msgstr ""
+"La CLI host non è installata. Installare backuppilot-cli sul sistema o "
+"scegliere l'esecuzione Desktop."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:970
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:996
+msgid "(No encryption)"
+msgstr "(Nessuna crittografia)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:973
+msgid "Encryption key"
+msgstr "Chiave di crittografia"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:974
+msgid "Manage keys under Encryption in the sidebar"
+msgstr "Gestisci le chiavi in ​​Crittografia nella barra laterale"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1050
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1084
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1090
+msgid "Could not test connection"
+msgstr "Impossibile testare la connessione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1061
+msgid "Testing…"
+msgstr "Prova…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1077
+msgid "PBS accepted the credentials."
+msgstr "PBS ha accettato le credenziali."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1078
+msgid "Connection successful"
+msgstr "Connessione riuscita"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1083
+msgid "PBS rejected the credentials."
+msgstr "PBS ha rifiutato le credenziali."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1089
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1183
+msgid "Daemon error: {err}"
+msgstr "Errore demone: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1104
+msgid "Delete profile?"
+msgstr "Eliminare il profilo?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1105
+msgid "This cannot be undone."
+msgstr "Questa operazione non può essere annullata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1141
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1150
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:54
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:309
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:507
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:133
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:362
+msgid "OK"
+msgstr "OK"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1173
+msgid "Any network"
+msgstr "Qualsiasi rete"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1185
+msgid "Network"
+msgstr "Rete"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1186
+msgid "Only run backups on this Wi-Fi or wired connection."
+msgstr "Esegui i backup solo su questa connessione Wi-Fi o cablata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1203
+msgid "No limit"
+msgstr "Nessun limite"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1204
+msgid "Very slow (512 KiB/s)"
+msgstr "Molto lento (512 KiB/s)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1205
+msgid "Slow (1 MiB/s)"
+msgstr "Lento (1 MiB/s)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1206
+msgid "Medium (5 MiB/s)"
+msgstr "Medio (5 MiB/s)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1207
+msgid "Fast cap (10 MiB/s)"
+msgstr "Limite veloce (10 MiB/s)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1218
+msgid "Upload speed"
+msgstr "Velocità di caricamento"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1219
+msgid "Limits how fast data is sent to the backup server."
+msgstr "Limita la velocità con cui i dati vengono inviati al server di backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1290
+msgid "Monday"
+msgstr "Lunedi"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1291
+msgid "Tuesday"
+msgstr "Martedì"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1292
+msgid "Wednesday"
+msgstr "Mercoledì"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1293
+msgid "Thursday"
+msgstr "Giovedì"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1294
+msgid "Friday"
+msgstr "Venerdì"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1295
+msgid "Saturday"
+msgstr "Sabato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1296
+msgid "Sunday"
+msgstr "Domenica"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1301
+msgid "Day of week"
+msgstr "Giorno della settimana"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1329
+msgid "How often"
+msgstr "Quante volte"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1338
+msgid "Every day"
+msgstr "Ogni giorno"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1339
+msgid "Every hour"
+msgstr "Ogni ora"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1340
+msgid "Once a week"
+msgstr "Una volta alla settimana"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1341
+msgid "When you sign in"
+msgstr "Quando accedi"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/editor.rs:1342
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/advanced_ui.rs:29
+msgid "Advanced"
+msgstr "Avanzato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:10
+msgid "Preflight checks"
+msgstr "Controlli preliminari"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:11
+msgid ""
+"DNS, network port, PBS login, paths, and backup conditions for this profile."
+msgstr ""
+"DNS, porta di rete, accesso PBS, percorsi e condizioni di backup per questo "
+"profilo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:23
+msgid "Check readiness"
+msgstr "Controlla la disponibilità"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:24
+msgid "Run all checks without starting a backup."
+msgstr "Esegui tutti i controlli senza avviare un backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:25
+msgid "Run preflight now"
+msgstr "Esegui il preflight adesso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:35
+msgid "Profile enabled"
+msgstr "Profilo abilitato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:36
+msgid "Backup paths configured"
+msgstr "Percorsi di backup configurati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:37
+msgid "Backup path exists"
+msgstr "Il percorso di backup esiste"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:38
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:39
+msgid "Read permission on backup path"
+msgstr "Autorizzazione di lettura sul percorso di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:40
+msgid "proxmox-backup-client installed"
+msgstr "proxmox-backup-client installato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:41
+msgid "API token stored"
+msgstr "Token API archiviato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:42
+msgid "On AC power"
+msgstr "Con alimentazione CA"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:43
+msgid "Required network active"
+msgstr "Rete richiesta attiva"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:44
+msgid "VPN connection active"
+msgstr "Connessione VPN attiva"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:45
+msgid "PBS DNS resolution"
+msgstr "Risoluzione DNS PBS"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:46
+msgid "PBS TCP port reachable"
+msgstr "Porta TCP PBS raggiungibile"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:47
+msgid "PBS authentication"
+msgstr "Autenticazione PBS"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:54
+msgid "Failed"
+msgstr "Fallito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:58
+msgid "path does not exist: {path}"
+msgstr "il percorso non esiste: {path}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:61
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:64
+msgid "no read permission: {path}"
+msgstr "nessun permesso di lettura: {path}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:69
+msgid "required network not active ({names})"
+msgstr "rete richiesta non attiva ({names})"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:74
+msgid "profile is disabled"
+msgstr "il profilo è disabilitato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:75
+msgid "no backup paths configured"
+msgstr "nessun percorso di backup configurato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:76
+msgid "proxmox-backup-client not found"
+msgstr "client-backup-proxmox non trovato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:78
+msgid ""
+"API token not available for background backups , open the profile and save "
+"again"
+msgstr ""
+"Token API non disponibile per i backup in background, apri il profilo e "
+"salva di nuovo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:79
+msgid "device not on AC power"
+msgstr "dispositivo non collegato all'alimentazione CA"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:80
+msgid "VPN connection required but not active"
+msgstr "Connessione VPN richiesta ma non attiva"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/preflight_panel.rs:95
+msgid "No checks yet , tap «Run preflight now»."
+msgstr "Nessun controllo ancora, tocca «Run preflight now»."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:63
+msgid "Remove"
+msgstr "Rimuovere"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:135
+msgid "No folders selected yet."
+msgstr "Nessuna cartella ancora selezionata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:141
+msgid "Add folder"
+msgstr "Aggiungi cartella"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:142
+msgid "Choose a directory on this computer."
+msgstr "Scegli una directory su questo computer."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:143
+msgid "Browse…"
+msgstr "Sfoglia..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:173
+msgid ""
+"No exclude patterns yet , backups include all files under the selected "
+"folders."
+msgstr ""
+"Nessun modello di esclusione ancora, i backup includono tutti i file nelle "
+"cartelle selezionate."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:179
+msgid "Add exclude pattern"
+msgstr "Aggiungi modello di esclusione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:180
+msgid "For example *.tmp or node_modules"
+msgstr "Ad esempio *.tmp o node_modules"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:181
+msgid "Add…"
+msgstr "Aggiungere…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:202
+msgid "Select folder to back up"
+msgstr "Seleziona la cartella di cui eseguire il backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:229
+msgid "Exclude pattern"
+msgstr "Escludi modello"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:235
+msgid "Pattern"
+msgstr "Modello"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:242
+msgid ""
+"One pattern per entry. * matches part of a name (e.g. *.tmp).              "
+"Use **/ only if a folder should be skipped in all subfolders , e.g. **/"
+"node_modules."
+msgstr ""
+"Un modello per voce. * corrisponde a parte di un nome (ad esempio "
+"*.tmp).              Utilizza **/ only if a folder should be skipped in all "
+"subfolders, e.g. **/node_modules."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/string_list_editor.rs:265
+msgid "Add"
+msgstr "Aggiungere"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/run_history.rs:43
+msgid "No backup runs recorded yet."
+msgstr "Nessuna esecuzione di backup ancora registrata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/profiles/run_history.rs:113
+msgid "Backup history {name}"
+msgstr "Cronologia backup {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:46
+msgid ""
+"If you lose an encryption key or its password, your backups cannot be "
+"restored , not even by administrators on the backup server."
+msgstr ""
+"Se perdi una chiave di crittografia o la sua password, i tuoi backup non "
+"potranno essere ripristinati, nemmeno dagli amministratori del server di "
+"backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:55
+msgid "Create key"
+msgstr "Crea chiave"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:58
+msgid "Import key"
+msgstr "Chiave di importazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:124
+msgid "No encryption keys yet. Create or import a key to use with profiles."
+msgstr ""
+"Nessuna chiave di crittografia ancora. Create or import a key to use with "
+"profiles."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:135
+msgid "Could not load keys: {err}"
+msgstr "Impossibile caricare le chiavi: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:175
+msgid "Save a copy of the key file"
+msgstr "Salvare una copia del file chiave"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:180
+msgid "Cannot delete while key is in use"
+msgstr "Impossibile eliminare mentre la chiave è in uso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:181
+msgid "Delete key"
+msgstr "Cancella chiave"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:227
+msgid "Created {when}"
+msgstr "Creato {when}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:228
+msgid "Usage: {usage}"
+msgstr "Usage: {usage}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:230
+msgid "Last saved: {when}"
+msgstr "Last saved: {when}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:235
+msgid "Password stored"
+msgstr "Password stored"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:236
+msgid "Password missing"
+msgstr "Password missing"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:238
+msgid "{status} , hint: {hint}"
+msgstr "{status}, suggerimento: {hint}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:260
+msgid "Not used"
+msgstr "Non utilizzato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:272
+msgid "{profile} ({count} encrypted snapshots)"
+msgstr "{profile} ({count} snapshot crittografati)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:279
+msgid "{profile} (assigned)"
+msgstr "{profile} (assegnato)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:288
+msgid "Never"
+msgstr "Mai"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:313
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:330
+msgid "Create encryption key"
+msgstr "Crea chiave di crittografia"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:323
+msgid "Create"
+msgstr "Creare"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:331
+msgid ""
+"A new PBS encryption key will be created. Save a backup copy immediately "
+"(password manager, USB, safe). Without key and password, encrypted backups "
+"cannot be restored."
+msgstr ""
+"Verrà creata una nuova chiave di crittografia PBS. Salva immediatamente una "
+"copia di backup (gestore password, USB, cassaforte). Senza chiave e "
+"password, i backup crittografati non possono essere ripristinati."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:336
+msgid "Laptop backup key"
+msgstr "Chiave di backup del laptop"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:339
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:493
+msgid "Encryption password"
+msgstr "Password di crittografia"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:343
+msgid "Confirm password"
+msgstr "Conferma password"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:347
+msgid "Password hint (optional)"
+msgstr "Suggerimento per la password (facoltativo)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:384
+msgid "Passwords do not match."
+msgstr "Le password non corrispondono."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:388
+msgid "Password must be at least 8 characters."
+msgstr "La password deve contenere almeno 8 caratteri."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:412
+msgid "Key «{name}» created , save a backup copy now."
+msgstr "Chiave «__PH0__» creata, salva subito una copia di backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:427
+msgid "Could not create key: {err}"
+msgstr "Impossibile creare la chiave: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:445
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:652
+msgid "Save encryption key backup"
+msgstr "Salva il backup della chiave di crittografia"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:446
+msgid ""
+"Store a copy of the key file outside BackupPilot. You need the key file and "
+"password to restore encrypted backups."
+msgstr ""
+"Archiviare una copia del file chiave all'esterno di BackupPilot. Per "
+"ripristinare i backup crittografati sono necessari il file chiave e la "
+"password."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:448
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:342
+msgid "Later"
+msgstr "Dopo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:449
+msgid "Save copy…"
+msgstr "Salva copia..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:466
+msgid "Import encryption key"
+msgstr "Importa chiave di crittografia"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:476
+msgid "Import"
+msgstr "Importare"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:485
+msgid "Key file"
+msgstr "Fascicolo chiave"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:486
+msgid "No file selected yet"
+msgstr "Nessun file ancora selezionato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:488
+msgid "Choose file…"
+msgstr "Scegli file..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:508
+msgid ""
+"Choose the PBS key file (JSON), enter a display name and the encryption "
+"password, then tap Import."
+msgstr ""
+"Scegli il file della chiave PBS (JSON), inserisci un nome visualizzato e la "
+"password di crittografia, quindi tocca Importa."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:537
+msgid "Select encryption key file"
+msgstr "Seleziona il file della chiave di crittografia"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:552
+msgid "Could not read the selected file path."
+msgstr "Impossibile leggere il percorso del file selezionato."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:567
+msgid "Name is required."
+msgstr "Il nome è obbligatorio."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:572
+msgid "Encryption password is required."
+msgstr "È richiesta la password di crittografia."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:576
+msgid "Choose a key file first."
+msgstr "Scegli prima un file chiave."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:597
+msgid "Key «{name}» imported."
+msgstr "Chiave «__PH0__» importata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:604
+msgid "Import failed: {err}"
+msgstr "Importazione non riuscita: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:647
+msgid "Key file is missing on disk."
+msgstr "Il file chiave manca sul disco."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:663
+msgid "Could not save key file."
+msgstr "Impossibile salvare il file chiave."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:666
+msgid ""
+"Key file saved. Keep it separate from this computer and from the backup "
+"server."
+msgstr ""
+"File chiave salvato. Tienilo separato da questo computer e dal server di "
+"backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:692
+msgid "Delete key «{name}»?"
+msgstr "Eliminare la chiave «__PH0__»?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:693
+msgid "Profiles using this key must be changed first."
+msgstr "I profili che utilizzano questa chiave devono essere prima modificati."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:714
+msgid "Encryption key deleted."
+msgstr "Chiave di crittografia eliminata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/encryption_keys/mod.rs:719
+msgid "Could not delete: {err}"
+msgstr "Impossibile eliminare: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:151
+msgid "Restore running…"
+msgstr "Ripristina esecuzione..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:191
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:321
+msgid "Select a snapshot"
+msgstr "Seleziona un'istantanea"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:234
+msgid "Go up"
+msgstr "Vai su"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:257
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:815
+msgid "Search in this folder"
+msgstr "Cerca in questa cartella"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:264
+msgid "Check all files and folders in this folder"
+msgstr "Controlla tutti i file e le cartelle in questa cartella"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:271
+msgid "Uncheck all selected items"
+msgstr "Deseleziona tutti gli elementi selezionati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:322
+msgid ""
+"Choose a snapshot on the left to browse files and restore individual items."
+msgstr ""
+"Scegli un'istantanea a sinistra per sfogliare i file e ripristinare singoli "
+"elementi."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:334
+msgid "Files in backup"
+msgstr "File nel backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:348
+msgid "Restore destination"
+msgstr "Ripristina destinazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:349
+msgid "Local folder where recovered files will be written"
+msgstr "Cartella locale in cui verranno scritti i file recuperati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:353
+msgid "Folder on this computer"
+msgstr "Cartella su questo computer"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:360
+msgid "Choose folder…"
+msgstr "Scegli la cartella..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:367
+msgid "Overwrite existing files"
+msgstr "Sovrascrivi i file esistenti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:368
+msgid "Replace files that already exist in the target folder"
+msgstr "Sostituisci i file già esistenti nella cartella di destinazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:373
+msgid "Restore to original location"
+msgstr "Ripristina nella posizione originale"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:374
+msgid ""
+"Use the backup source path that matches the selected archive (when available)"
+msgstr ""
+"Utilizza il percorso di origine del backup che corrisponde all'archivio "
+"selezionato (se disponibile)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:384
+msgid "Restore entire archive"
+msgstr "Ripristina l'intero archivio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:389
+msgid "Restore selected"
+msgstr "Ripristina selezionato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:814
+msgid "Search backup paths"
+msgstr "Cerca percorsi di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:936
+msgid "Could not load preview for {archive}: {err}"
+msgstr "Impossibile caricare l'anteprima per {archive}: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:991
+msgid "Restore selected ({count})"
+msgstr "Ripristina selezionato ({count})"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1229
+msgid "No snapshots found for this profile."
+msgstr "Nessuno snapshot trovato per questo profilo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1250
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1256
+msgid "Failed to load snapshots: {err}"
+msgstr "Impossibile caricare gli snapshot: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1312
+msgid "Encrypted with key «{name}»"
+msgstr "Crittografato con chiave «__PH0__»"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1313
+msgid "Encrypted , key not stored in BackupPilot"
+msgstr "Crittografato, chiave non archiviata in BackupPilot"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1314
+msgid "Encrypted backup"
+msgstr "Backup crittografato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1433
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1438
+msgid "Failed to load files: {err}"
+msgstr "Impossibile caricare i file: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1477
+msgid "Reading backup catalog…"
+msgstr "Lettura del catalogo di backup…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1485
+msgid "For large backups this can take a few minutes."
+msgstr ""
+"Per backup di grandi dimensioni l'operazione può richiedere alcuni minuti."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1501
+msgid "Loading file list…"
+msgstr "Caricamento elenco file..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1567
+msgid "No backup archives in this snapshot. Check profile backup paths."
+msgstr ""
+"Nessun archivio di backup in questo snapshot. Controlla i percorsi di backup "
+"del profilo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1572
+msgid "No backup paths match your search."
+msgstr "Nessun percorso di backup corrisponde alla tua ricerca."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1609
+msgid "No files in this archive root (catalog empty or still loading)."
+msgstr ""
+"Nessun file in questa radice dell'archivio (catalogo vuoto o ancora in "
+"caricamento)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1652
+msgid "No files in this folder. Go up or pick another snapshot."
+msgstr "Nessun file in questa cartella. Vai su o scegli un'altra istantanea."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1655
+msgid "No files match your search."
+msgstr "Nessun file corrisponde alla tua ricerca."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1720
+msgid "Writing files to {target}. This may take a while for large restores."
+msgstr ""
+"Scrittura di file su {target}. L'operazione potrebbe richiedere del tempo "
+"per i ripristini di grandi dimensioni."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1725
+msgid "Writing files from «{name}» to {target}. This may take a while."
+msgstr ""
+"Scrittura di file da «__PH0__» a {target}. L'operazione potrebbe richiedere "
+"del tempo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1825
+msgid "Choose a restore folder or enable restore to original location."
+msgstr ""
+"Scegli una cartella di ripristino o abilita il ripristino nella posizione "
+"originale."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1846
+msgid "Selected files must belong to the same backup archive."
+msgstr "I file selezionati devono appartenere allo stesso archivio di backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1855
+msgid "No backup archive selected. Reload the file list."
+msgstr "Nessun archivio di backup selezionato. Ricaricare l'elenco dei file."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1885
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:895
+msgid "Restore started in the background."
+msgstr "Il ripristino è iniziato in background."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1915
+msgid "Restore could not be started"
+msgstr "Impossibile avviare il ripristino"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1920
+msgid "Restore failed: {err}"
+msgstr "Ripristino non riuscito: {err}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1934
+msgid "Choose restore target folder"
+msgstr "Scegli la cartella di destinazione del ripristino"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1987
+msgid "{count} file(s) already exist at the target. Overwrite them?"
+msgstr "I file {count} esistono già nella destinazione. Sovrascriverli?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:1999
+msgid "Files already exist"
+msgstr "I file esistono già"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/mod.rs:2003
+msgid "Overwrite"
+msgstr "Sovrascrivi"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:101
+msgid "Expand to preview top-level folders"
+msgstr "Espandi per visualizzare in anteprima le cartelle di livello superiore"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:110
+msgid "Archive , double-click to open, - to collapse preview"
+msgstr "Archivio, fare doppio clic per aprire, - per comprimere l'anteprima"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:111
+msgid "Archive {name}"
+msgstr "Archivio {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:130
+msgid "Mount read-only in file manager…"
+msgstr "Monta la sola lettura nel file manager…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:135
+msgid "Mounted , click to open in file manager"
+msgstr "Montato, fare clic per aprire nel file manager"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:140
+msgid "Mounting…"
+msgstr "Montaggio…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:179
+msgid "Restore this folder and everything inside it"
+msgstr "Ripristina questa cartella e tutto ciò che contiene"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:180
+msgid "Restore this file"
+msgstr "Ripristina questo file"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:191
+msgid "Folder , double-click to open, checkbox to restore all contents"
+msgstr ""
+"Cartella, fare doppio clic per aprire, casella di controllo per ripristinare "
+"tutti i contenuti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:192
+msgid "File"
+msgstr "File"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:221
+msgid "Parent folder"
+msgstr "Cartella principale"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:288
+msgid "Backup paths in this snapshot"
+msgstr "Percorsi di backup in questo snapshot"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:291
+msgid "Inside archive {name}"
+msgstr "Archivio interno {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/restore/browser.rs:293
+msgid "/ (archive root)"
+msgstr "/ (radice dell'archivio)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:51
+msgid "Version"
+msgstr "Versione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:65
+msgid "Copyright"
+msgstr "Copyright"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:73
+msgid "License"
+msgstr "Licenza"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:74
+msgid "GNU Affero General Public License v3.0 or later"
+msgstr "GNU Affero General Public License v3.0 o successiva"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:80
+msgid "Website"
+msgstr "Sito web"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:90
+msgid "Support"
+msgstr "Supporto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:91
+msgid "Open support ticket"
+msgstr "Apri ticket di supporto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:114
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:138
+msgid "Check for updates"
+msgstr "Controlla gli aggiornamenti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:115
+msgid "Tap to search for a newer version."
+msgstr "Tocca per cercare una versione più recente."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:127
+msgid "View available update"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:129
+msgid "Version {version}"
+msgstr "Versione {version}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:145
+msgid "Release page"
+msgstr "Pagina di rilascio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:254
+msgid "{app} (proxmox-backup-client {pbs})"
+msgstr "{app} (proxmox-backup-client {pbs})"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/about.rs:266
+msgid "Copyright © 2018-{year} OneSystems GmbH (Michael Kleger)"
+msgstr "Copyright © 2018-{year} OneSystems GmbH (Michael Kleger)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:88
+msgid "Proxmox Backup Client"
+msgstr "Client di backup Proxmox"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:96
+msgid "Detected system: {system}"
+msgstr "Sistema rilevato: {system}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:114
+msgid ""
+"Configure the official Proxmox APT repository and install proxmox-backup-"
+"client (sudo required)"
+msgstr ""
+"Configura il repository APT ufficiale di Proxmox e installa proxmox-backup-"
+"client (sudo richiesto)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:117
+msgid ""
+"Enable COPR derenderkeks/proxmox-backup-client and install proxmox-backup-"
+"client (Fedora/RHEL, sudo required)"
+msgstr ""
+"Abilita COPR derenderkeks/proxmox-backup-client e installa proxmox-backup-"
+"client (Fedora/RHEL, sudo richiesto)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:126
+msgid "Install in terminal"
+msgstr "Installa nel terminale"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:141
+msgid "Copy install script"
+msgstr "Copia lo script di installazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:142
+msgid "Paste into a root shell if you prefer to install manually"
+msgstr "Incolla in una shell di root se preferisci installare manualmente"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:148
+msgid "Install script copied to clipboard"
+msgstr "Installa lo script copiato negli appunti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:161
+msgid "COPR package page"
+msgstr "Pagina del pacchetto COPR"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:163
+msgid ""
+"Community build for Fedora and RHEL (derenderkeks/proxmox-backup-client)"
+msgstr ""
+"Creazione della community per Fedora e RHEL (derenderkeks/proxmox-backup-"
+"client)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:171
+msgid "Open installation guide"
+msgstr "Apri la guida all'installazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:172
+msgid "Official Proxmox Backup Server documentation (Debian/Ubuntu)"
+msgstr "Documentazione ufficiale del server di backup Proxmox (Debian/Ubuntu)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:286
+msgid ""
+"Terminal opened. Enter your administrator password when prompted (sudo)."
+msgstr ""
+"Terminale aperto. Inserisci la password dell'amministratore quando richiesto "
+"(sudo)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:291
+msgid ""
+"Could not open a terminal , install script copied to clipboard. Run it in a "
+"root shell."
+msgstr ""
+"Impossibile aprire un terminale, installare lo script copiato negli appunti. "
+"Eseguilo in una shell di root."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:295
+msgid "Terminal could not be started"
+msgstr "Impossibile avviare il terminale"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:300
+msgid "Could not prepare installation files. Check write access to /tmp."
+msgstr ""
+"Impossibile preparare i file di installazione. Controllare l'accesso in "
+"scrittura a /tmp."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:302
+msgid "Installation not started"
+msgstr "Installazione non avviata"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:319
+msgid "Press Enter to close…"
+msgstr "Premi Invio per chiudere..."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:504
+msgid "proxmox-backup-client was not found after installation"
+msgstr "proxmox-backup-client non è stato trovato dopo l'installazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:508
+msgid "Installation script failed"
+msgstr "Lo script di installazione non è riuscito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:548
+msgid "BackupPilot , installing Proxmox Backup Client"
+msgstr "BackupPilot, installazione di Proxmox Backup Client"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:549
+msgid ""
+"Administrator rights are required. You will be prompted for your sudo "
+"password."
+msgstr ""
+"Sono richiesti i diritti di amministratore. Ti verrà richiesta la password "
+"sudo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:550
+msgid "Starting installation…"
+msgstr "Avvio dell'installazione…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:551
+msgid "Installation finished."
+msgstr "Installazione terminata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:552
+msgid "Installation failed. See the messages above."
+msgstr "Installazione non riuscita. Vedi i messaggi qui sopra."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:605
+msgid ""
+"Install from the AUR or use the static client binary from the Proxmox "
+"documentation."
+msgstr ""
+"Installa da AUR o utilizza il file binario client statico dalla "
+"documentazione di Proxmox."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/pbs_client_setup.rs:607
+msgid "See the Proxmox PBS installation guide for client-only repositories."
+msgstr ""
+"Consulta la guida all'installazione di Proxmox PBS per i repository solo "
+"client."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:142
+msgid "Start at login"
+msgstr "Inizia al login"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:143
+msgid ""
+"Show the tray icon and run scheduled backups after you sign in. The main "
+"window stays closed until you open it from the tray."
+msgstr ""
+"Mostra l'icona nella barra delle applicazioni ed esegui backup pianificati "
+"dopo l'accesso. La finestra principale rimane chiusa finché non la apri "
+"dalla barra delle applicazioni."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:149
+msgid "Applies to all backup profiles."
+msgstr "Si applica a tutti i profili di backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:154
+msgid "Check backup server reachability"
+msgstr "Controlla la raggiungibilità del server di backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:155
+msgid ""
+"Skip backups when the backup server cannot be reached before the run starts."
+msgstr ""
+"Saltare i backup quando non è possibile raggiungere il server di backup "
+"prima dell'avvio dell'esecuzione."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:168
+msgid "Warn after (days)"
+msgstr "Avvisa dopo (giorni)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:169
+msgid "Show a warning when no successful backup has run for this long."
+msgstr ""
+"Mostra un avviso quando non viene eseguito alcun backup riuscito per questo "
+"tempo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:183
+msgid "Mark backup health as critical after this many days without success."
+msgstr ""
+"Contrassegnare l'integrità del backup come critica dopo molti giorni senza "
+"successo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:196
+msgid "Keep log entries (days)"
+msgstr "Conserva le voci del registro (giorni)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:197
+msgid ""
+"Backup runs and system events older than this are removed automatically. Set "
+"to 0 to keep all entries."
+msgstr ""
+"Le esecuzioni di backup e gli eventi di sistema precedenti a questo vengono "
+"rimossi automaticamente. Impostare su 0 per mantenere tutte le voci."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:202
+msgid "Desktop notifications"
+msgstr "Notifiche sul desktop"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:203
+msgid "Show GNOME/libnotify messages from BackupPilot."
+msgstr "Mostra i messaggi GNOME/libnotify da BackupPilot."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:208
+msgid "Backup in progress"
+msgstr "Backup in corso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:209
+msgid ""
+"Live progress in the GNOME notification center while a backup is running."
+msgstr ""
+"Avanzamento in tempo reale nel centro notifiche di GNOME mentre è in "
+"esecuzione un backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:215
+msgid "Successful backups"
+msgstr "Backup riusciti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:221
+msgid "Failed backups"
+msgstr "Backup non riusciti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:227
+msgid "Skipped backups"
+msgstr "Backup saltati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:228
+msgid "For example when preflight checks fail or all backups are paused."
+msgstr ""
+"Ad esempio quando i controlli preliminari falliscono o tutti i backup "
+"vengono sospesi."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:234
+msgid "Restore finished"
+msgstr "Ripristino terminato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:240
+msgid "Overdue backups"
+msgstr "Backup scaduti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:241
+msgid "Desktop notification when backup health is warning or critical."
+msgstr ""
+"Notifica desktop quando l'integrità del backup è avviso o critica."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:247
+msgid "Updates available"
+msgstr "Aggiornamenti disponibili"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:248
+msgid "Desktop notification when a newer release is available."
+msgstr "Notifica desktop quando è disponibile una versione più recente."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:254
+msgid "Show tray icon"
+msgstr "Mostra l'icona nella barra delle applicazioni"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:255
+msgid "Restart BackupPilot to apply changes to the tray icon."
+msgstr ""
+"Riavviare BackupPilot per applicare le modifiche all'icona nella barra delle "
+"applicazioni."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:260
+msgid "Pause all backups"
+msgstr "Metti in pausa tutti i backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:261
+msgid "Scheduled and manual backups are skipped until turned off."
+msgstr ""
+"I backup pianificati e manuali vengono saltati finché non vengono "
+"disattivati."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:266
+msgid "Close window to tray"
+msgstr "Chiudi la finestra sul vassoio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:267
+msgid ""
+"Closing the main window hides it; the app keeps running in the background."
+msgstr ""
+"Chiudendo la finestra principale la si nasconde; l'app continua a funzionare "
+"in background."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:280
+msgid "Check for updates automatically"
+msgstr "Controlla automaticamente gli aggiornamenti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:281
+msgid "Checked daily by the background service against GitLab releases."
+msgstr ""
+"Controllato quotidianamente dal servizio in background rispetto alle "
+"versioni GitLab."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:287
+msgid "Notify when an update is available"
+msgstr "Avvisa quando è disponibile un aggiornamento"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:292
+msgid "Check for updates now"
+msgstr "Controlla subito gli aggiornamenti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:293
+msgid "Uses GitLab releases for this application."
+msgstr "Utilizza le versioni GitLab per questa applicazione."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:328
+msgid "Startup"
+msgstr "Avvio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:337
+msgid ""
+"Default conditions and health thresholds for all profiles (applied when you "
+"save settings)."
+msgstr ""
+"Condizioni predefinite e soglie di integrità per tutti i profili (applicate "
+"quando si salvano le impostazioni)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:346
+msgid "Health checks"
+msgstr "Controlli sanitari"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:347
+msgid "When to warn about missing successful backups across all profiles."
+msgstr ""
+"Quando avvisare in caso di backup riusciti mancanti in tutti i profili."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:356
+msgid "Activity log"
+msgstr "Registro delle attività"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:357
+msgid ""
+"Limits how much backup history is stored locally. The background service "
+"removes older entries once per day."
+msgstr ""
+"Limita la quantità di cronologia di backup archiviata localmente. Il "
+"servizio in background rimuove le voci meno recenti una volta al giorno."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:365
+msgid "Notifications"
+msgstr "Notifiche"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:382
+msgid "Tray & behavior"
+msgstr "Vassoio e comportamento"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:392
+msgid "Language & appearance"
+msgstr "Linguaggio e aspetto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:417
+msgid "Reset"
+msgstr "Reset"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:418
+msgid "Remove all local BackupPilot data from this computer."
+msgstr "Rimuovere tutti i dati BackupPilot locali da questo computer."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:422
+msgid "Reset all data"
+msgstr "Reimposta tutti i dati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:423
+msgid ""
+"Deletes settings, profiles, backup history, caches and autostart "
+"configuration. This cannot be undone."
+msgstr ""
+"Elimina impostazioni, profili, cronologia di backup, cache e configurazione "
+"di avvio automatico. Questa operazione non può essere annullata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:428
+msgid "Reset…"
+msgstr "Reset…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:447
+msgid "Reset BackupPilot?"
+msgstr "Reimpostare BackupPilot?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:448
+msgid ""
+"All profiles, backup history, settings and cached data on this computer will "
+"be permanently deleted."
+msgstr ""
+"Tutti i profili, la cronologia dei backup, le impostazioni e i dati "
+"memorizzati nella cache di questo computer verranno eliminati "
+"definitivamente."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:451
+msgid "Reset everything"
+msgstr "Resetta tutto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:498
+msgid "All local data was reset."
+msgstr "Tutti i dati locali sono stati ripristinati."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:504
+msgid "Reset failed"
+msgstr "Reimpostazione non riuscita"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:505
+msgid "Could not reset: {detail}"
+msgstr "Impossibile reimpostare: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:513
+msgid ""
+"Checks GitLab once per day for new releases. When an update is available, "
+"you can open the release page to download a Flatpak bundle (no automatic "
+"install)."
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:515
+msgid ""
+"Checks GitLab once per day for new stable or beta releases. When an update "
+"is available, you are asked before .deb or .rpm packages are downloaded and "
+"installed."
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:518
+msgid "Updates"
+msgstr "Aggiornamenti"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:530
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:549
+msgid "System default"
+msgstr "Predefinito del sistema"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:531
+msgid "German"
+msgstr "tedesco"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:532
+msgid "English"
+msgstr "Inglese"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:533
+msgid "French"
+msgstr "francese"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:534
+msgid "Italian"
+msgstr "Italiano"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:537
+msgid "Language"
+msgstr "Lingua"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:539
+msgid ""
+"The interface updates immediately. Notifications and the background service "
+"use the new language after a full restart."
+msgstr ""
+"L'interfaccia si aggiorna immediatamente. Le notifiche e il servizio in "
+"background utilizzano la nuova lingua dopo un riavvio completo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:550
+msgid "Light"
+msgstr "Leggero"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:551
+msgid "Dark"
+msgstr "Buio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:554
+msgid "Appearance"
+msgstr "Aspetto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:562
+msgid "Stable"
+msgstr "Stabile"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:562
+msgid "Beta (preview)"
+msgstr "Beta (anteprima)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:564
+msgid "Release channel"
+msgstr "Canale di rilascio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/settings.rs:765
+msgid "Log retention must be 0 (keep all) or between 7 and 3650 days."
+msgstr ""
+"La conservazione del log deve essere 0 (mantieni tutto) o compresa tra 7 e "
+"3650 giorni."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/autostart.rs:370
+msgid "systemctl failed: {detail}"
+msgstr "systemctl non riuscito: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:83
+msgid "Open BackupPilot"
+msgstr "Apri BackupPilot"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:106
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:220
+msgid "Stop backup"
+msgstr "Interrompi il backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:114
+msgid "Resume scheduled backups"
+msgstr "Riprendere i backup pianificati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:115
+msgid "Pause scheduled backups"
+msgstr "Sospendere i backup pianificati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:119
+msgid "Open restore"
+msgstr "Apri ripristino"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:128
+msgid "Open log"
+msgstr "Apri registro"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray.rs:158
+msgid "Quit"
+msgstr "Esentato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:124
+msgid "{name}: {detail}"
+msgstr "{name}: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:134
+msgid "Warning"
+msgstr "Avvertimento"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:135
+msgid "Critical"
+msgstr "Critico"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:136
+msgid "Unknown"
+msgstr "Sconosciuto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/tray_state.rs:150
+msgid "{name} ({health}): {run}"
+msgstr "{name} ({health}): {run}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:29
+msgid "Preflight check failed"
+msgstr "Controllo preliminare non riuscito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:33
+msgid "Backup not started: {msg}"
+msgstr "Backup non avviato: {msg}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:47
+msgid ""
+"Backup running , see Overview for progress. Large backups can take a while."
+msgstr ""
+"Backup in esecuzione, vedere Panoramica per l'avanzamento. I backup di "
+"grandi dimensioni possono richiedere del tempo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:130
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1029
+msgid "Backup completed: {name}"
+msgstr "Backup completato: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:137
+msgid "Backup skipped ({name}): {reason}"
+msgstr "Backup saltato ({name}): {reason}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/status_poll.rs:148
+msgid "Backup failed ({name}): {reason}"
+msgstr "Backup non riuscito ({name}): {reason}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:57
+msgid "Last update check failed: {detail}"
+msgstr "Controllo dell'ultimo aggiornamento non riuscito: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:62
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:88
+msgid "You are running the latest version."
+msgstr "Stai utilizzando la versione più recente."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:68
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:76
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:78
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:222
+msgid "Checking for updates…"
+msgstr "Controllo aggiornamenti…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:121
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:122
+msgid "Update check failed: {detail}"
+msgstr "Controllo aggiornamento non riuscito: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:169
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:244
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:270
+msgid "New version available"
+msgstr "Nuova versione disponibile"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:188
+msgid "Last check failed: {detail}"
+msgstr "Ultimo controllo fallito: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:203
+msgid "Installed version {version}"
+msgstr "Versione installata {version}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:240
+msgid "Version {version} is available. Do you want to update now?{notes}"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:247
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:273
+msgid "Not now"
+msgstr "Non adesso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:248
+msgid "Update now"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:266
+msgid ""
+"Version {version} is available. Open the release page to download the "
+"Flatpak bundle or installation instructions.{notes}"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:274
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:295
+msgid "Open release page"
+msgstr "Apri la pagina di rilascio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:290
+msgid "Updates not supported"
+msgstr "Aggiornamenti non supportati"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:292
+msgid ""
+"Automatic installation is only available on Debian/Ubuntu (.deb) and Fedora/"
+"RHEL (.rpm) systems."
+msgstr ""
+"L'installazione automatica è disponibile solo sui sistemi Debian/Ubuntu "
+"(.deb) e Fedora/RHEL (.rpm)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:311
+msgid "Downloading update…"
+msgstr "Download dell'aggiornamento…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:322
+msgid "Installing update…"
+msgstr "Installazione dell'aggiornamento…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:337
+msgid "Update installed"
+msgstr "Aggiornamento installato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:339
+msgid ""
+"Restart BackupPilot to use the new version. The background service will be "
+"restarted."
+msgstr ""
+"Riavviare BackupPilot per utilizzare la nuova versione. Il servizio in "
+"background verrà riavviato."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:343
+msgid "Restart now"
+msgstr "Ricomincia adesso"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:356
+msgid "Update failed"
+msgstr "Aggiornamento non riuscito"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-gui/src/updates.rs:358
+msgid "Could not install the update: {detail}"
+msgstr "Impossibile installare l'aggiornamento: {detail}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:179
+msgid "Interrupted (application restarted)"
+msgstr "Interrotto (applicazione riavviata)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:350
+msgid "Cancelling backup…"
+msgstr "Annullamento backup…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:390
+msgid "All scheduled backups are paused in settings"
+msgstr "Tutti i backup pianificati vengono sospesi nelle impostazioni"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:429
+msgid ""
+"This profile runs on the host via backuppilot-cli (systemd/cron). Start it "
+"with: backuppilot-cli backup <name>"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:484
+msgid ""
+"A backup for this backup target is already running on the server or in "
+"BackupPilot."
+msgstr ""
+"Un backup per questa destinazione di backup è già in esecuzione sul server o "
+"in BackupPilot."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:524
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1052
+msgid "Backup «{name}»"
+msgstr "Backup «__PH0__»"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:530
+msgid "Preparing backup…"
+msgstr "Preparazione del backup…"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:590
+msgid ""
+"A backup for this profile is already running. Use Stop to cancel it first."
+msgstr ""
+"Un backup per questo profilo è già in esecuzione. Utilizzare Stop per "
+"annullarlo prima."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:636
+msgid "Backup cancelled"
+msgstr "Backup annullato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:821
+msgid "Restore blocked to avoid overwriting existing files."
+msgstr "Ripristino bloccato per evitare di sovrascrivere i file esistenti."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:990
+msgid "Restore completed: {name}"
+msgstr "Ripristino completato: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:991
+msgid "Files were restored to {target}."
+msgstr "I file sono stati ripristinati in {target}."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:996
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1048
+msgid "unknown error"
+msgstr "errore sconosciuto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:998
+msgid "Restore failed: {name}"
+msgstr "Ripristino non riuscito: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1017
+msgid "Another backup is already running for this backup target."
+msgstr "Un altro backup è già in esecuzione per questa destinazione di backup."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1030
+msgid "The backup finished successfully."
+msgstr "Il backup è stato completato con successo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1035
+msgid "Skipped by preflight"
+msgstr "Saltato dal preflight"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1037
+msgid "Backup skipped: {name}"
+msgstr "Backup saltato: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1042
+msgid "Backup cancelled: {name}"
+msgstr "Backup annullato: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-daemon/src/service.rs:1043
+msgid "The backup was stopped."
+msgstr "Il backup è stato interrotto."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/main.rs:276
+msgid "No backups are currently running."
+msgstr "Nessun backup in esecuzione."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:60
+msgid "Update check timed out."
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:79
+msgid "You are running the latest version ({version})."
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:128
+msgid "backuppilot-cli"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:130
+msgid "Version {version} is available (installed: {installed})."
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:141
+msgid "Open the release page to download the Flatpak bundle: {url}"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:146
+msgid "Install via BackupPilot (About) or download: {url}"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/update_notice.rs:151
+msgid "See the release page: {url}"
+msgstr ""
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:37
+msgid "No snapshots found for profile {name}."
+msgstr "Nessuno snapshot per il profilo {name}."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:78
+msgid "No archives in snapshot {snapshot}."
+msgstr "Nessun archivio nello snapshot {snapshot}."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:136
+msgid "No entries under '{path}' in {snapshot}/{archive}."
+msgstr "Nessuna voce sotto «{path}» in {snapshot}/{archive}."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:147
+msgid "dir"
+msgstr "cartella"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:149
+msgid "file"
+msgstr "file"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:211
+msgid "Restore completed: {target}"
+msgstr "Ripristino completato: {target}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:219
+msgid "Conflict"
+msgstr "Conflitto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:242
+msgid "No active mounts (including from earlier CLI runs)."
+msgstr "Nessun mount attivo (anche da precedenti esecuzioni CLI)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:318
+msgid "Mounted at: {path}"
+msgstr "Montato in: {path}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:322
+msgid "Mount ID: {id}"
+msgstr "ID mount: {id}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:343
+msgid "All mounts were disconnected."
+msgstr "Tutti i mount sono stati disconnessi."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:354
+msgid "Provide a mount id (from `mounts`) or use --all."
+msgstr "Fornire un ID mount (da `mounts`) o usare --all."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:372
+msgid "Mount disconnected: {id}"
+msgstr "Mount disconnesso: {id}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:396
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:757
+msgid "encrypted"
+msgstr "crittografato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_ops.rs:398
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:759
+msgid "plain"
+msgstr "non crittografato"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:68
+msgid "No active FUSE mounts under ~/.local/share/backuppilot/mounts/."
+msgstr "Nessun mount FUSE attivo in ~/.local/share/backuppilot/mounts/."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:72
+msgid "GUI mounts are managed by the daemon (see the app for an overview)."
+msgstr "I mount GUI sono gestiti dal daemon (vedi l'app)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:79
+msgid "Disconnect all {count} mounts"
+msgstr "Disconnetti tutti i {count} mount"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:96
+msgid "Disconnect mount"
+msgstr "Disconnetti mount"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:127
+msgid "Restore files to disk"
+msgstr "Ripristina file su disco"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:128
+msgid "Mount archive read-only (file manager)"
+msgstr "Monta archivio in sola lettura (file manager)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:129
+msgid "Browse files only"
+msgstr "Sfoglia solo i file"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:134
+msgid "What would you like to do?"
+msgstr "Cosa vuoi fare?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:176
+msgid "No profiles configured."
+msgstr "Nessun profilo configurato."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:185
+msgid "Choose profile"
+msgstr "Scegli profilo"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:198
+msgid "Loading snapshots from PBS …"
+msgstr "Caricamento snapshot da PBS …"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:207
+msgid "No snapshots for profile {name}."
+msgstr "Nessuno snapshot per il profilo {name}."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:218
+msgid "Choose snapshot"
+msgstr "Scegli snapshot"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:233
+msgid "Resolving archives …"
+msgstr "Ricerca archivi …"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:241
+msgid ""
+"No archives found — check profile paths in the app or load the PBS manifest."
+msgstr ""
+"Nessun archivio — controlla i percorsi nel profilo nell'app o carica il "
+"manifest PBS."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:263
+msgid "Choose archive / backup path"
+msgstr "Scegli archivio / percorso backup"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:295
+msgid "FUSE is not available (install the fuse3 package)."
+msgstr "FUSE non disponibile (installare il pacchetto fuse3)."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:301
+msgid "Mount archive read-only? (network access to PBS; only trusted backups)"
+msgstr ""
+"Montare l'archivio in sola lettura? (accesso di rete a PBS; solo backup "
+"attendibili)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:321
+msgid "Open in file manager?"
+msgstr "Aprire nel file manager?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:340
+msgid "Guided mode does not support --json."
+msgstr "La modalità guidata non supporta --json."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:343
+msgid "Guided mode requires an interactive terminal."
+msgstr "La modalità guidata richiede un terminale interattivo."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:356
+msgid "Entire archive"
+msgstr "Intero archivio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:357
+msgid "Select specific files or folders"
+msgstr "Seleziona file o cartelle specifici"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:358
+msgid "Enter glob patterns (e.g. Documents/**)"
+msgstr "Inserire pattern glob (es. Documents/**)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:362
+msgid "Restore scope"
+msgstr "Ambito del ripristino"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:379
+msgid "Glob patterns (comma-separated for multiple)"
+msgstr "Pattern glob (separati da virgola)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:405
+msgid "Restore in progress (may take a long time) …"
+msgstr "Ripristino in corso (può richiedere tempo) …"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:419
+msgid "Select files or folders with Enter. Then choose Done."
+msgstr "Seleziona con Invio. Poi scegli Fine."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:422
+msgid "No space bar needed — each entry runs an action immediately."
+msgstr "Non serve la barra spaziatrice — ogni voce esegue un'azione subito."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:437
+msgid "Archive root"
+msgstr "Radice archivio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:442
+msgid "{location} — selected: {count}"
+msgstr "{location} — selezionati: {count}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:459
+msgid "Please select at least one file or folder."
+msgstr "Seleziona almeno un file o una cartella."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:506
+msgid "► Done — choose target folder (nothing selected yet)"
+msgstr "► Fine — scegli cartella di destinazione (nessuna selezione)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:509
+msgid "► Done — restore {count} item(s), choose target folder"
+msgstr "► Fine — ripristina {count} elemento/i, scegli destinazione"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:517
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:688
+msgid "↑ Parent folder"
+msgstr "↑ Cartella superiore"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:524
+msgid "− Remove folder: {name}"
+msgstr "− Rimuovi cartella: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:527
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:692
+msgid "→ Open folder: {name}"
+msgstr "→ Apri cartella: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:529
+msgid "+ Select folder: {name}"
+msgstr "+ Seleziona cartella: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:535
+msgid "− Deselect file: {name}"
+msgstr "− Deseleziona file: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:538
+msgid "+ Select file: {name}"
+msgstr "+ Seleziona file: {name}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:562
+msgid "unknown"
+msgstr "sconosciuto"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:569
+msgid "Original path ({path})"
+msgstr "Percorso originale ({path})"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:570
+msgid "Enter another target folder …"
+msgstr "Inserire un'altra cartella di destinazione …"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:574
+msgid "Restore to"
+msgstr "Ripristina in"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:598
+msgid "Target directory on disk"
+msgstr "Directory di destinazione su disco"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:611
+msgid "No target directory specified."
+msgstr "Nessuna directory di destinazione specificata."
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:616
+msgid "Overwrite existing files under {target}?"
+msgstr "Sovrascrivere i file esistenti in {target}?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:621
+msgid "Overwrite existing files in {target}?"
+msgstr "Sovrascrivere i file esistenti in {target}?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:633
+msgid "Summary:"
+msgstr "Riepilogo:"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:635
+msgid "Scope: entire archive"
+msgstr "Ambito: intero archivio"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:639
+msgid "Scope: {count} path(s)/pattern(s)"
+msgstr "Ambito: {count} percorso/i/pattern"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:647
+msgid "Target: {target}"
+msgstr "Destinazione: {target}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:650
+msgid "yes"
+msgstr "sì"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:652
+msgid "no (abort on conflicts)"
+msgstr "no (interrompi in caso di conflitto)"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:656
+msgid "Overwrite: {value}"
+msgstr "Sovrascrivi: {value}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:660
+msgid "Start restore now?"
+msgstr "Avviare il ripristino ora?"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:685
+msgid "← Exit"
+msgstr "← Esci"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:701
+msgid "Contents of {archive}"
+msgstr "Contenuto di {archive}"
+
+#: /home/mkleger/Entwicklung/Applikationen/BackupPilot/App/crates/backuppilot-cli/src/restore_wizard.rs:703
+msgid "Contents of /{path}"
+msgstr "Contenuto di /{path}"
+
+#~ msgid "Version {version} is ready to install."
+#~ msgstr "La versione {version} è pronta per l'installazione."
+
+#~ msgid "Install available update"
+#~ msgstr "Installa l'aggiornamento disponibile"
+
+#~ msgid ""
+#~ "Checks GitLab once per day for new stable or beta releases and can "
+#~ "install .deb or .rpm packages after confirmation."
+#~ msgstr ""
+#~ "Controlla GitLab una volta al giorno per nuove versioni stabili o beta e "
+#~ "può installare pacchetti .deb o .rpm dopo la conferma."
+
+#~ msgid "Version {version} can be installed."
+#~ msgstr "È possibile installare la versione {version}."
+
+#~ msgid ""
+#~ "Version {version} is ready to install.\n"
+#~ "\n"
+#~ "{notes}"
+#~ msgstr ""
+#~ "La versione {version} è pronta per l'installazione.\n"
+#~ "\n"
+#~ "{notes}"
+
+#~ msgid "Install update"
+#~ msgstr "Installa l'aggiornamento"
+
+#~ msgid "Download and install"
+#~ msgstr "Scarica e installa"
+
+#~ msgid "All scheduled backups are paused"
+#~ msgstr "Tutti i backup pianificati vengono sospesi"
+
+#~ msgid "{critical} backup job(s) critically overdue, {warn} warning(s)"
+#~ msgstr "{critical} processi di backup gravemente scaduti, {warn} avvisi"
+
+#~ msgid "{warn} backup job(s) need attention"
+#~ msgstr "I processi di backup {warn} richiedono attenzione"
+
+#~ msgid ""
+#~ "Restart BackupPilot completely to apply the selected language (including "
+#~ "notifications)."
+#~ msgstr ""
+#~ "Riavviare completamente BackupPilot per applicare la lingua selezionata "
+#~ "(comprese le notifiche)."
+
+#~ msgid "Restart BackupPilot"
+#~ msgstr "Riavviare BackupPilot"

@@ -1,0 +1,26 @@
+# Rust build output
+/target/
+
+# Compiled gettext catalogs (regenerate with scripts/i18n-compile.sh)
+/locale/
+messages.mo
+
+# i18n tooling
+/.venv-i18n/
+/po/*.po~
+/po/backuppilot.pot
+
+# Python helpers (scripts/)
+__pycache__/
+*.pyc
+
+# Editor / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Local data / backups
+**/*.rs.bk
+*.db
+*.db-journal

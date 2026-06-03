@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=BackupPilot
+Name[de]=BackupPilot
+Comment=Desktop backup agent for Proxmox Backup Server
+Comment[de]=Desktop-Backup-Agent für den Proxmox Backup Server
+Exec=backuppilot
+Icon=ch.onesystems.backuppilot
+Terminal=false
+Type=Application
+Categories=Utility;System;
+StartupNotify=true
+Keywords=backup;pbs;proxmox;

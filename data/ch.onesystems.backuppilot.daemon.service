@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=ch.onesystems.backuppilot.daemon
+Exec=/usr/bin/backuppilot-daemon
+User=@

@@ -1,0 +1,14 @@
+[Unit]
+Description=BackupPilot background service
+After=dbus.service
+
+[Service]
+Type=dbus
+BusName=ch.onesystems.backuppilot.daemon
+ExecStart=/usr/bin/backuppilot-daemon
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,11 @@
+[package]
+name = "backuppilot-i18n"
+description = "GNU gettext internationalization for BackupPilot"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+gettext-rs = { package = "gettext-rs", version = "0.7", default-features = false, features = ["gettext-system"] }
