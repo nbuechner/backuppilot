@@ -190,11 +190,91 @@ pub fn resolve_pbs_client_binary() -> PathBuf {
         return path;
     }
 
+    #[cfg(windows)]
+    if let Some(wsl_wrapper) = resolve_wsl_pbs_client() {
+        return wsl_wrapper;
+    }
+
     PathBuf::from("proxmox-backup-client")
+}
+
+/// On Windows: if WSL has `proxmox-backup-client`, create a wrapper `.cmd` and return its path.
+#[cfg(windows)]
+pub fn resolve_wsl_pbs_client() -> Option<PathBuf> {
+    // Quick check: is wsl.exe callable?
+    let wsl_up = std::process::Command::new("wsl")
+        .args(["true"])
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+    if !wsl_up {
+        return None;
+    }
+
+    // Check if proxmox-backup-client is installed inside WSL
+    let pbs_ok = std::process::Command::new("wsl")
+        .args(["proxmox-backup-client", "version"])
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false);
+    if !pbs_ok {
+        return None;
+    }
+
+    ensure_wsl_pbs_wrapper().ok()
+}
+
+/// Writes the WSL wrapper scripts to `data_dir()` and returns the `.cmd` path.
+#[cfg(windows)]
+pub fn ensure_wsl_pbs_wrapper() -> std::io::Result<PathBuf> {
+    let dir = data_dir();
+    std::fs::create_dir_all(&dir)?;
+
+    let ps1_path = dir.join("pbs-client-wsl.ps1");
+    let cmd_path = dir.join("pbs-client-wsl.cmd");
+
+    // PowerShell script: translate Windows backup-spec paths to WSL paths, then call wsl
+    let ps1 = r#"param()
+$allArgs = $args
+
+# Forward PBS_ environment variables into WSL via WSLENV
+$env:WSLENV = "PBS_PASSWORD/u:PBS_REPOSITORY/u:PBS_HOST/u:PBS_PORT/u:PBS_DATASTORE/u:PBS_FINGERPRINT/u"
+
+# Translate archive-spec paths: "archive.pxar:C:\path" -> "archive.pxar:/mnt/c/path"
+$translated = $allArgs | ForEach-Object {
+    $a = $_
+    if ($a -match '^([^:]+\.pxar):(.+)$') {
+        $archive  = $Matches[1]
+        $winPath  = $Matches[2]
+        $wslPath  = (& wsl wslpath -u ([string]$winPath)).Trim()
+        "${archive}:${wslPath}"
+    } else {
+        $a
+    }
+}
+
+& wsl proxmox-backup-client @translated
+exit $LASTEXITCODE
+"#;
+    std::fs::write(&ps1_path, ps1.replace('\n', "\r\n"))?;
+
+    // Minimal .cmd launcher (Windows can't execute .ps1 directly)
+    let cmd = format!(
+        "@echo off\r\npowershell.exe -NoProfile -ExecutionPolicy Bypass -File \"{ps1}\" %*\r\nexit /b %ERRORLEVEL%\r\n",
+        ps1 = ps1_path.display()
+    );
+    std::fs::write(&cmd_path, cmd)?;
+
+    Ok(cmd_path)
 }
 
 /// Locate an executable on standard system paths and `$PATH`.
 pub fn find_executable(name: &str) -> Option<PathBuf> {
+    #[cfg(not(windows))]
     for candidate in ["/usr/bin", "/usr/local/bin"] {
         let path = PathBuf::from(candidate).join(name);
         if path.is_file() {
@@ -205,10 +285,19 @@ pub fn find_executable(name: &str) -> Option<PathBuf> {
     let Ok(path_var) = std::env::var("PATH") else {
         return None;
     };
-    for dir in path_var.split(':').filter(|d| !d.is_empty()) {
-        let path = PathBuf::from(dir).join(name);
+
+    // split_paths handles platform-specific separators (`:` on Unix, `;` on Windows)
+    for dir in std::env::split_paths(&path_var) {
+        let path = dir.join(name);
         if path.is_file() {
             return Some(path);
+        }
+        #[cfg(windows)]
+        {
+            let path_exe = dir.join(format!("{name}.exe"));
+            if path_exe.is_file() {
+                return Some(path_exe);
+            }
         }
     }
     None

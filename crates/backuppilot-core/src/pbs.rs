@@ -25,7 +25,7 @@ async fn probe_pbs_binary(path: &Path) -> bool {
     if !path.is_file() {
         return false;
     }
-    Command::new(path)
+    spawn_pbs_command(path)
         .arg("version")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -33,6 +33,25 @@ async fn probe_pbs_binary(path: &Path) -> bool {
         .await
         .map(|s| s.success())
         .unwrap_or(false)
+}
+
+/// Builds a `Command` for the given PBS client binary.
+/// On Windows, `.cmd`/`.bat` wrapper files are launched via `cmd /c` since
+/// `CreateProcess` cannot execute them directly.
+fn spawn_pbs_command(binary: &Path) -> Command {
+    #[cfg(windows)]
+    {
+        let ext = binary
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("");
+        if ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat") {
+            let mut cmd = Command::new("cmd");
+            cmd.args([std::ffi::OsStr::new("/c"), binary.as_os_str()]);
+            return cmd;
+        }
+    }
+    Command::new(binary)
 }
 
 async fn probe_flatpak_host_pbs() -> bool {
@@ -332,7 +351,7 @@ impl PbsClient {
         let repo_arg = parts.pbs_repository_bash_style(&auth_id);
         let password = parts.api_token_secret();
 
-        let mut cmd = Command::new(resolve_pbs_client_binary());
+        let mut cmd = spawn_pbs_command(&resolve_pbs_client_binary());
         apply_pbs_client_env(
             &mut cmd,
             &parts,
