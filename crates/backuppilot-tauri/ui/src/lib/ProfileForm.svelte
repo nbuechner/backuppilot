@@ -20,7 +20,7 @@
   let pbsUser        = $state(existingRepo.user ?? 'root@pam');
   let pbsToken       = $state(existingRepo.token ?? '');
   let pbsDatastore   = $state(existingRepo.datastore ?? '');
-  let pbsFingerprint = $state(profile?.fingerprint ?? '');
+  let pbsFingerprint = $state(profile?.server_fingerprint ?? '');
 
   // Backup config
   let backupId  = $state(isEdit ? (profile.backup_id ?? '') : '');
@@ -87,7 +87,7 @@
       excludes: profile?.excludes ?? [],
       schedule: buildSchedule(),
       conditions: profile?.conditions ?? {
-        execution_context: 'daemon',
+        execution_context: 'desktop',
         require_ac_power: false,
         require_network: [],
         require_vpn: false,
@@ -95,7 +95,7 @@
       },
       health_check: profile?.health_check ?? {},
     };
-    if (pbsFingerprint.trim()) profileData.fingerprint = pbsFingerprint.trim();
+    if (pbsFingerprint.trim()) profileData.server_fingerprint = pbsFingerprint.trim();
 
     saving = true;
     try {

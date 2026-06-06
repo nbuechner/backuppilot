@@ -12,6 +12,8 @@ pub enum ScheduleType {
     Weekly,
     Custom,
     OnLogin,
+    /// Never run automatically; only triggered manually by the user.
+    Manual,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

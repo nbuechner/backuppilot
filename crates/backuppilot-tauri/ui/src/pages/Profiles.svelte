@@ -121,10 +121,11 @@
   <div class="profile-list">
     {#each profiles as p}
       {@const st = statusFor(p.id)}
+      {@const repo = (() => { try { return JSON.parse(p.repository); } catch { return {}; } })()}
       <div class="card profile-card">
         <div class="profile-info">
           <span class="profile-name">{p.name}</span>
-          <span class="profile-host">{p.pbs_server}</span>
+          <span class="profile-host">{repo.host ?? p.repository}</span>
           {#if st?.progress_message}
             <span class="progress-msg">{st.progress_message}</span>
           {/if}

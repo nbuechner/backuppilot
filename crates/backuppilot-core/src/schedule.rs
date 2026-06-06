@@ -17,7 +17,7 @@ pub fn due_schedule_slot(profile: &BackupProfile, now: DateTime<Local>) -> Optio
         ScheduleType::Hourly => hourly_slot(now),
         ScheduleType::Daily => daily_slot(&profile.schedule, now),
         ScheduleType::Weekly => weekly_slot(&profile.schedule, now),
-        ScheduleType::OnLogin => None,
+        ScheduleType::OnLogin | ScheduleType::Manual => None,
         ScheduleType::Custom => custom_slot(&profile.schedule, now),
     }
 }
