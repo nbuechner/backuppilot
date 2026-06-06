@@ -4,8 +4,6 @@
   "identifier": "me.buechner.backuppilot",
   "build": {
     "frontendDist": "ui/dist",
-    "devUrl": "http://localhost:5173",
-    "beforeDevCommand": "cd ui && npm run dev",
     "beforeBuildCommand": "cd ui && npm run build"
   },
   "app": {
