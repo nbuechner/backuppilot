@@ -4,7 +4,6 @@ const os = require('os')
 
 const isWindows = os.platform() === 'win32'
 
-// Path to the compiled debug binary (run `cargo build -p backuppilot-tauri` first)
 const appBin = path.resolve(
   __dirname, '..', '..', '..', 'target', 'debug',
   'backuppilot-tauri' + (isWindows ? '.exe' : '')
@@ -18,8 +17,14 @@ exports.config = {
   specs: ['./test/specs/**/*.js'],
   maxInstances: 1,
 
+  // Connect to the tauri-driver WebDriver server (port 4444)
+  hostname: 'localhost',
+  port: 4444,
+  path: '/',
+
   capabilities: [{
     maxInstances: 1,
+    browserName: '',
     'tauri:options': { application: appBin },
   }],
 
@@ -37,8 +42,6 @@ exports.config = {
   //   Linux/macOS: WebKitWebDriver on PATH
   onPrepare: async () => {
     if (isWindows) {
-      // Auto-download msedgedriver matching the installed WebView2/Edge version.
-      // Reads version from the WebView2 installation directory.
       const { execSync } = require('child_process')
       let edgeVersion
       try {
@@ -47,13 +50,11 @@ exports.config = {
           { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
         ).trim()
       } catch {
-        // Fallback: let edgedriver pick the latest
         edgeVersion = undefined
       }
 
       const { download } = require('edgedriver')
       const driverPath = await download(edgeVersion)
-      // Add the driver directory to PATH so tauri-driver can find it
       process.env.PATH = path.dirname(driverPath) + path.delimiter + process.env.PATH
       console.log(`msedgedriver ready: ${driverPath}`)
     }
@@ -61,6 +62,9 @@ exports.config = {
     tauriDriver = spawn('tauri-driver', [], {
       stdio: [null, process.stdout, process.stderr],
     })
+
+    // Give tauri-driver a moment to bind its port
+    await new Promise(resolve => setTimeout(resolve, 1000))
   },
 
   onComplete: () => {
