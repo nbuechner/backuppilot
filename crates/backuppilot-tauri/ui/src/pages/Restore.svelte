@@ -61,7 +61,7 @@
     try {
       catalog = await listCatalog({
         profile_id: selectedProfile.id,
-        snapshot: selectedSnapshot.backup_id,
+        snapshot: selectedSnapshot.path,
         archive_name: selectedArchive || '',
         parent_path: path,
         force_refresh: false,
@@ -114,7 +114,7 @@
     try {
       const req = {
         profile_id: selectedProfile.id,
-        snapshot: selectedSnapshot.backup_id,
+        snapshot: selectedSnapshot.path,
         archive_name: selectedArchive,
         target_dir: targetDir,
         overwrite,
@@ -138,9 +138,16 @@
     }
   }
 
-  function formatDate(ts) {
+  function formatSnapshotDate(s) {
+    // path = "host/{backup_id}/{ISO8601}"
+    const ts = s.path?.split('/')[2];
     if (!ts) return '—';
-    return new Date(ts * 1000).toLocaleString();
+    return new Date(ts).toLocaleString();
+  }
+
+  function snapshotLabel(s) {
+    const parts = s.path?.split('/') ?? [];
+    return parts[1] ?? s.path ?? '?';
   }
 
   loadProfiles();
@@ -198,11 +205,11 @@
       {#each snapshots as s}
         <button
           class="list-item snapshot-item"
-          class:selected={selectedSnapshot?.backup_id === s.backup_id}
+          class:selected={selectedSnapshot?.path === s.path}
           onclick={() => selectSnapshot(s)}
         >
-          <span class="mono">{s.backup_id}</span>
-          <span class="muted">{formatDate(s.backup_time)}</span>
+          <span class="mono">{snapshotLabel(s)}</span>
+          <span class="muted">{formatSnapshotDate(s)}</span>
         </button>
       {/each}
     {/if}
