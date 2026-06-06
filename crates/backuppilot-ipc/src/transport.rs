@@ -127,10 +127,19 @@ impl IpcServer {
         {
             use tokio::net::windows::named_pipe::ServerOptions;
             // first_pipe_instance(true) fails if another server already owns the pipe.
-            let first = ServerOptions::new()
-                .first_pipe_instance(true)
-                .create(PIPE_NAME)
-                .map_err(|e| IpcError::Connect(format!("pipe already in use: {e}")))?;
+            // security_descriptor with "D:(A;;GA;;;WD)" allows Everyone (World) full access so
+            // the pipe is reachable from any logon session (interactive, SSH, Task Scheduler…).
+            let mut opts = ServerOptions::new();
+            opts.first_pipe_instance(true);
+            // Create the pipe with a permissive DACL so it's reachable from any logon
+            // session (interactive, SSH, Task Scheduler each have separate sessions).
+            #[allow(unsafe_code)]
+            let first = unsafe {
+                let sd = pipe_security_descriptor_allow_all()
+                    .unwrap_or(core::ptr::null_mut());
+                opts.create_with_security_attributes_raw(PIPE_NAME, sd)
+                    .map_err(|e| IpcError::Connect(format!("pipe already in use: {e}")))?
+            };
             return Ok(Self { pipe_name: PIPE_NAME.to_string(), first_instance: Some(first) });
         }
     }
@@ -243,6 +252,30 @@ async fn handle_windows<H, Fut>(
         let _ = writer.write_all(reply.as_bytes()).await;
         let _ = writer.flush().await;
     }
+}
+
+/// On Windows: creates a SECURITY_DESCRIPTOR that grants Everyone (World) full access.
+///
+/// This ensures the named pipe is reachable from any logon session — interactive desktop,
+/// SSH (session 0), and Task Scheduler services all use separate logon sessions, but all
+/// need to connect to the same pipe.
+///
+/// Returns a heap-allocated security descriptor pointer (via `LocalAlloc` internally).
+/// The caller is responsible for freeing it with `LocalFree`. Returns `None` on failure.
+#[cfg(windows)]
+#[allow(unsafe_code)]
+unsafe fn pipe_security_descriptor_allow_all() -> Option<*mut core::ffi::c_void> {
+    use windows_sys::Win32::Security::Authorization::ConvertStringSecurityDescriptorToSecurityDescriptorA;
+    // D:(A;;GA;;;WD)  — DACL: Allow GENERIC_ALL to World (Everyone)
+    let sddl = b"D:(A;;GA;;;WD)\0";
+    let mut sd = core::ptr::null_mut::<core::ffi::c_void>();
+    let ok = ConvertStringSecurityDescriptorToSecurityDescriptorA(
+        sddl.as_ptr(),
+        1, // SDDL_REVISION_1
+        &mut sd,
+        core::ptr::null_mut(),
+    );
+    if ok != 0 { Some(sd) } else { None }
 }
 
 async fn dispatch_line<H, Fut>(line: &str, handler: &H) -> String
