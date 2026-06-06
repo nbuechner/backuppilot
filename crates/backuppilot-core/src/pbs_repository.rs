@@ -378,6 +378,13 @@ fn parse_token_storage(token: &str) -> (String, String) {
         }
     }
 
+    // A stored token name (e.g. "win-test") is a valid token_id. Check before
+    // is_likely_api_token_secret, which also matches short names like "win-test".
+    // Real PBS secrets are UUIDs (36 chars) and fail is_valid_token_id's length check.
+    if is_valid_token_id(token) {
+        return (token.to_string(), String::new());
+    }
+
     if is_likely_api_token_secret(token) {
         return (String::new(), token.to_string());
     }
