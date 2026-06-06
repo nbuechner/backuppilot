@@ -1,11 +1,13 @@
 <script>
   import { listProfiles, listStatuses, runBackup, cancelBackup, deleteProfile } from '../lib/ipc.js';
+  import ProfileForm from '../lib/ProfileForm.svelte';
 
-  let profiles = $state([]);
-  let statuses = $state([]);
-  let loading  = $state(true);
-  let error    = $state('');
-  let busy     = $state({});  // profileId → true while action running
+  let profiles    = $state([]);
+  let statuses    = $state([]);
+  let loading     = $state(true);
+  let error       = $state('');
+  let busy        = $state({});
+  let showForm    = $state(false);
 
   async function load() {
     try {
@@ -72,7 +74,17 @@
   onDestroy(() => clearInterval(interval));
 </script>
 
-<h1 class="page-title">Backup Profiles</h1>
+{#if showForm}
+  <ProfileForm
+    onSaved={() => { showForm = false; load(); }}
+    onCancel={() => showForm = false}
+  />
+{/if}
+
+<div class="page-header">
+  <h1 class="page-title">Backup Profiles</h1>
+  <button class="btn-primary" onclick={() => showForm = true}>+ Add Profile</button>
+</div>
 
 {#if loading}
   <div class="center"><span class="spinner"></span></div>
@@ -113,7 +125,13 @@
 {/if}
 
 <style>
-  .page-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .page-title { font-size: 20px; font-weight: 600; }
 
   .center { display: flex; justify-content: center; padding: 40px; }
 
