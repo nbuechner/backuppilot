@@ -10,10 +10,8 @@ const appBin = path.resolve(
   'backuppilot-tauri' + (isWindows ? '.exe' : '')
 )
 
-// tauri-driver process handle
 let tauriDriver
 
-// Ensure cleanup on unexpected exit
 process.on('exit', () => { if (tauriDriver) tauriDriver.kill() })
 
 exports.config = {
@@ -33,13 +31,33 @@ exports.config = {
     timeout: 30000,
   },
 
-  // Spawn tauri-driver before tests.
+  // Download msedgedriver (Windows) and start tauri-driver before tests.
   // Prerequisites:
   //   cargo install tauri-driver
-  //   Windows: msedgedriver.exe on PATH matching your WebView2/Edge version
-  //            (download from https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/)
   //   Linux/macOS: WebKitWebDriver on PATH
-  onPrepare: () => {
+  onPrepare: async () => {
+    if (isWindows) {
+      // Auto-download msedgedriver matching the installed WebView2/Edge version.
+      // Reads version from the WebView2 installation directory.
+      const { execSync } = require('child_process')
+      let edgeVersion
+      try {
+        edgeVersion = execSync(
+          'powershell -Command "(Get-Item \\"C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application\\*\\msedgewebview2.exe\\" | Select-Object -First 1).VersionInfo.FileVersion"',
+          { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
+        ).trim()
+      } catch {
+        // Fallback: let edgedriver pick the latest
+        edgeVersion = undefined
+      }
+
+      const { download } = require('edgedriver')
+      const driverPath = await download(edgeVersion)
+      // Add the driver directory to PATH so tauri-driver can find it
+      process.env.PATH = path.dirname(driverPath) + path.delimiter + process.env.PATH
+      console.log(`msedgedriver ready: ${driverPath}`)
+    }
+
     tauriDriver = spawn('tauri-driver', [], {
       stdio: [null, process.stdout, process.stderr],
     })
