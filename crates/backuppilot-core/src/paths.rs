@@ -83,6 +83,12 @@ pub fn pbs_client_path() -> &'static Path {
         .as_path()
 }
 
+/// Same as [`pbs_client_path`] but returns an owned `PathBuf`.
+/// Useful in `spawn_blocking` closures that need `'static` ownership.
+pub fn pbs_client_path_owned() -> std::path::PathBuf {
+    pbs_client_path().to_path_buf()
+}
+
 /// True when running inside a Flatpak sandbox (updates are delivered via Flathub).
 pub fn is_flatpak_runtime() -> bool {
     std::env::var_os("FLATPAK_ID").is_some()

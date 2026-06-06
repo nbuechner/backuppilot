@@ -12,7 +12,7 @@ use tracing::{debug, warn};
 use crate::encryption::{apply_encryption_to_command, normalize_fingerprint, EncryptionCliMode};
 use crate::error::{CoreError, Result};
 use crate::paths::{
-    profile_backup_client_config, resolve_pbs_client_binary, runtime_profile_config_dir,
+    profile_backup_client_config, runtime_profile_config_dir,
 };
 use crate::pbs_repository::{PbsRepositoryParts, PBS_AUTH_ID_MAX_LEN};
 use crate::profile::{BackupProfile, CredentialVerifyResult};
@@ -131,11 +131,11 @@ pub struct PbsClient;
 
 impl PbsClient {
     pub async fn is_available() -> bool {
-        // resolve_pbs_client_binary() may spawn wsl.exe synchronously on Windows.
-        // Run it in a blocking thread with a timeout so it cannot stall the async runtime.
+        // pbs_client_path() caches the result in a OnceLock, avoiding repeated WSL probes.
+        // It may block (spawns wsl.exe synchronously on Windows); run in a blocking thread.
         let binary = tokio::time::timeout(
-            Duration::from_secs(10),
-            tokio::task::spawn_blocking(resolve_pbs_client_binary),
+            Duration::from_secs(60),
+            tokio::task::spawn_blocking(crate::paths::pbs_client_path_owned),
         )
         .await
         .ok()
@@ -362,7 +362,7 @@ impl PbsClient {
         let repo_arg = parts.pbs_repository_bash_style(&auth_id);
         let password = parts.api_token_secret();
 
-        let mut cmd = spawn_pbs_command(&resolve_pbs_client_binary());
+        let mut cmd = spawn_pbs_command(crate::paths::pbs_client_path());
         apply_pbs_client_env(
             &mut cmd,
             &parts,
@@ -573,7 +573,7 @@ async fn run_pbs_list_repository(
     password: &str,
     server_fingerprint: Option<&str>,
 ) -> std::result::Result<std::process::Output, String> {
-    let mut cmd = Command::new(resolve_pbs_client_binary());
+    let mut cmd = spawn_pbs_command(crate::paths::pbs_client_path());
     apply_pbs_client_env(
         &mut cmd,
         parts,
@@ -602,7 +602,7 @@ async fn run_pbs_list(
     server_fingerprint: Option<&str>,
 ) -> std::result::Result<std::process::Output, String> {
     let (server, port) = parts.server_and_port();
-    let mut cmd = Command::new(resolve_pbs_client_binary());
+    let mut cmd = spawn_pbs_command(crate::paths::pbs_client_path());
     apply_pbs_client_env(
         &mut cmd,
         parts,
