@@ -574,8 +574,10 @@ async fn run_pbs_list_repository(
         password,
         server_fingerprint,
     );
-    cmd.arg("list")
-        .arg(format!("--repository={repository_arg}"));
+    // PBS_REPOSITORY is already set by apply_pbs_client_env; do not pass --repository flag
+    // because PBS client 3.x rejects the `user@host:port:store` format as a CLI argument
+    // (the same value is accepted via env var).
+    cmd.arg("list");
     if let Some(ns) = namespace.filter(|s| !s.is_empty()) {
         cmd.arg(format!("--ns={ns}"));
     }
@@ -594,7 +596,6 @@ async fn run_pbs_list(
     password: &str,
     server_fingerprint: Option<&str>,
 ) -> std::result::Result<std::process::Output, String> {
-    let (server, port) = parts.server_and_port();
     let mut cmd = spawn_pbs_command(crate::paths::pbs_client_path());
     apply_pbs_client_env(
         &mut cmd,
@@ -603,13 +604,9 @@ async fn run_pbs_list(
         password,
         server_fingerprint,
     );
-    cmd.arg("list")
-        .arg(format!("--auth-id={auth_id}"))
-        .arg(format!("--server={server}"))
-        .arg(format!("--datastore={}", parts.datastore));
-    if port != 8007 {
-        cmd.arg(format!("--port={port}"));
-    }
+    // Component flags (--auth-id, --server, --datastore) were added in PBS client 4.x.
+    // PBS_REPOSITORY is already set by apply_pbs_client_env and works on all versions.
+    cmd.arg("list");
     if let Some(ns) = namespace.filter(|s| !s.is_empty()) {
         cmd.arg(format!("--ns={ns}"));
     }
