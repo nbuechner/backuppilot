@@ -131,22 +131,35 @@ impl IpcServer {
             // the pipe is reachable from any logon session (interactive, SSH, Task Scheduler…).
             let mut opts = ServerOptions::new();
             opts.first_pipe_instance(true);
-            // Create the pipe with a permissive DACL so it's reachable from any logon
+            // Create the pipe with a NULL DACL so it is reachable from any logon
             // session (interactive, SSH, Task Scheduler each have separate sessions).
+            // NULL DACL = no access-control list = unrestricted access.
             #[allow(unsafe_code)]
             let first = unsafe {
-                use windows_sys::Win32::Security::SECURITY_ATTRIBUTES;
-                let sd = pipe_security_descriptor_allow_all()
-                    .unwrap_or(core::ptr::null_mut());
+                use windows_sys::Win32::Security::{
+                    InitializeSecurityDescriptor, SetSecurityDescriptorDacl,
+                    SECURITY_ATTRIBUTES, SECURITY_DESCRIPTOR,
+                };
+                let mut sd = core::mem::zeroed::<SECURITY_DESCRIPTOR>();
+                let sd_ok = InitializeSecurityDescriptor(
+                    core::ptr::addr_of_mut!(sd).cast::<core::ffi::c_void>(),
+                    1, // SECURITY_DESCRIPTOR_REVISION
+                ) != 0;
+                let dacl_ok = sd_ok && SetSecurityDescriptorDacl(
+                    core::ptr::addr_of_mut!(sd).cast::<core::ffi::c_void>(),
+                    1,                        // bDaclPresent = TRUE
+                    core::ptr::null_mut(),    // pDacl = NULL  →  unrestricted
+                    0,                        // bDaclDefaulted = FALSE
+                ) != 0;
                 let mut sa = SECURITY_ATTRIBUTES {
                     nLength: core::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
-                    lpSecurityDescriptor: sd,
+                    lpSecurityDescriptor: core::ptr::addr_of_mut!(sd).cast::<core::ffi::c_void>(),
                     bInheritHandle: 0,
                 };
-                let sa_ptr = if sd.is_null() {
-                    core::ptr::null_mut()
+                let sa_ptr = if dacl_ok {
+                    core::ptr::addr_of_mut!(sa).cast::<core::ffi::c_void>()
                 } else {
-                    (&mut sa as *mut SECURITY_ATTRIBUTES).cast::<core::ffi::c_void>()
+                    core::ptr::null_mut() // fall back to default security
                 };
                 opts.create_with_security_attributes_raw(PIPE_NAME, sa_ptr)
                     .map_err(|e| IpcError::Connect(format!("pipe already in use: {e}")))?
@@ -268,29 +281,6 @@ async fn handle_windows<H, Fut>(
     }
 }
 
-/// On Windows: creates a SECURITY_DESCRIPTOR that grants Everyone (World) full access.
-///
-/// This ensures the named pipe is reachable from any logon session — interactive desktop,
-/// SSH (session 0), and Task Scheduler services all use separate logon sessions, but all
-/// need to connect to the same pipe.
-///
-/// Returns a heap-allocated security descriptor pointer (via `LocalAlloc` internally).
-/// The caller is responsible for freeing it with `LocalFree`. Returns `None` on failure.
-#[cfg(windows)]
-#[allow(unsafe_code)]
-unsafe fn pipe_security_descriptor_allow_all() -> Option<*mut core::ffi::c_void> {
-    use windows_sys::Win32::Security::Authorization::ConvertStringSecurityDescriptorToSecurityDescriptorA;
-    // D:(A;;GA;;;WD)  — DACL: Allow GENERIC_ALL to World (Everyone)
-    let sddl = b"D:(A;;GA;;;WD)\0";
-    let mut sd = core::ptr::null_mut::<core::ffi::c_void>();
-    let ok = ConvertStringSecurityDescriptorToSecurityDescriptorA(
-        sddl.as_ptr(),
-        1, // SDDL_REVISION_1
-        &mut sd,
-        core::ptr::null_mut(),
-    );
-    if ok != 0 { Some(sd) } else { None }
-}
 
 async fn dispatch_line<H, Fut>(line: &str, handler: &H) -> String
 where
