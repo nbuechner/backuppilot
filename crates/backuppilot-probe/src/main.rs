@@ -62,6 +62,28 @@ async fn main() {
         Err(e) => { eprintln!("ERROR list_statuses: {e}"); ok = false; }
     }
 
+    // ── recent activity ────────────────────────────────────────────────────────
+    match IpcClient::call("list_recent_activity", serde_json::json!({ "limit": 5 })).await {
+        Ok(raw) => {
+            match serde_json::from_str::<Value>(&raw) {
+                Ok(entries) => {
+                    let arr = entries.as_array().cloned().unwrap_or_default();
+                    println!("recent activity: {} entries", arr.len());
+                    for e in &arr {
+                        let name   = e["profile_name"].as_str().unwrap_or("system");
+                        let status = e["run"]["status"].as_str().unwrap_or("?");
+                        let start  = e["run"]["started_at"].as_str().unwrap_or("?");
+                        let msg    = e["run"]["error_message"].as_str().unwrap_or("");
+                        let suffix = if msg.is_empty() { String::new() } else { format!("  err={msg}") };
+                        println!("  {start}  {name}  {status}{suffix}");
+                    }
+                }
+                Err(e) => { eprintln!("ERROR parse activity: {e}"); ok = false; }
+            }
+        }
+        Err(e) => { eprintln!("ERROR list_recent_activity: {e}"); ok = false; }
+    }
+
     // ── list_snapshots for each profile ───────────────────────────────────────
     match IpcClient::call("list_profiles", Value::Null).await {
         Ok(raw) => {
