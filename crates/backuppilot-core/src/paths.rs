@@ -217,8 +217,16 @@ pub fn resolve_pbs_client_binary() -> PathBuf {
     }
 
     #[cfg(windows)]
-    if let Some(wsl_wrapper) = resolve_wsl_pbs_client() {
-        return wsl_wrapper;
+    {
+        // If the WSL wrapper was already written (e.g. detected in a previous session),
+        // use it directly without re-probing WSL. Avoids S4U/service context failures.
+        let prebuilt = data_dir().join("pbs-client-wsl.cmd");
+        if prebuilt.is_file() {
+            return prebuilt;
+        }
+        if let Some(wsl_wrapper) = resolve_wsl_pbs_client() {
+            return wsl_wrapper;
+        }
     }
 
     PathBuf::from("proxmox-backup-client")
