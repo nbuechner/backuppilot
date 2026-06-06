@@ -50,7 +50,7 @@ pub(super) async fn api_verify_credentials(client: &PbsApiClient) -> CredentialV
         "/api2/json/admin/datastore/{}/snapshots",
         client.datastore()
     );
-    let mut req = client.get(&url).query(&[("backup-type", "host"), ("limit", "1")]);
+    let mut req = client.get(&url).query(&[("backup-type", "host")]);
     if let Some(ns) = client.namespace() {
         req = req.query(&[("ns", ns)]);
     }
