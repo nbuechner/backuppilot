@@ -68,11 +68,20 @@
     await load();
   }
 
+  function onKeydown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n' && !showForm) {
+      e.preventDefault();
+      showForm = true;
+    }
+  }
+
   load();
   const interval = setInterval(load, 5000);
   import { onDestroy } from 'svelte';
   onDestroy(() => clearInterval(interval));
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 {#if showForm}
   <ProfileForm

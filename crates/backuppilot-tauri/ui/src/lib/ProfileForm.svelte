@@ -28,6 +28,10 @@
   let saving = $state(false);
   let error  = $state('');
 
+  function onKeydown(e) {
+    if (e.key === 'Escape') onCancel();
+  }
+
   // Populate backup ID from hostname
   async function loadHostname() {
     try {
@@ -100,6 +104,8 @@
     }
   }
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <div class="overlay" onclick={onCancel}>
   <div class="dialog" onclick={e => e.stopPropagation()}>
