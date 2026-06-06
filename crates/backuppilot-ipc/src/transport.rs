@@ -3,6 +3,7 @@
 //! Each call opens a fresh connection, sends one request, reads one response,
 //! then closes. This matches the per-call spawn_blocking pattern in the GUI.
 
+#[cfg(unix)]
 use std::path::PathBuf;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tracing::warn;
