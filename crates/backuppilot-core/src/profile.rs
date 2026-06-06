@@ -169,7 +169,10 @@ pub struct NewProfile {
 
 /// Hostname used as PBS `backup-id` when the user leaves the field empty.
 pub fn default_backup_id() -> String {
-    if let Ok(host) = std::env::var("HOSTNAME").or_else(|_| std::env::var("hostname")) {
+    if let Ok(host) = std::env::var("HOSTNAME")
+        .or_else(|_| std::env::var("hostname"))
+        .or_else(|_| std::env::var("COMPUTERNAME"))
+    {
         let host = host.trim();
         if !host.is_empty() {
             return host.to_string();

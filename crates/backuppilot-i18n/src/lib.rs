@@ -78,11 +78,8 @@ pub fn set_language(language: UiLanguage) {
 }
 
 fn rebind_textdomain() {
-    if let Some(dir) = locale_search_dir() {
-        let _ = bindtextdomain(DOMAIN, dir.to_str().unwrap_or("/usr/share/locale"));
-    } else {
-        let _ = bindtextdomain(DOMAIN, "/usr/share/locale");
-    }
+    let dir = locale_search_dir().unwrap_or_else(|| PathBuf::from("/usr/share/locale"));
+    let _ = bindtextdomain(DOMAIN, dir.to_str().unwrap_or("/usr/share/locale"));
     let _ = textdomain(DOMAIN);
 }
 
@@ -115,10 +112,19 @@ fn locale_search_dir() -> Option<PathBuf> {
     }
 
     // Prefer user-installed translations from `build.sh local --install`.
-    if let Ok(home) = std::env::var("HOME") {
-        let local = PathBuf::from(home).join(".local/share/locale");
+    let home = std::env::var("HOME").or_else(|_| std::env::var("USERPROFILE"));
+    if let Ok(home) = home {
+        let local = PathBuf::from(&home).join(".local/share/locale");
         if locale_dir_usable(&local) {
             return local.canonicalize().ok();
+        }
+        // Windows: also check %APPDATA%\backuppilot\locale
+        #[cfg(windows)]
+        if let Ok(appdata) = std::env::var("APPDATA") {
+            let win_locale = PathBuf::from(appdata).join("backuppilot").join("locale");
+            if locale_dir_usable(&win_locale) {
+                return win_locale.canonicalize().ok();
+            }
         }
     }
 
