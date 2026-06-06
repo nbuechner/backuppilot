@@ -145,7 +145,7 @@ impl IpcServer {
         #[cfg(unix)]
         self.serve_unix(handler).await;
         #[cfg(windows)]
-        self.serve_windows(self.first_instance, handler).await;
+        self.serve_windows(handler).await;
     }
 
     #[cfg(unix)]
@@ -168,11 +168,8 @@ impl IpcServer {
     }
 
     #[cfg(windows)]
-    async fn serve_windows<H, Fut>(
-        self,
-        first: Option<tokio::net::windows::named_pipe::NamedPipeServer>,
-        handler: H,
-    ) where
+    async fn serve_windows<H, Fut>(self, handler: H)
+    where
         H: Fn(String, serde_json::Value) -> Fut + Send + Sync + 'static + Clone,
         Fut: std::future::Future<Output = Result<String, String>> + Send + 'static,
     {
@@ -180,7 +177,7 @@ impl IpcServer {
 
         // Accept a connection on an already-created pipe instance, then immediately
         // create the next one so we're always ready for the next client.
-        let mut current = first.expect("first_instance must be set");
+        let mut current = self.first_instance.expect("first_instance must be set");
         loop {
             if let Err(e) = current.connect().await {
                 warn!("IPC named pipe connect error: {e}");
