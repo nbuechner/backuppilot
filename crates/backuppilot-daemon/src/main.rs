@@ -24,6 +24,12 @@ async fn main() -> anyhow::Result<()> {
         .with_env_filter(EnvFilter::from_default_env().add_directive("backuppilot=info".parse()?))
         .init();
 
+    // Exit immediately if another daemon instance is already running.
+    if backuppilot_ipc::IpcClient::call("version", serde_json::Value::Null).await.is_ok() {
+        info!("BackupPilot daemon already running — exiting");
+        return Ok(());
+    }
+
     let db = Database::open().context("failed to open database")?;
     let service = DaemonService::new(db);
     service.reconcile_interrupted_runs().await;

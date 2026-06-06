@@ -103,6 +103,8 @@ pub struct IpcServer {
     listener: tokio::net::UnixListener,
     #[cfg(windows)]
     pipe_name: String,
+    #[cfg(windows)]
+    first_instance: Option<tokio::net::windows::named_pipe::NamedPipeServer>,
 }
 
 impl IpcServer {
@@ -123,7 +125,13 @@ impl IpcServer {
         }
         #[cfg(windows)]
         {
-            return Ok(Self { pipe_name: PIPE_NAME.to_string() });
+            use tokio::net::windows::named_pipe::ServerOptions;
+            // first_pipe_instance(true) fails if another server already owns the pipe.
+            let first = ServerOptions::new()
+                .first_pipe_instance(true)
+                .create(PIPE_NAME)
+                .map_err(|e| IpcError::Connect(format!("pipe already in use: {e}")))?;
+            return Ok(Self { pipe_name: PIPE_NAME.to_string(), first_instance: Some(first) });
         }
     }
 
@@ -137,7 +145,7 @@ impl IpcServer {
         #[cfg(unix)]
         self.serve_unix(handler).await;
         #[cfg(windows)]
-        self.serve_windows(handler).await;
+        self.serve_windows(self.first_instance, handler).await;
     }
 
     #[cfg(unix)]
@@ -160,30 +168,36 @@ impl IpcServer {
     }
 
     #[cfg(windows)]
-    async fn serve_windows<H, Fut>(self, handler: H)
-    where
+    async fn serve_windows<H, Fut>(
+        self,
+        first: Option<tokio::net::windows::named_pipe::NamedPipeServer>,
+        handler: H,
+    ) where
         H: Fn(String, serde_json::Value) -> Fut + Send + Sync + 'static + Clone,
         Fut: std::future::Future<Output = Result<String, String>> + Send + 'static,
     {
         use tokio::net::windows::named_pipe::ServerOptions;
+
+        // Accept a connection on an already-created pipe instance, then immediately
+        // create the next one so we're always ready for the next client.
+        let mut current = first.expect("first_instance must be set");
         loop {
-            let server = match ServerOptions::new()
-                .first_pipe_instance(false)
-                .create(&self.pipe_name)
-            {
+            if let Err(e) = current.connect().await {
+                warn!("IPC named pipe connect error: {e}");
+                break;
+            }
+            // Create the next instance before spawning the handler so we never
+            // miss a connection.
+            let next = match ServerOptions::new().create(&self.pipe_name) {
                 Ok(s) => s,
                 Err(e) => {
                     warn!("IPC named pipe create error: {e}");
-                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-                    continue;
+                    break;
                 }
             };
-            if let Err(e) = server.connect().await {
-                warn!("IPC named pipe connect error: {e}");
-                continue;
-            }
             let h = handler.clone();
-            tokio::spawn(handle_windows(server, h));
+            tokio::spawn(handle_windows(current, h));
+            current = next;
         }
     }
 }
