@@ -260,8 +260,11 @@ async fn handle_windows<H, Fut>(
     let mut lines = BufReader::new(reader).lines();
     if let Ok(Some(line)) = lines.next_line().await {
         let reply = dispatch_line(&line, &handler).await;
-        let _ = writer.write_all(reply.as_bytes()).await;
-        let _ = writer.flush().await;
+        if let Err(e) = writer.write_all(reply.as_bytes()).await {
+            warn!("IPC write error: {e}");
+        } else if let Err(e) = writer.flush().await {
+            warn!("IPC flush error: {e}");
+        }
     }
 }
 

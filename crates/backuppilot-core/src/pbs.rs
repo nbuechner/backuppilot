@@ -131,7 +131,18 @@ pub struct PbsClient;
 
 impl PbsClient {
     pub async fn is_available() -> bool {
-        if probe_pbs_binary(&resolve_pbs_client_binary()).await {
+        // resolve_pbs_client_binary() may spawn wsl.exe synchronously on Windows.
+        // Run it in a blocking thread with a timeout so it cannot stall the async runtime.
+        let binary = tokio::time::timeout(
+            Duration::from_secs(10),
+            tokio::task::spawn_blocking(resolve_pbs_client_binary),
+        )
+        .await
+        .ok()
+        .and_then(|r| r.ok())
+        .unwrap_or_else(|| std::path::PathBuf::from("proxmox-backup-client"));
+
+        if probe_pbs_binary(&binary).await {
             return true;
         }
         if std::env::var_os("FLATPAK_ID").is_some() {
