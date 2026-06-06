@@ -296,21 +296,35 @@ pub fn ensure_wsl_pbs_wrapper() -> std::io::Result<PathBuf> {
     let ps1_path = dir.join("pbs-client-wsl.ps1");
     let cmd_path = dir.join("pbs-client-wsl.cmd");
 
-    // PowerShell script: translate Windows backup-spec paths to WSL paths, then call wsl
+    // PowerShell script: translate Windows backup-spec paths to WSL paths, then call wsl.
+    // Avoid calling `wsl wslpath` to convert paths — PowerShell strips backslashes when
+    // passing arguments to wsl.exe (known WSL+PowerShell argument-passing bug).
+    // Directly construct the /mnt/<drive>/... path instead.
     let ps1 = r#"param()
 $allArgs = $args
 
 # Forward PBS_ environment variables into WSL via WSLENV
 $env:WSLENV = "PBS_PASSWORD/u:PBS_REPOSITORY/u:PBS_HOST/u:PBS_PORT/u:PBS_DATASTORE/u:PBS_FINGERPRINT/u"
 
+function ConvertTo-WslPath {
+    param([string]$WinPath)
+    # "C:\Users\foo" -> "/mnt/c/Users/foo"
+    if ($WinPath -match '^([A-Za-z]):\\(.*)$') {
+        $drive = $Matches[1].ToLower()
+        $rest  = $Matches[2] -replace '\\', '/'
+        return "/mnt/$drive/$rest"
+    }
+    return $WinPath
+}
+
 # Translate archive-spec paths: "archive.pxar:C:\path" -> "archive.pxar:/mnt/c/path"
 # @() forces an array so that splatting @translated passes strings, not characters.
 $translated = @($allArgs | ForEach-Object {
     $a = $_
     if ($a -match '^([^:]+\.pxar):(.+)$') {
-        $archive  = $Matches[1]
-        $winPath  = $Matches[2]
-        $wslPath  = (& wsl wslpath -u ([string]$winPath)).Trim()
+        $archive = $Matches[1]
+        $winPath = $Matches[2]
+        $wslPath = ConvertTo-WslPath $winPath
         "${archive}:${wslPath}"
     } else {
         $a
