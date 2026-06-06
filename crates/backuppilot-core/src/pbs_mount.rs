@@ -247,7 +247,7 @@ pub async fn spawn_mount_process(
 
     let _ = PbsClient::write_profile_config(profile);
 
-    let mut cmd = Command::new(pbs_client_path());
+    let mut cmd = crate::pbs::spawn_pbs_command(pbs_client_path());
     apply_pbs_client_env(
         &mut cmd,
         &parts,

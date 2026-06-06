@@ -38,7 +38,7 @@ async fn probe_pbs_binary(path: &Path) -> bool {
 /// Builds a `Command` for the given PBS client binary.
 /// On Windows, `.cmd`/`.bat` wrapper files are launched via `cmd /c` since
 /// `CreateProcess` cannot execute them directly.
-fn spawn_pbs_command(binary: &Path) -> Command {
+pub(crate) fn spawn_pbs_command(binary: &Path) -> Command {
     #[cfg(windows)]
     {
         let ext = binary
