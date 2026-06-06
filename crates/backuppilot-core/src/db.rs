@@ -943,7 +943,8 @@ fn repository_for_storage(
         return Ok((repository.to_string(), None));
     }
     let mut stripped = parts.clone();
-    stripped.token = String::new();
+    let (token_id, _) = parts.api_token_parts();
+    stripped.token = token_id; // keep name, drop secret (secret goes to keyring)
     Ok((
         crate::pbs_repository::encode_repository(&stripped),
         Some(parts),

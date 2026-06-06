@@ -41,7 +41,9 @@ pub fn persist_profile_credentials(
     }
     store_api_token(profile_id, &token)?;
     let mut stored = parts.clone();
-    stored.token = String::new();
+    // Keep the token name in the DB so auth-id can be reconstructed on load.
+    let (token_id, _) = parts.api_token_parts();
+    stored.token = token_id; // e.g. "win-test" (name only, secret is in keyring)
     Ok(encode_repository(&stored))
 }
 
@@ -51,8 +53,14 @@ pub fn hydrate_profile_repository(profile_id: i64, repository: &str) -> Result<S
         .map_err(|e| CoreError::PbsCommand(e.to_string()))?;
 
     if parts.api_token_secret().is_empty() {
-        if let Some(token) = load_api_token(profile_id)? {
-            parts.token = token;
+        if let Some(secret) = load_api_token(profile_id)? {
+            // Reconstruct "name=secret" so pbs_auth_id() can recover the token name.
+            let (token_id, _) = parts.api_token_parts();
+            parts.token = if token_id.is_empty() {
+                secret
+            } else {
+                format!("{token_id}={secret}")
+            };
         }
     }
 
