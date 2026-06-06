@@ -175,27 +175,41 @@ impl IpcServer {
     {
         use tokio::net::windows::named_pipe::ServerOptions;
 
-        // Accept a connection on an already-created pipe instance, then immediately
-        // create the next one so we're always ready for the next client.
-        let mut current = self.first_instance.expect("first_instance must be set");
-        loop {
-            if let Err(e) = current.connect().await {
-                warn!("IPC named pipe connect error: {e}");
-                break;
+        // Pre-create a pool of waiting pipe instances so concurrent callers
+        // (e.g. listProfiles + listStatuses fired simultaneously) never see
+        // "all pipe instances busy" (os error 231).
+        const POOL: usize = 8;
+        let first = self.first_instance.expect("first_instance must be set");
+        let mut pool = vec![first];
+        for _ in 1..POOL {
+            match ServerOptions::new().create(&self.pipe_name) {
+                Ok(s) => pool.push(s),
+                Err(e) => { warn!("IPC pool init error: {e}"); break; }
             }
-            // Create the next instance before spawning the handler so we never
-            // miss a connection.
-            let next = match ServerOptions::new().create(&self.pipe_name) {
-                Ok(s) => s,
-                Err(e) => {
-                    warn!("IPC named pipe create error: {e}");
-                    break;
-                }
-            };
-            let h = handler.clone();
-            tokio::spawn(handle_windows(current, h));
-            current = next;
         }
+
+        // Each pool slot gets its own independent accept loop.
+        let mut handles = Vec::new();
+        for server in pool {
+            let h = handler.clone();
+            let name = self.pipe_name.clone();
+            handles.push(tokio::spawn(async move {
+                let mut current = server;
+                loop {
+                    if let Err(e) = current.connect().await {
+                        warn!("IPC named pipe connect error: {e}");
+                        break;
+                    }
+                    let next = match ServerOptions::new().create(&name) {
+                        Ok(s) => s,
+                        Err(e) => { warn!("IPC named pipe create error: {e}"); break; }
+                    };
+                    tokio::spawn(handle_windows(current, h.clone()));
+                    current = next;
+                }
+            }));
+        }
+        for h in handles { let _ = h.await; }
     }
 }
 
