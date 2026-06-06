@@ -219,9 +219,10 @@ pub fn resolve_pbs_client_binary() -> PathBuf {
     #[cfg(windows)]
     {
         // If the WSL wrapper was already written (e.g. detected in a previous session),
-        // use it directly without re-probing WSL. Avoids S4U/service context failures.
-        let prebuilt = data_dir().join("pbs-client-wsl.cmd");
-        if prebuilt.is_file() {
+        // use it directly without re-probing WSL. Avoids S4U/service context failures
+        // where data_dir() may resolve to the system profile (Session 0) instead of
+        // the user's AppData.
+        if let Some(prebuilt) = find_wsl_wrapper_in_any_profile() {
             return prebuilt;
         }
         if let Some(wsl_wrapper) = resolve_wsl_pbs_client() {
@@ -230,6 +231,30 @@ pub fn resolve_pbs_client_binary() -> PathBuf {
     }
 
     PathBuf::from("proxmox-backup-client")
+}
+
+/// Searches all user profiles under `C:\Users` for a pre-built WSL wrapper.
+/// Needed when the daemon runs in Session 0 where data_dir() resolves to the
+/// system profile path rather than the interactive user's AppData.
+#[cfg(windows)]
+fn find_wsl_wrapper_in_any_profile() -> Option<PathBuf> {
+    // First check data_dir() (works in interactive sessions)
+    let local = data_dir().join("pbs-client-wsl.cmd");
+    if local.is_file() {
+        return Some(local);
+    }
+    // Enumerate C:\Users\*\AppData\Roaming\backuppilot\BackupPilot\data\pbs-client-wsl.cmd
+    let users = PathBuf::from(r"C:\Users");
+    let entries = std::fs::read_dir(&users).ok()?;
+    for entry in entries.flatten() {
+        let candidate = entry
+            .path()
+            .join(r"AppData\Roaming\backuppilot\BackupPilot\data\pbs-client-wsl.cmd");
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+    }
+    None
 }
 
 /// On Windows: if WSL has `proxmox-backup-client`, create a wrapper `.cmd` and return its path.
