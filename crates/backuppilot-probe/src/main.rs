@@ -62,6 +62,38 @@ async fn main() {
         Err(e) => { eprintln!("ERROR list_statuses: {e}"); ok = false; }
     }
 
+    // ── list_snapshots for each profile ───────────────────────────────────────
+    match IpcClient::call("list_profiles", Value::Null).await {
+        Ok(raw) => {
+            if let Ok(profiles) = serde_json::from_str::<Value>(&raw) {
+                for p in profiles.as_array().cloned().unwrap_or_default() {
+                    let id = p["id"].as_i64().unwrap_or(-1);
+                    let name = p["name"].as_str().unwrap_or("?");
+                    let params = serde_json::json!({ "profile_id": id });
+                    match IpcClient::call("list_snapshots", params).await {
+                        Ok(raw) => {
+                            match serde_json::from_str::<Value>(&raw) {
+                                Ok(snaps) => {
+                                    let arr = snaps.as_array().cloned().unwrap_or_default();
+                                    println!("snapshots [{id}] {name}: {} found", arr.len());
+                                    for s in arr.iter().take(3) {
+                                        let path = s["path"].as_str().unwrap_or("?");
+                                        let size = s["size_bytes"].as_u64().unwrap_or(0);
+                                        let enc  = s["encrypted"].as_bool().unwrap_or(false);
+                                        println!("  {path}  size={size}  encrypted={enc}");
+                                    }
+                                }
+                                Err(e) => { eprintln!("ERROR parse snapshots [{id}]: {e}"); ok = false; }
+                            }
+                        }
+                        Err(e) => { eprintln!("ERROR list_snapshots [{id}]: {e}"); ok = false; }
+                    }
+                }
+            }
+        }
+        Err(_) => {}
+    }
+
     if !ok {
         std::process::exit(1);
     }
