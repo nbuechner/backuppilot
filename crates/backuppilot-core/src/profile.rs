@@ -312,7 +312,8 @@ pub fn redact_profile_for_client(mut profile: BackupProfile) -> BackupProfile {
     profile.api_token_configured = crate::secrets::has_api_token(profile.id);
     if let Ok(mut parts) = PbsRepositoryParts::parse(&profile.repository) {
         if !parts.api_token_secret().is_empty() {
-            parts.token.clear();
+            let (token_id, _) = parts.api_token_parts();
+            parts.token = token_id; // keep name, drop secret
             profile.repository = encode_repository(&parts);
         }
     }
