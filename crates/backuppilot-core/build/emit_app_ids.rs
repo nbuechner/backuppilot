@@ -30,17 +30,8 @@ pub fn emit() {
     println!("cargo:rustc-env=BACKUPPILOT_DBUS_NAME={dbus_name}");
     println!("cargo:rustc-env=BACKUPPILOT_DBUS_PATH={dbus_path}");
 
-    match pkg.as_str() {
-        "backuppilot-daemon" => {
-            let tpl = include_str!("templates/dbus_iface.inc.rs");
-            let content = substitute_dbus(tpl, &dbus_name, &dbus_path);
-            std::fs::write(out_dir.join("dbus_iface.rs"), content).expect("write dbus_iface.rs");
-        }
-        "backuppilot-gui" => {
-            let tpl = include_str!("templates/dbus_proxy.inc.rs");
-            let content = substitute_dbus(tpl, &dbus_name, &dbus_path);
-            std::fs::write(out_dir.join("dbus_proxy.rs"), content).expect("write dbus_proxy.rs");
-        }
-        _ => {}
+    if pkg == "backuppilot-daemon" {
+        let tpl = include_str!("templates/ipc_handler.inc.rs");
+        std::fs::write(out_dir.join("ipc_handler.rs"), tpl).expect("write ipc_handler.rs");
     }
 }

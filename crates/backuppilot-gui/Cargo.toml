@@ -16,6 +16,7 @@ anyhow.workspace = true
 chrono.workspace = true
 backuppilot-core = { path = "../backuppilot-core" }
 backuppilot-i18n = { path = "../backuppilot-i18n" }
+backuppilot-ipc = { path = "../backuppilot-ipc" }
 gtk = { package = "gtk4", version = "0.9", features = ["v4_16"] }
 gdk-pixbuf = "0.20"
 libadwaita = { version = "0.7", features = ["v1_6"] }
@@ -23,6 +24,5 @@ serde.workspace = true
 serde_json.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
-zbus.workspace = true
 ksni = "0.3"
 tokio = { workspace = true, features = ["rt"] }

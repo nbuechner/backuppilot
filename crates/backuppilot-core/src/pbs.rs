@@ -131,16 +131,27 @@ impl PbsClient {
             format!("invalid PBS connection settings: {e}")
         })?;
 
-        if !Self::is_available().await {
-            return Err("proxmox-backup-client not found".into());
-        }
-
         let endpoint = parts.tcp_connect_address();
 
         if !tcp_reachable(&endpoint).await {
             return Err(format!(
                 "cannot reach {endpoint} (network or firewall); PBS port is usually 8007"
             ));
+        }
+
+        // When the CLI binary is absent (e.g. Windows) verify via REST API.
+        if !Self::is_available().await {
+            return match crate::pbs_api::PbsApiClient::new(&parts, namespace, server_fingerprint) {
+                Ok(api) => {
+                    let r = api.verify_credentials().await;
+                    if r.ok {
+                        Ok(())
+                    } else {
+                        Err(r.message.unwrap_or_else(|| "authentication failed".into()))
+                    }
+                }
+                Err(e) => Err(format!("PBS REST API setup failed: {e}")),
+            };
         }
 
         let result = Self::verify_credentials(repository, namespace, server_fingerprint).await;
@@ -172,10 +183,14 @@ impl PbsClient {
             }
         };
 
+        // When the CLI binary is absent (e.g. Windows) fall back to REST API.
         if !Self::is_available().await {
-            return CredentialVerifyResult {
-                ok: false,
-                message: Some("proxmox-backup-client not found".into()),
+            return match crate::pbs_api::PbsApiClient::new(&parts, namespace, server_fingerprint) {
+                Ok(api) => api.verify_credentials().await,
+                Err(e) => CredentialVerifyResult {
+                    ok: false,
+                    message: Some(format!("PBS REST API setup failed: {e}")),
+                },
             };
         }
 

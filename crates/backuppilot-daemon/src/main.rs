@@ -9,11 +9,10 @@ mod update_monitor;
 use anyhow::Context;
 use backuppilot_core::{load_app_settings, Database, UiLanguage};
 use backuppilot_i18n::{self, UiLanguage as I18nLanguage};
+use backuppilot_ipc::IpcServer;
 use tracing::info;
 use tracing_subscriber::EnvFilter;
-use zbus::connection;
 
-use crate::dbus_iface::{BackupPilotDaemon, DBUS_OBJECT_PATH, DBUS_WELL_KNOWN_NAME};
 use crate::service::DaemonService;
 
 #[tokio::main]
@@ -32,22 +31,17 @@ async fn main() -> anyhow::Result<()> {
     health_monitor::spawn(service.clone());
     log_retention_monitor::spawn(service.clone());
     update_monitor::spawn();
-    let daemon = BackupPilotDaemon { service };
 
-    let _connection = connection::Builder::session()?
-        .name(DBUS_WELL_KNOWN_NAME)?
-        .serve_at(DBUS_OBJECT_PATH, daemon)?
-        .build()
-        .await
-        .context("failed to start D-Bus service")?;
+    let server = IpcServer::bind().context("failed to bind IPC socket")?;
+    info!("BackupPilot daemon running (IPC)");
 
-    info!(
-        name = DBUS_WELL_KNOWN_NAME,
-        path = DBUS_OBJECT_PATH,
-        "BackupPilot daemon running"
-    );
+    server
+        .serve(move |method, params| {
+            let svc = service.clone();
+            async move { dbus_iface::dispatch(&svc, &method, params).await }
+        })
+        .await;
 
-    std::future::pending::<()>().await;
     Ok(())
 }
 

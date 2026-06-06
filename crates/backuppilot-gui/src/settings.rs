@@ -471,7 +471,7 @@ fn run_reset_all_data(parent: &ApplicationWindow, toast: &ToastOverlay) {
         async {
             match connect().await {
                 Ok(proxy) => dbus_client::reset_all_data(&proxy).await,
-                Err(_) => wipe_all_local_data().map_err(|e| zbus::Error::Failure(e.to_string())),
+                Err(_) => wipe_all_local_data().map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string())),
             }
         },
         move |result| {

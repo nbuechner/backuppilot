@@ -26,3 +26,9 @@ hex = "0.4"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+# Windows Credential Manager — replaces secret-tool on Windows.
+keyring = "3"
+# WinRT toast notifications — replaces notify-send on Windows.
+notify-rust = { version = "4", default-features = false }

@@ -81,7 +81,7 @@ pub fn init(debug: bool) -> Result<(), String> {
     let filter = if debug {
         // RUST_LOG overrides defaults when set.
         EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-            EnvFilter::new("backuppilot=debug,zbus=info,gtk=info")
+            EnvFilter::new("backuppilot=debug,ipc=info,gtk=info")
         })
     } else {
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("backuppilot=info"))

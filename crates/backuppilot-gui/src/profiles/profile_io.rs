@@ -7,7 +7,7 @@ use backuppilot_core::{
 use backuppilot_i18n::{tr, tr_fmt};
 use gtk::prelude::*;
 use libadwaita::{ApplicationWindow, Toast, ToastOverlay};
-use zbus::fdo::Error as FdoError;
+
 
 use crate::dbus_client::{self, connect};
 use crate::dbus_runtime;
@@ -58,20 +58,20 @@ pub fn import_profile_yaml(
                         .iter()
                         .find(|p| p.name.eq_ignore_ascii_case(&name))
                         .map(|p| p.id);
-                    let db = Database::open().map_err(|e| FdoError::Failed(e.to_string()))?;
+                    let db = Database::open().map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string()))?;
                     let mut new = doc
                         .into_new_profile(&db)
-                        .map_err(|e| FdoError::Failed(e.to_string()))?;
+                        .map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string()))?;
                     let updated = if let Some(id) = existing {
                         new.repository = merge_repository_for_update(id, &new.repository)
-                            .map_err(|e| FdoError::Failed(e.to_string()))?;
+                            .map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string()))?;
                         dbus_client::update_profile(&proxy, id, &normalize_new_profile(new)).await?;
                         true
                     } else {
                         dbus_client::create_profile(&proxy, &new).await?;
                         false
                     };
-                    Ok::<_, zbus::Error>((name, updated))
+                    Ok::<_, backuppilot_ipc::IpcError>((name, updated))
                 },
                 move |result| match result {
                     Ok((name, updated)) => {
@@ -125,13 +125,13 @@ pub fn export_profile_yaml(
             let toast = toast.clone();
             dbus_runtime::spawn(
                 async move {
-                    let db = Database::open().map_err(|e| FdoError::Failed(e.to_string()))?;
+                    let db = Database::open().map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string()))?;
                     let profile = db
                         .get_profile(profile_id)
-                        .map_err(|e| FdoError::Failed(e.to_string()))?;
+                        .map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string()))?;
                     let yaml = profile_to_yaml(&db, &profile)
-                        .map_err(|e| FdoError::Failed(e.to_string()))?;
-                    std::fs::write(&target, yaml).map_err(|e| FdoError::Failed(e.to_string()))?;
+                        .map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string()))?;
+                    std::fs::write(&target, yaml).map_err(|e| backuppilot_ipc::IpcError::failure(e.to_string()))?;
                     Ok(())
                 },
                 move |result| {

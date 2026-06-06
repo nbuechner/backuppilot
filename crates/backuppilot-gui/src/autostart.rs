@@ -164,7 +164,7 @@ WantedBy=graphical-session.target
     )
 }
 
-const GUI_LAUNCH_SCRIPT: &str = include_str!("../../../../packaging/backuppilot-gui-launch.sh");
+const GUI_LAUNCH_SCRIPT: &str = include_str!("../../../packaging/backuppilot-gui-launch.sh");
 
 fn resolve_gui_launcher(gui: &Path) -> Result<PathBuf, String> {
     let system = PathBuf::from("/usr/libexec/backuppilot-gui-launch.sh");

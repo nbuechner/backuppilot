@@ -6,6 +6,7 @@ members = [
     "crates/backuppilot-daemon",
     "crates/backuppilot-gui",
     "crates/backuppilot-i18n",
+    "crates/backuppilot-ipc",
 ]
 
 [workspace.package]

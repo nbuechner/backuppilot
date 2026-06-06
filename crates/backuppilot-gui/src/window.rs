@@ -849,7 +849,7 @@ fn maybe_spawn_tray_after_dashboard() {
     finish_dashboard_apply();
 }
 
-fn apply_dashboard_refresh_result(widget: &gtk::Widget, result: Result<DashboardData, zbus::Error>) {
+fn apply_dashboard_refresh_result(widget: &gtk::Widget, result: Result<DashboardData, backuppilot_ipc::IpcError>) {
     match result {
         Err(err) => {
             tracing::warn!(%err, "dashboard refresh failed");
@@ -1241,7 +1241,7 @@ fn build_update_hint_placeholder() -> gtk::Widget {
     box_.upcast()
 }
 
-async fn fetch_dashboard_data() -> zbus::Result<DashboardData> {
+async fn fetch_dashboard_data() -> backuppilot_ipc::Result<DashboardData> {
     let proxy = match connect().await {
         Ok(proxy) => proxy,
         Err(_) => {
@@ -1249,7 +1249,7 @@ async fn fetch_dashboard_data() -> zbus::Result<DashboardData> {
             connect().await?
         }
     };
-    let pbs_available = proxy.pbs_client_available().await?;
+    let pbs_available = dbus_client::pbs_client_available(&proxy).await?;
     let statuses = dbus_client::list_statuses(&proxy).await?;
     const DASHBOARD_ACTIVITY_LIMIT: u32 = 6;
     let activity = dbus_client::list_recent_activity(&proxy, DASHBOARD_ACTIVITY_LIMIT).await?;

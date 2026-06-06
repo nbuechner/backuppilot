@@ -1,7 +1,13 @@
-//! API token storage via freedesktop Secret Service (`secret-tool`) with file fallback.
-
-use std::io::Write;
-use std::process::{Command, Stdio};
+//! API token and encryption password storage.
+//!
+//! Storage strategy (both platforms):
+//!   Primary   – platform keychain (Windows Credential Manager / freedesktop Secret Service)
+//!   Fallback  – plain file under `config_dir()`, mode 0600 on Unix
+//!
+//! The file fallback is intentional: the daemon runs in a background systemd
+//! session where the keyring is often locked right after login, so backup jobs
+//! would fail without it. On Windows the file is also kept as a fallback for
+//! services running as SYSTEM (different credential store from the user).
 
 use tracing::warn;
 
@@ -9,6 +15,8 @@ use crate::error::{CoreError, Result};
 use crate::ids::APP_ID;
 use crate::paths::{config_dir, ensure_data_dirs};
 use crate::pbs_repository::{encode_repository, PbsRepositoryParts};
+
+// ── Path helpers ─────────────────────────────────────────────────────────────
 
 fn fallback_token_path(profile_id: i64) -> std::path::PathBuf {
     config_dir().join("tokens").join(format!("{profile_id}.secret"))
@@ -20,6 +28,8 @@ fn fallback_encryption_password_path(key_id: i64) -> std::path::PathBuf {
         .join(format!("{key_id}.secret"))
 }
 
+// ── Public API ────────────────────────────────────────────────────────────────
+
 /// Stores the API token secret and returns repository JSON without the secret.
 pub fn persist_profile_credentials(
     profile_id: i64,
@@ -29,9 +39,7 @@ pub fn persist_profile_credentials(
     if token.is_empty() {
         return Err(CoreError::PbsCommand("API token secret is required".into()));
     }
-
     store_api_token(profile_id, &token)?;
-
     let mut stored = parts.clone();
     stored.token = String::new();
     Ok(encode_repository(&stored))
@@ -56,7 +64,7 @@ pub fn hydrate_profile_repository(profile_id: i64, repository: &str) -> Result<S
     Ok(encode_repository(&parts))
 }
 
-/// Ensures a file copy exists when the token is only in the keyring (older installs).
+/// Ensures a file copy of the token exists (needed for the background daemon).
 fn ensure_fallback_token_file(profile_id: i64, token: &str) {
     let path = fallback_token_path(profile_id);
     if path.is_file() {
@@ -65,7 +73,7 @@ fn ensure_fallback_token_file(profile_id: i64, token: &str) {
     let _ = write_fallback_token(profile_id, token);
 }
 
-/// Loads the stored API token secret for profile editing or internal use.
+/// Returns the stored API token secret for profile editing.
 pub fn load_stored_api_token(profile_id: i64) -> Option<String> {
     load_api_token(profile_id)
         .ok()
@@ -73,7 +81,7 @@ pub fn load_stored_api_token(profile_id: i64) -> Option<String> {
         .filter(|t| !t.trim().is_empty())
 }
 
-/// Whether a token is stored for this profile (keyring or file fallback).
+/// Whether a token exists for this profile (keyring or file fallback).
 pub fn has_api_token(profile_id: i64) -> bool {
     load_api_token(profile_id)
         .ok()
@@ -82,7 +90,7 @@ pub fn has_api_token(profile_id: i64) -> bool {
 }
 
 pub fn delete_api_token(profile_id: i64) -> Result<()> {
-    let _ = delete_secret_tool(profile_id);
+    let _ = keyring_delete(&token_account(profile_id));
     let path = fallback_token_path(profile_id);
     if path.is_file() {
         std::fs::remove_file(path).map_err(CoreError::Io)?;
@@ -90,122 +98,17 @@ pub fn delete_api_token(profile_id: i64) -> Result<()> {
     Ok(())
 }
 
-fn store_api_token(profile_id: i64, token: &str) -> Result<()> {
-    let keyring_ok = store_secret_tool(profile_id, token).is_ok();
-    // Always keep a file copy so scheduled backups work when the keyring is locked
-    // (common right after login under systemd) or secret-tool is unavailable in the daemon.
-    write_fallback_token(profile_id, token)?;
-    if keyring_ok {
-        Ok(())
-    } else {
-        warn!(profile_id, "using file fallback for API token (install libsecret for keyring storage)");
-        Ok(())
-    }
-}
-
-fn load_api_token(profile_id: i64) -> Result<Option<String>> {
-    if let Some(token) = load_secret_tool(profile_id) {
-        let token = token.trim().to_string();
-        if !token.is_empty() {
-            return Ok(Some(token));
-        }
-    }
-    let path = fallback_token_path(profile_id);
-    if path.is_file() {
-        let token = std::fs::read_to_string(&path).map_err(CoreError::Io)?;
-        let token = token.trim().to_string();
-        if !token.is_empty() {
-            return Ok(Some(token));
-        }
-    }
-    Ok(None)
-}
-
-fn store_secret_tool(profile_id: i64, token: &str) -> Result<()> {
-    let label = format!("{APP_ID} profile {profile_id}");
-    let mut child = Command::new("secret-tool")
-        .args([
-            "store",
-            "--label",
-            &label,
-            "xdg:service",
-            APP_ID,
-            "xdg:profile",
-            &profile_id.to_string(),
-        ])
-        .stdin(Stdio::piped())
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped())
-        .spawn()
-        .map_err(|e| CoreError::PbsCommand(format!("secret-tool not available: {e}")))?;
-
-    if let Some(mut stdin) = child.stdin.take() {
-        stdin
-            .write_all(token.as_bytes())
-            .map_err(CoreError::Io)?;
-    }
-
-    let status = child.wait().map_err(CoreError::Io)?;
-    if status.success() {
-        Ok(())
-    } else {
-        Err(CoreError::PbsCommand(
-            "secret-tool store failed (is libsecret installed?)".into(),
-        ))
-    }
-}
-
-fn load_secret_tool(profile_id: i64) -> Option<String> {
-    let output = Command::new("secret-tool")
-        .args(["lookup", "xdg:service", APP_ID, "xdg:profile", &profile_id.to_string()])
-        .output()
-        .ok()?;
-    if output.status.success() {
-        Some(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        None
-    }
-}
-
-fn delete_secret_tool(profile_id: i64) -> Result<()> {
-    let status = Command::new("secret-tool")
-        .args(["clear", "xdg:service", APP_ID, "xdg:profile", &profile_id.to_string()])
-        .status()
-        .map_err(CoreError::Io)?;
-    if status.success() {
-        Ok(())
-    } else {
-        Err(CoreError::PbsCommand("secret-tool clear failed".into()))
-    }
-}
-
-fn write_fallback_token(profile_id: i64, token: &str) -> Result<()> {
-    ensure_data_dirs().map_err(CoreError::Io)?;
-    let dir = config_dir().join("tokens");
-    std::fs::create_dir_all(&dir).map_err(CoreError::Io)?;
-    let path = fallback_token_path(profile_id);
-    std::fs::write(&path, token).map_err(CoreError::Io)?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600));
+pub fn store_encryption_key_password(key_id: i64, password: &str) -> Result<()> {
+    let keyring_ok = keyring_store(&enc_key_account(key_id), password).is_ok();
+    write_fallback_encryption_password(key_id, password)?;
+    if !keyring_ok {
+        warn!(key_id, "using file fallback for encryption password (keyring unavailable)");
     }
     Ok(())
 }
 
-pub fn store_encryption_key_password(key_id: i64, password: &str) -> Result<()> {
-    let keyring_ok = store_encryption_secret_tool(key_id, password).is_ok();
-    write_fallback_encryption_password(key_id, password)?;
-    if keyring_ok {
-        Ok(())
-    } else {
-        warn!(key_id, "using file fallback for encryption password");
-        Ok(())
-    }
-}
-
 pub fn load_encryption_key_password(key_id: i64) -> Result<Option<String>> {
-    if let Some(pw) = load_encryption_secret_tool(key_id) {
+    if let Some(pw) = keyring_load(&enc_key_account(key_id)) {
         let pw = pw.trim().to_string();
         if !pw.is_empty() {
             return Ok(Some(pw));
@@ -230,7 +133,7 @@ pub fn has_encryption_key_password(key_id: i64) -> bool {
 }
 
 pub fn delete_encryption_key_password(key_id: i64) -> Result<()> {
-    let _ = clear_encryption_secret_tool(key_id);
+    let _ = keyring_delete(&enc_key_account(key_id));
     let path = fallback_encryption_password_path(key_id);
     if path.is_file() {
         std::fs::remove_file(path).map_err(CoreError::Io)?;
@@ -238,17 +141,100 @@ pub fn delete_encryption_key_password(key_id: i64) -> Result<()> {
     Ok(())
 }
 
-fn store_encryption_secret_tool(key_id: i64, password: &str) -> Result<()> {
-    let label = format!("{APP_ID} encryption key {key_id}");
+/// Migrates tokens still embedded in repository JSON into the credential store.
+pub fn migrate_repository_tokens(profile_id: i64, repository: &str) -> Result<String> {
+    let parts = PbsRepositoryParts::parse(repository)
+        .map_err(|e| CoreError::PbsCommand(e.to_string()))?;
+    if parts.api_token_secret().is_empty() {
+        return Ok(repository.to_string());
+    }
+    warn!(profile_id, "migrating API token from database to credential store");
+    persist_profile_credentials(profile_id, &parts)
+}
+
+// ── Internal token helpers ────────────────────────────────────────────────────
+
+fn store_api_token(profile_id: i64, token: &str) -> Result<()> {
+    let keyring_ok = keyring_store(&token_account(profile_id), token).is_ok();
+    // Always keep a file copy so the background daemon can read it when the
+    // keyring is locked (common right after login under systemd on Linux, and
+    // for Windows services running as SYSTEM).
+    write_fallback_token(profile_id, token)?;
+    if !keyring_ok {
+        warn!(profile_id, "using file fallback for API token (keyring unavailable)");
+    }
+    Ok(())
+}
+
+fn load_api_token(profile_id: i64) -> Result<Option<String>> {
+    if let Some(token) = keyring_load(&token_account(profile_id)) {
+        let token = token.trim().to_string();
+        if !token.is_empty() {
+            return Ok(Some(token));
+        }
+    }
+    let path = fallback_token_path(profile_id);
+    if path.is_file() {
+        let token = std::fs::read_to_string(&path).map_err(CoreError::Io)?;
+        let token = token.trim().to_string();
+        if !token.is_empty() {
+            return Ok(Some(token));
+        }
+    }
+    Ok(None)
+}
+
+// ── Keyring account name helpers ──────────────────────────────────────────────
+
+fn token_account(profile_id: i64) -> String {
+    format!("profile-{profile_id}")
+}
+
+fn enc_key_account(key_id: i64) -> String {
+    format!("encryption-key-{key_id}")
+}
+
+// ── Platform keyring implementations ─────────────────────────────────────────
+
+// ·· Windows: Windows Credential Manager via the `keyring` crate ··············
+
+#[cfg(windows)]
+fn keyring_store(account: &str, secret: &str) -> Result<()> {
+    keyring::Entry::new(APP_ID, account)
+        .and_then(|e| e.set_password(secret))
+        .map_err(|e| CoreError::PbsCommand(format!("Windows Credential Manager store failed: {e}")))
+}
+
+#[cfg(windows)]
+fn keyring_load(account: &str) -> Option<String> {
+    keyring::Entry::new(APP_ID, account)
+        .and_then(|e| e.get_password())
+        .ok()
+}
+
+#[cfg(windows)]
+fn keyring_delete(account: &str) -> Result<()> {
+    keyring::Entry::new(APP_ID, account)
+        .and_then(|e| e.delete_credential())
+        .map_err(|e| CoreError::PbsCommand(format!("Windows Credential Manager delete failed: {e}")))
+}
+
+// ·· Unix: freedesktop Secret Service via `secret-tool` subprocess ············
+
+#[cfg(unix)]
+fn keyring_store(account: &str, secret: &str) -> Result<()> {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
     let mut child = Command::new("secret-tool")
         .args([
             "store",
             "--label",
-            &label,
+            &format!("{APP_ID} {account}"),
             "xdg:service",
             APP_ID,
-            "xdg:encryption_key",
-            &key_id.to_string(),
+            "xdg:account",
+            account,
         ])
         .stdin(Stdio::piped())
         .stdout(Stdio::null())
@@ -257,28 +243,23 @@ fn store_encryption_secret_tool(key_id: i64, password: &str) -> Result<()> {
         .map_err(|e| CoreError::PbsCommand(format!("secret-tool not available: {e}")))?;
 
     if let Some(mut stdin) = child.stdin.take() {
-        stdin
-            .write_all(password.as_bytes())
-            .map_err(CoreError::Io)?;
+        stdin.write_all(secret.as_bytes()).map_err(CoreError::Io)?;
     }
-
     let status = child.wait().map_err(CoreError::Io)?;
     if status.success() {
         Ok(())
     } else {
-        Err(CoreError::PbsCommand("secret-tool store failed".into()))
+        Err(CoreError::PbsCommand(
+            "secret-tool store failed (is libsecret installed?)".into(),
+        ))
     }
 }
 
-fn load_encryption_secret_tool(key_id: i64) -> Option<String> {
+#[cfg(unix)]
+fn keyring_load(account: &str) -> Option<String> {
+    use std::process::Command;
     let output = Command::new("secret-tool")
-        .args([
-            "lookup",
-            "xdg:service",
-            APP_ID,
-            "xdg:encryption_key",
-            &key_id.to_string(),
-        ])
+        .args(["lookup", "xdg:service", APP_ID, "xdg:account", account])
         .output()
         .ok()?;
     if output.status.success() {
@@ -288,15 +269,11 @@ fn load_encryption_secret_tool(key_id: i64) -> Option<String> {
     }
 }
 
-fn clear_encryption_secret_tool(key_id: i64) -> Result<()> {
+#[cfg(unix)]
+fn keyring_delete(account: &str) -> Result<()> {
+    use std::process::Command;
     let status = Command::new("secret-tool")
-        .args([
-            "clear",
-            "xdg:service",
-            APP_ID,
-            "xdg:encryption_key",
-            &key_id.to_string(),
-        ])
+        .args(["clear", "xdg:service", APP_ID, "xdg:account", account])
         .status()
         .map_err(CoreError::Io)?;
     if status.success() {
@@ -304,6 +281,22 @@ fn clear_encryption_secret_tool(key_id: i64) -> Result<()> {
     } else {
         Err(CoreError::PbsCommand("secret-tool clear failed".into()))
     }
+}
+
+// ── Fallback file helpers ─────────────────────────────────────────────────────
+
+fn write_fallback_token(profile_id: i64, token: &str) -> Result<()> {
+    ensure_data_dirs().map_err(CoreError::Io)?;
+    let dir = config_dir().join("tokens");
+    std::fs::create_dir_all(&dir).map_err(CoreError::Io)?;
+    let path = fallback_token_path(profile_id);
+    std::fs::write(&path, token).map_err(CoreError::Io)?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600));
+    }
+    Ok(())
 }
 
 fn write_fallback_encryption_password(key_id: i64, password: &str) -> Result<()> {
@@ -318,15 +311,4 @@ fn write_fallback_encryption_password(key_id: i64, password: &str) -> Result<()>
         let _ = std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600));
     }
     Ok(())
-}
-
-/// Migrates tokens still embedded in repository JSON into the credential store.
-pub fn migrate_repository_tokens(profile_id: i64, repository: &str) -> Result<String> {
-    let parts = PbsRepositoryParts::parse(repository)
-        .map_err(|e| CoreError::PbsCommand(e.to_string()))?;
-    if parts.api_token_secret().is_empty() {
-        return Ok(repository.to_string());
-    }
-    warn!(profile_id, "migrating API token from database to credential store");
-    persist_profile_credentials(profile_id, &parts)
 }

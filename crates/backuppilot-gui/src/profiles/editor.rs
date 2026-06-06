@@ -1023,7 +1023,7 @@ fn refill_encryption_key_combo(
     );
 }
 
-async fn save_profile(profile_id: Option<i64>, data: NewProfile) -> Result<(), zbus::Error> {
+async fn save_profile(profile_id: Option<i64>, data: NewProfile) -> Result<(), backuppilot_ipc::IpcError> {
     let proxy = connect().await?;
     match profile_id {
         Some(id) => {
@@ -1120,7 +1120,7 @@ fn confirm_delete(
                 async move {
                     let proxy = connect().await?;
                     dbus_client::delete_profile(&proxy, profile_id).await?;
-                    Ok::<(), zbus::Error>(())
+                    Ok::<(), backuppilot_ipc::IpcError>(())
                 },
                 move |result| {
                     let _ = result;

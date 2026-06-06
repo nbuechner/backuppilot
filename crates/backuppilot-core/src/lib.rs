@@ -23,6 +23,7 @@ pub mod preflight;
 pub mod secrets;
 pub mod paths;
 pub mod pbs;
+pub mod pbs_api;
 pub mod mount_manager;
 pub mod mount_registry;
 pub mod pbs_mount;
@@ -57,6 +58,7 @@ pub use pbs_install::{
     PbsClientInstallGuide, PbsClientInstallMethod, PBS_CLIENT_COPR_URL, PBS_CLIENT_DOC_URL,
 };
 pub use pbs_repository::{normalize_pbs_host, PbsRepositoryParts, RepositoryParseError};
+pub use pbs_api::{PbsApiClient, PbsApiError};
 pub use encryption::{
     apply_encryption_to_command, encryption_key_in_use, export_encryption_key_copy,
     fingerprints_match, key_absolute_path, normalize_fingerprint, read_key_fingerprint,

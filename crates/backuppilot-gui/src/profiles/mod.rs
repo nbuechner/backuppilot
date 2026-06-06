@@ -581,7 +581,7 @@ fn append_error_row(list: &gtk::ListBox, message: &str) {
 }
 
 async fn daemon_list_profiles_and_statuses(
-) -> zbus::Result<(Vec<BackupProfile>, Vec<ProfileStatus>)> {
+) -> backuppilot_ipc::Result<(Vec<BackupProfile>, Vec<ProfileStatus>)> {
     let proxy = connect().await?;
     let profiles = dbus_client::list_profiles(&proxy).await?;
     let statuses = dbus_client::list_statuses(&proxy).await?;

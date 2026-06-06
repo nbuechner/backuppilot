@@ -1,1 +1,1 @@
-include!(concat!(env!("OUT_DIR"), "/dbus_iface.rs"));
+include!(concat!(env!("OUT_DIR"), "/ipc_handler.rs"));

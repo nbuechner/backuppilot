@@ -273,6 +273,16 @@ pub fn resolve_encryption_key_id_for_snapshot(
 
 impl PbsRestore {
     pub async fn list_snapshots(profile: &BackupProfile) -> Result<Vec<PbsSnapshotInfo>> {
+        // REST API fallback: works on platforms without the CLI binary (e.g. Windows).
+        if !crate::pbs::PbsClient::is_available().await {
+            let api = crate::pbs_api::PbsApiClient::from_profile(profile)
+                .map_err(|e| CoreError::PbsCommand(e))?;
+            return api
+                .list_snapshots(&profile.backup_id)
+                .await
+                .map_err(|e| CoreError::PbsCommand(e.to_string()));
+        }
+
         let parts = repository_parts(profile)?;
         let group = snapshot_group(profile);
         let output = run_pbs_with_timeout(
@@ -455,6 +465,16 @@ impl PbsRestore {
         profile: &BackupProfile,
         snapshot: &str,
     ) -> Result<Vec<String>> {
+        // REST API fallback: works on platforms without the CLI binary (e.g. Windows).
+        if !crate::pbs::PbsClient::is_available().await {
+            let api = crate::pbs_api::PbsApiClient::from_profile(profile)
+                .map_err(|e| CoreError::PbsCommand(e))?;
+            return api
+                .list_snapshot_archives(snapshot)
+                .await
+                .map_err(|e| CoreError::PbsCommand(e.to_string()));
+        }
+
         let parts = repository_parts(profile)?;
         let output = run_pbs_with_timeout(
             profile,

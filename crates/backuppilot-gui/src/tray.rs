@@ -277,7 +277,7 @@ fn schedule_toggle_pause() {
     });
 }
 
-async fn fetch_statuses() -> zbus::Result<Vec<ProfileStatus>> {
+async fn fetch_statuses() -> backuppilot_ipc::Result<Vec<ProfileStatus>> {
     let proxy = connect().await?;
     dbus_client::list_statuses(&proxy).await
 }

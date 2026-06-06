@@ -170,7 +170,7 @@ pub fn stop_polling() {
     });
 }
 
-async fn daemon_list_statuses() -> zbus::Result<Vec<ProfileStatus>> {
+async fn daemon_list_statuses() -> backuppilot_ipc::Result<Vec<ProfileStatus>> {
     let proxy = connect().await?;
     dbus_client::list_statuses(&proxy).await
 }

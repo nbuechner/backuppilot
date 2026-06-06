@@ -6,9 +6,8 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 
-use backuppilot_core::{find_executable, is_flatpak_runtime, DBUS_NAME, DBUS_SERVICE_FILE};
+use backuppilot_core::{find_executable, is_flatpak_runtime, DBUS_SERVICE_FILE};
 use backuppilot_i18n::tr;
-use zbus::names::{BusName, InterfaceName};
 
 const DAEMON_SYSTEMD_UNIT: &str = "backuppilot-daemon.service";
 const REACHABILITY_WAIT: Duration = Duration::from_millis(250);
@@ -64,23 +63,11 @@ pub fn is_daemon_reachable() -> bool {
             .enable_all()
             .build()
             .ok()
-            .and_then(|rt| {
+            .map(|rt| {
                 rt.block_on(async {
-                    let conn = zbus::Connection::session().await.ok()?;
-                    let bus = BusName::from_static_str("org.freedesktop.DBus").ok()?;
-                    let iface =
-                        InterfaceName::from_static_str("org.freedesktop.DBus").ok()?;
-                    let reply = conn
-                        .call_method(
-                            Some(bus),
-                            "/org/freedesktop/DBus",
-                            Some(iface),
-                            "NameHasOwner",
-                            &(DBUS_NAME,),
-                        )
+                    backuppilot_ipc::IpcClient::call("version", serde_json::Value::Null)
                         .await
-                        .ok()?;
-                    reply.body().deserialize::<bool>().ok()
+                        .is_ok()
                 })
             })
             .unwrap_or(false)
