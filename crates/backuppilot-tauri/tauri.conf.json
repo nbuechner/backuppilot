@@ -11,10 +11,11 @@
       {
         "label": "main",
         "title": "BackupPilot",
-        "width": 1100,
-        "height": 720,
-        "minWidth": 800,
-        "minHeight": 560,
+        "width": 900,
+        "height": 660,
+        "minWidth": 700,
+        "minHeight": 500,
+        "center": true,
         "visible": false
       }
     ],
