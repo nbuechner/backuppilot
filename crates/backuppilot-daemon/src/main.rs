@@ -17,6 +17,13 @@ use crate::service::DaemonService;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // Hide the console window in release builds — the daemon runs in the background.
+    #[cfg(all(windows, not(debug_assertions)))]
+    unsafe {
+        extern "system" { fn FreeConsole() -> i32; }
+        FreeConsole();
+    }
+
     backuppilot_i18n::init();
     apply_language(&load_app_settings());
 
