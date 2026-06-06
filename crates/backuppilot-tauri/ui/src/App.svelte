@@ -1,16 +1,18 @@
 <script>
-  import Profiles from './pages/Profiles.svelte';
-  import Activity from './pages/Activity.svelte';
-  import Restore  from './pages/Restore.svelte';
-  import Settings from './pages/Settings.svelte';
+  import Profiles        from './pages/Profiles.svelte';
+  import Activity        from './pages/Activity.svelte';
+  import Restore         from './pages/Restore.svelte';
+  import Settings        from './pages/Settings.svelte';
+  import EncryptionKeys  from './pages/EncryptionKeys.svelte';
 
   let page = $state('profiles');
 
   const nav = [
-    { id: 'profiles', label: 'Profiles',  icon: '🗂' },
-    { id: 'activity', label: 'Activity',  icon: '📋' },
-    { id: 'restore',  label: 'Restore',   icon: '⏮' },
-    { id: 'settings', label: 'Settings',  icon: '⚙' },
+    { id: 'profiles', label: 'Profiles',        icon: '🗂' },
+    { id: 'activity', label: 'Activity',         icon: '📋' },
+    { id: 'restore',  label: 'Restore',          icon: '⏮' },
+    { id: 'keys',     label: 'Encryption Keys',  icon: '🔑' },
+    { id: 'settings', label: 'Settings',         icon: '⚙' },
   ];
 </script>
 
@@ -38,6 +40,8 @@
       <Activity />
     {:else if page === 'restore'}
       <Restore />
+    {:else if page === 'keys'}
+      <EncryptionKeys />
     {:else if page === 'settings'}
       <Settings />
     {/if}

@@ -1,29 +1,42 @@
 <script>
   import { ipcCall } from './ipc.js';
 
-  let { onSaved, onCancel } = $props();
+  let { onSaved, onCancel, profile = null } = $props();
+
+  const isEdit = profile != null;
+
+  // Parse existing repository JSON if editing
+  function parseRepo(repoJson) {
+    try { return JSON.parse(repoJson); } catch { return {}; }
+  }
+  const existingRepo = isEdit ? parseRepo(profile.repository) : {};
 
   // Basic
-  let name       = $state('');
-  let enabled    = $state(true);
+  let name       = $state(isEdit ? profile.name : '');
+  let enabled    = $state(isEdit ? profile.enabled : true);
 
   // PBS connection
-  let pbsHost      = $state('');
-  let pbsUser      = $state('root@pam');
-  let pbsToken     = $state('');
-  let pbsDatastore = $state('');
-  let pbsFingerprint = $state('');
+  let pbsHost        = $state(existingRepo.host ?? '');
+  let pbsUser        = $state(existingRepo.user ?? 'root@pam');
+  let pbsToken       = $state(existingRepo.token ?? '');
+  let pbsDatastore   = $state(existingRepo.datastore ?? '');
+  let pbsFingerprint = $state(profile?.fingerprint ?? '');
 
   // Backup config
-  let backupId   = $state('');
-  let namespace  = $state('');
-  let pathInput  = $state('');
-  let paths      = $state([]);
+  let backupId  = $state(isEdit ? (profile.backup_id ?? '') : '');
+  let namespace = $state(isEdit ? (profile.namespace ?? '') : '');
+  let pathInput = $state('');
+  let paths     = $state(isEdit ? [...(profile.paths ?? [])] : []);
 
   // Schedule
-  let scheduleType = $state('daily');
-  let scheduleTime = $state('02:00');
-  let scheduleWeekday = $state(1);
+  function parseSchedule(s) {
+    if (!s) return { type: 'daily', time: '02:00', weekday: 1 };
+    return { type: s.type ?? 'daily', time: s.time ?? '02:00', weekday: s.weekday ?? 1 };
+  }
+  const sched = parseSchedule(profile?.schedule);
+  let scheduleType    = $state(sched.type);
+  let scheduleTime    = $state(sched.time);
+  let scheduleWeekday = $state(sched.weekday);
 
   let saving = $state(false);
   let error  = $state('');
@@ -31,16 +44,6 @@
   function onKeydown(e) {
     if (e.key === 'Escape') onCancel();
   }
-
-  // Populate backup ID from hostname
-  async function loadHostname() {
-    try {
-      const v = await ipcCall('version', null);
-      // Hostname not returned by version — use env fallback below
-    } catch {}
-    // Browser-side: navigator doesn't give hostname; leave blank for user to fill
-  }
-  loadHostname();
 
   function addPath() {
     const p = pathInput.trim();
@@ -74,28 +77,36 @@
       datastore: pbsDatastore.trim(),
     });
 
-    const newProfile = {
+    const profileData = {
       name: name.trim(),
       enabled,
       repository,
       namespace: namespace.trim() || null,
       backup_id: backupId.trim() || 'localhost',
       paths,
-      excludes: [],
+      excludes: profile?.excludes ?? [],
       schedule: buildSchedule(),
-      conditions: {
+      conditions: profile?.conditions ?? {
         execution_context: 'daemon',
         require_ac_power: false,
         require_network: [],
         require_vpn: false,
         require_server_reachable: true,
       },
-      health_check: {},
+      health_check: profile?.health_check ?? {},
     };
+    if (pbsFingerprint.trim()) profileData.fingerprint = pbsFingerprint.trim();
 
     saving = true;
     try {
-      await ipcCall('create_profile', { profile_json: JSON.stringify(newProfile) });
+      if (isEdit) {
+        await ipcCall('update_profile', {
+          profile_id: profile.id,
+          profile_json: JSON.stringify(profileData),
+        });
+      } else {
+        await ipcCall('create_profile', { profile_json: JSON.stringify(profileData) });
+      }
       onSaved();
     } catch (e) {
       error = String(e);
@@ -110,22 +121,22 @@
 <div class="overlay" onclick={onCancel}>
   <div class="dialog" onclick={e => e.stopPropagation()}>
     <div class="dialog-header">
-      <h2>New Backup Profile</h2>
+      <h2>{isEdit ? 'Edit Profile' : 'New Backup Profile'}</h2>
       <button class="close-btn" onclick={onCancel}>✕</button>
     </div>
 
     <div class="dialog-body">
 
-      <!-- Basic -->
+      <!-- General -->
       <section>
         <h3 class="section-title">General</h3>
         <div class="field">
-          <label>Profile name</label>
-          <input type="text" bind:value={name} placeholder="My Backup" />
+          <label for="pf-name">Profile name</label>
+          <input id="pf-name" type="text" placeholder="My Backup" bind:value={name} />
         </div>
-        <div class="field row">
-          <label>Enabled</label>
-          <input type="checkbox" bind:checked={enabled} />
+        <div class="field">
+          <label for="pf-enabled">Enabled</label>
+          <input id="pf-enabled" type="checkbox" bind:checked={enabled} />
         </div>
       </section>
 
@@ -133,26 +144,24 @@
       <section>
         <h3 class="section-title">PBS Connection</h3>
         <div class="field">
-          <label>Host</label>
-          <input type="text" bind:value={pbsHost} placeholder="192.168.1.100 or pbs.example.com" />
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>User</label>
-            <input type="text" bind:value={pbsUser} placeholder="root@pam" />
-          </div>
-          <div class="field">
-            <label>Datastore</label>
-            <input type="text" bind:value={pbsDatastore} placeholder="backups" />
-          </div>
+          <label for="pf-host">PBS host</label>
+          <input id="pf-host" type="text" placeholder="192.168.1.100 or pbs.example.com" bind:value={pbsHost} />
         </div>
         <div class="field">
-          <label>API Token</label>
-          <input type="password" bind:value={pbsToken} placeholder="tokenid=secret" />
+          <label for="pf-user">User</label>
+          <input id="pf-user" type="text" placeholder="root@pam" bind:value={pbsUser} />
         </div>
         <div class="field">
-          <label>TLS Fingerprint <span class="optional">(optional)</span></label>
-          <input type="text" bind:value={pbsFingerprint} placeholder="XX:XX:XX:..." />
+          <label for="pf-token">API token</label>
+          <input id="pf-token" type="text" placeholder="tokenid=secret" bind:value={pbsToken} />
+        </div>
+        <div class="field">
+          <label for="pf-ds">Datastore</label>
+          <input id="pf-ds" type="text" placeholder="backups" bind:value={pbsDatastore} />
+        </div>
+        <div class="field">
+          <label for="pf-fp">Fingerprint</label>
+          <input id="pf-fp" type="text" placeholder="AA:BB:CC:… (optional)" bind:value={pbsFingerprint} />
         </div>
       </section>
 
@@ -160,81 +169,77 @@
       <section>
         <h3 class="section-title">Backup</h3>
         <div class="field">
-          <label>Backup ID <span class="optional">(hostname)</span></label>
-          <input type="text" bind:value={backupId} placeholder="my-pc" />
+          <label for="pf-bid">Backup ID</label>
+          <input id="pf-bid" type="text" placeholder="hostname" bind:value={backupId} />
         </div>
         <div class="field">
-          <label>Namespace <span class="optional">(optional)</span></label>
-          <input type="text" bind:value={namespace} placeholder="team/project" />
+          <label for="pf-ns">Namespace</label>
+          <input id="pf-ns" type="text" placeholder="optional" bind:value={namespace} />
         </div>
         <div class="field">
           <label>Backup paths</label>
-          <div class="path-list">
-            {#each paths as p}
-              <div class="path-item">
-                <span>{p}</span>
-                <button class="remove-btn" onclick={() => removePath(p)}>✕</button>
-              </div>
-            {/each}
-            <div class="path-add">
-              <input
-                type="text"
-                bind:value={pathInput}
-                placeholder="C:\Users\user\Documents"
-                onkeydown={e => e.key === 'Enter' && addPath()}
-              />
-              <button class="btn-ghost add-btn" onclick={addPath}>Add</button>
-            </div>
+          <div class="path-input-row">
+            <input type="text" placeholder="C:\Users\user\Documents" bind:value={pathInput}
+              onkeydown={e => e.key === 'Enter' && addPath()} />
+            <button class="btn-ghost-sm" onclick={addPath}>Add</button>
           </div>
         </div>
+        {#if paths.length > 0}
+          <div class="path-list">
+            {#each paths as p}
+              <div class="path-tag">
+                <span class="mono">{p}</span>
+                <button onclick={() => removePath(p)}>×</button>
+              </div>
+            {/each}
+          </div>
+        {/if}
       </section>
 
       <!-- Schedule -->
       <section>
         <h3 class="section-title">Schedule</h3>
-        <div class="field-row">
+        <div class="field">
+          <label for="pf-sched">Type</label>
+          <select id="pf-sched" bind:value={scheduleType}>
+            <option value="manual">Manual</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+        {#if scheduleType !== 'manual'}
           <div class="field">
-            <label>Type</label>
-            <select bind:value={scheduleType}>
-              <option value="manual">Manual only</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
+            <label for="pf-time">Time</label>
+            <input id="pf-time" type="time" bind:value={scheduleTime} />
+          </div>
+        {/if}
+        {#if scheduleType === 'weekly'}
+          <div class="field">
+            <label for="pf-wday">Weekday</label>
+            <select id="pf-wday" bind:value={scheduleWeekday}>
+              <option value={1}>Monday</option>
+              <option value={2}>Tuesday</option>
+              <option value={3}>Wednesday</option>
+              <option value={4}>Thursday</option>
+              <option value={5}>Friday</option>
+              <option value={6}>Saturday</option>
+              <option value={0}>Sunday</option>
             </select>
           </div>
-          {#if scheduleType !== 'manual'}
-            <div class="field">
-              <label>Time</label>
-              <input type="time" bind:value={scheduleTime} />
-            </div>
-          {/if}
-          {#if scheduleType === 'weekly'}
-            <div class="field">
-              <label>Weekday</label>
-              <select bind:value={scheduleWeekday}>
-                <option value={1}>Monday</option>
-                <option value={2}>Tuesday</option>
-                <option value={3}>Wednesday</option>
-                <option value={4}>Thursday</option>
-                <option value={5}>Friday</option>
-                <option value={6}>Saturday</option>
-                <option value={7}>Sunday</option>
-              </select>
-            </div>
-          {/if}
-        </div>
+        {/if}
       </section>
-
-      {#if error}
-        <div class="error-box">{error}</div>
-      {/if}
 
     </div>
 
+    {#if error}
+      <div class="error-box">{error}</div>
+    {/if}
+
     <div class="dialog-footer">
-      <button class="btn-ghost" onclick={onCancel}>Cancel</button>
-      <button class="btn-primary" disabled={saving} onclick={save}>
-        {saving ? 'Saving…' : 'Create Profile'}
+      <button class="btn-primary" onclick={save} disabled={saving}>
+        {saving ? 'Saving…' : (isEdit ? 'Save Changes' : 'Create Profile')}
       </button>
+      <button class="btn-ghost" onclick={onCancel}>Cancel</button>
     </div>
   </div>
 </div>
@@ -243,58 +248,41 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0, 0, 0, 0.45);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    z-index: 100;
+    z-index: 50;
+    padding: 40px 20px;
+    overflow-y: auto;
   }
 
   .dialog {
-    background: #fff;
-    border-radius: 10px;
-    width: 620px;
-    max-height: 88vh;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: 540px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
   }
 
   .dialog-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 24px 14px;
+    padding: 20px 24px 16px;
     border-bottom: 1px solid var(--border);
   }
-
-  .dialog-header h2 { font-size: 16px; font-weight: 600; }
+  .dialog-header h2 { font-size: 16px; font-weight: 700; margin: 0; }
 
   .close-btn {
-    background: transparent;
-    border: none;
-    font-size: 16px;
-    color: var(--text-muted);
-    padding: 4px 8px;
-    cursor: pointer;
+    background: none; border: none; font-size: 18px;
+    color: var(--text-muted); cursor: pointer; padding: 2px 6px;
   }
   .close-btn:hover { color: var(--text); }
 
-  .dialog-body {
-    overflow-y: auto;
-    padding: 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 14px 24px;
-    border-top: 1px solid var(--border);
-  }
+  .dialog-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; max-height: 60vh; }
 
   section { display: flex; flex-direction: column; gap: 10px; }
 
@@ -302,75 +290,67 @@
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: var(--text-muted);
-    margin-bottom: 2px;
+    margin: 0;
   }
 
-  .field { display: flex; flex-direction: column; gap: 4px; }
-  .field.row { flex-direction: row; align-items: center; gap: 10px; }
-
-  .field-row {
+  .field {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: 130px 1fr;
+    align-items: center;
+    gap: 10px;
   }
-
-  label { font-size: 12px; font-weight: 500; color: var(--text); }
-
-  .optional { font-weight: 400; color: var(--text-muted); }
-
-  input[type="text"],
-  input[type="password"],
-  input[type="time"],
-  select {
+  .field label { font-size: 13px; color: var(--text); }
+  .field input[type="text"],
+  .field input[type="time"],
+  .field select {
     padding: 7px 10px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     font-size: 13px;
-    background: #fff;
+    background: var(--bg);
     color: var(--text);
-    outline: none;
     width: 100%;
   }
-  input:focus, select:focus { border-color: var(--blue); }
+  .field input[type="checkbox"] { width: 16px; height: 16px; }
 
-  .path-list { display: flex; flex-direction: column; gap: 6px; }
+  .path-input-row { display: flex; gap: 6px; }
+  .path-input-row input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg); }
 
-  .path-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 6px 10px;
-    font-size: 13px;
+  .path-list { display: flex; flex-direction: column; gap: 4px; padding-left: 140px; }
+  .path-tag {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 4px 8px; font-size: 12px;
   }
-
-  .remove-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 12px;
-    padding: 0 4px;
-    cursor: pointer;
+  .path-tag button {
+    background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px;
   }
-  .remove-btn:hover { color: var(--red); }
-
-  .path-add {
-    display: flex;
-    gap: 8px;
-  }
-  .path-add input { flex: 1; }
-  .add-btn { white-space: nowrap; }
+  .mono { font-family: monospace; }
 
   .error-box {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    font-size: 13px;
+    margin: 0 24px 16px;
+    background: #f8d7da; color: #721c24;
+    border: 1px solid #f5c6cb; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px;
   }
+
+  .dialog-footer {
+    display: flex;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-ghost-sm {
+    background: transparent; border: 1px solid var(--border);
+    padding: 5px 12px; border-radius: var(--radius-sm); font-size: 13px;
+    cursor: pointer; color: var(--text); white-space: nowrap;
+  }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border);
+    padding: 8px 18px; border-radius: var(--radius-sm); font-size: 13px;
+    font-weight: 500; cursor: pointer; color: var(--text);
+  }
+  .btn-ghost:hover { background: var(--bg); }
 </style>

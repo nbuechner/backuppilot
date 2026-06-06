@@ -1,91 +1,343 @@
 <script>
-  import { listProfiles, listSnapshots } from '../lib/ipc.js';
+  import { listProfiles, listSnapshots, listCatalog, restoreArchive, listActiveMounts, unmountSnapshot } from '../lib/ipc.js';
+  import { onDestroy } from 'svelte';
 
-  let profiles   = $state([]);
-  let snapshots  = $state([]);
-  let selectedProfile = $state(null);
-  let loading    = $state(false);
-  let error      = $state('');
+  let profiles    = $state([]);
+  let snapshots   = $state([]);
+  let catalog     = $state(null);   // ListCatalogResponse
+  let activeMounts = $state([]);
+
+  let selectedProfile  = $state(null);
+  let selectedSnapshot = $state(null);
+  let selectedArchive  = $state('');
+  let currentPath      = $state('/');
+
+  let targetDir     = $state('');
+  let overwrite     = $state(false);
+  let selectedPaths = $state(new Set());
+
+  let loadingSnapshots = $state(false);
+  let loadingCatalog   = $state(false);
+  let restoring        = $state(false);
+  let restoreResult    = $state(null);
+  let error            = $state('');
 
   async function loadProfiles() {
     try {
-      profiles = await listProfiles();
+      [profiles, activeMounts] = await Promise.all([listProfiles(), listActiveMounts()]);
     } catch (e) {
       error = String(e);
     }
   }
 
-  async function loadSnapshots(profileId) {
-    loading = true;
+  async function selectProfile(p) {
+    selectedProfile = p;
+    selectedSnapshot = null;
+    catalog = null;
+    selectedArchive = '';
+    currentPath = '/';
     snapshots = [];
+    loadingSnapshots = true;
     try {
-      snapshots = await listSnapshots(profileId);
-      error = '';
+      snapshots = await listSnapshots(p.id);
     } catch (e) {
       error = String(e);
     } finally {
-      loading = false;
+      loadingSnapshots = false;
     }
   }
 
-  function selectProfile(p) {
-    selectedProfile = p;
-    loadSnapshots(p.id);
+  async function selectSnapshot(s) {
+    selectedSnapshot = s;
+    catalog = null;
+    selectedArchive = '';
+    currentPath = '/';
+    await loadCatalog('/');
+  }
+
+  async function loadCatalog(path) {
+    if (!selectedProfile || !selectedSnapshot) return;
+    loadingCatalog = true;
+    try {
+      catalog = await listCatalog({
+        profile_id: selectedProfile.id,
+        snapshot: selectedSnapshot.backup_id,
+        archive_name: selectedArchive || '',
+        parent_path: path,
+        force_refresh: false,
+        encryption_key_id: null,
+      });
+      currentPath = path;
+      if (!selectedArchive && catalog.suggested_archive) {
+        selectedArchive = catalog.suggested_archive;
+      }
+    } catch (e) {
+      error = String(e);
+    } finally {
+      loadingCatalog = false;
+    }
+  }
+
+  async function selectArchive(archive) {
+    selectedArchive = archive;
+    currentPath = '/';
+    await loadCatalog('/');
+  }
+
+  async function navigateDir(path) {
+    selectedPaths = new Set();
+    await loadCatalog(path);
+  }
+
+  function togglePath(path) {
+    const next = new Set(selectedPaths);
+    if (next.has(path)) next.delete(path);
+    else next.add(path);
+    selectedPaths = next;
+  }
+
+  function breadcrumbs() {
+    const parts = currentPath.split('/').filter(Boolean);
+    const crumbs = [{ label: '/', path: '/' }];
+    let acc = '';
+    for (const p of parts) {
+      acc += '/' + p;
+      crumbs.push({ label: p, path: acc });
+    }
+    return crumbs;
+  }
+
+  async function doRestore() {
+    if (!selectedProfile || !selectedSnapshot || !targetDir.trim()) return;
+    restoring = true;
+    restoreResult = null;
+    try {
+      const req = {
+        profile_id: selectedProfile.id,
+        snapshot: selectedSnapshot.backup_id,
+        archive_name: selectedArchive,
+        target_dir: targetDir,
+        overwrite,
+        patterns: selectedPaths.size > 0 ? Array.from(selectedPaths) : [],
+        encryption_key_id: null,
+      };
+      restoreResult = await restoreArchive(req);
+    } catch (e) {
+      error = String(e);
+    } finally {
+      restoring = false;
+    }
+  }
+
+  async function doUnmount(mountId) {
+    try {
+      await unmountSnapshot(mountId);
+      activeMounts = await listActiveMounts();
+    } catch (e) {
+      error = String(e);
+    }
+  }
+
+  function formatDate(ts) {
+    if (!ts) return '—';
+    return new Date(ts * 1000).toLocaleString();
   }
 
   loadProfiles();
+  const interval = setInterval(() => listActiveMounts().then(m => activeMounts = m).catch(() => {}), 10000);
+  onDestroy(() => clearInterval(interval));
 </script>
 
 <h1 class="page-title">Restore</h1>
 
-<div class="restore-layout">
-  <div class="panel card">
-    <h2 class="panel-title">1. Select Profile</h2>
-    {#each profiles as p}
-      <button
-        class="list-item"
-        class:selected={selectedProfile?.id === p.id}
-        onclick={() => selectProfile(p)}
-      >{p.name}</button>
+{#if error}
+  <div class="error-box" role="alert">{error}<button class="close-btn" onclick={() => error = ''}>×</button></div>
+{/if}
+
+{#if activeMounts.length > 0}
+  <div class="mount-banner card">
+    <strong>Active mounts:</strong>
+    {#each activeMounts as m}
+      <div class="mount-row">
+        <span class="mono">{m.mount_path}</span>
+        <span class="muted">{m.profile_name} / {m.snapshot_id}</span>
+        <button class="btn-ghost-sm" onclick={() => doUnmount(m.id)}>Unmount</button>
+      </div>
     {/each}
+  </div>
+{/if}
+
+<div class="restore-layout">
+
+  <!-- Step 1: Profile -->
+  <div class="panel card">
+    <h2 class="panel-title">1. Profile</h2>
     {#if profiles.length === 0}
       <p class="muted">No profiles.</p>
+    {:else}
+      {#each profiles as p}
+        <button
+          class="list-item"
+          class:selected={selectedProfile?.id === p.id}
+          onclick={() => selectProfile(p)}
+        >{p.name}</button>
+      {/each}
     {/if}
   </div>
 
+  <!-- Step 2: Snapshot -->
   <div class="panel card">
-    <h2 class="panel-title">2. Select Snapshot</h2>
+    <h2 class="panel-title">2. Snapshot</h2>
     {#if !selectedProfile}
       <p class="muted">Select a profile first.</p>
-    {:else if loading}
+    {:else if loadingSnapshots}
       <div class="center"><span class="spinner"></span></div>
-    {:else if error}
-      <p class="error-text">{error}</p>
     {:else if snapshots.length === 0}
       <p class="muted">No snapshots found.</p>
     {:else}
       {#each snapshots as s}
-        <div class="list-item snapshot-item">
-          <span>{s.backup_id}</span>
-          <span class="muted">{new Date(s.backup_time * 1000).toLocaleDateString()}</span>
-        </div>
+        <button
+          class="list-item snapshot-item"
+          class:selected={selectedSnapshot?.backup_id === s.backup_id}
+          onclick={() => selectSnapshot(s)}
+        >
+          <span class="mono">{s.backup_id}</span>
+          <span class="muted">{formatDate(s.backup_time)}</span>
+        </button>
       {/each}
     {/if}
   </div>
+
 </div>
 
+{#if selectedSnapshot && catalog}
+  <!-- Step 3: Archive & file browser -->
+  <div class="card browser-panel">
+    <h2 class="panel-title">3. Browse &amp; Select Files</h2>
+
+    {#if catalog.archives?.length > 1}
+      <div class="archive-tabs">
+        {#each catalog.archives as a}
+          <button
+            class="tab"
+            class:tab-active={selectedArchive === a}
+            onclick={() => selectArchive(a)}
+          >{a}</button>
+        {/each}
+      </div>
+    {/if}
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+      {#each breadcrumbs() as crumb, i}
+        {#if i > 0}<span class="crumb-sep">/</span>{/if}
+        <button class="crumb" onclick={() => navigateDir(crumb.path)}>{crumb.label}</button>
+      {/each}
+    </div>
+
+    {#if loadingCatalog}
+      <div class="center"><span class="spinner"></span></div>
+    {:else if catalog.entries?.length === 0}
+      <p class="muted">Empty directory.</p>
+    {:else}
+      <div class="file-list">
+        {#if currentPath !== '/'}
+          <button class="file-row" onclick={() => {
+            const parts = currentPath.split('/').filter(Boolean);
+            parts.pop();
+            navigateDir(parts.length ? '/' + parts.join('/') : '/');
+          }}>
+            <span class="file-icon">📁</span>
+            <span>..</span>
+          </button>
+        {/if}
+        {#each catalog.entries as entry}
+          <div class="file-row">
+            {#if !entry.is_dir}
+              <input type="checkbox"
+                checked={selectedPaths.has(entry.path)}
+                onchange={() => togglePath(entry.path)} />
+            {:else}
+              <span style="width:16px"></span>
+            {/if}
+            <button
+              class="file-name"
+              onclick={() => entry.is_dir ? navigateDir(entry.path) : togglePath(entry.path)}
+            >
+              <span class="file-icon">{entry.is_dir ? '📁' : '📄'}</span>
+              {entry.name}
+            </button>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+
+  <!-- Step 4: Restore options -->
+  <div class="card restore-options">
+    <h2 class="panel-title">4. Restore</h2>
+
+    {#if selectedPaths.size > 0}
+      <p class="muted">{selectedPaths.size} file(s) selected. Leave empty to restore entire archive.</p>
+    {:else}
+      <p class="muted">No files selected — entire archive will be restored.</p>
+    {/if}
+
+    <div class="field-row">
+      <label for="target-dir">Target directory</label>
+      <input id="target-dir" type="text" placeholder="/home/user/restored" bind:value={targetDir} />
+    </div>
+
+    <label class="toggle-row">
+      <span>Overwrite existing files</span>
+      <input type="checkbox" bind:checked={overwrite} />
+    </label>
+
+    <button class="btn-primary restore-btn" onclick={doRestore}
+      disabled={restoring || !targetDir.trim()}>
+      {restoring ? 'Restoring…' : 'Start Restore'}
+    </button>
+
+    {#if restoreResult}
+      {#if restoreResult.ok}
+        <div class="result-ok">✓ Restore completed successfully.</div>
+      {:else}
+        <div class="result-error">
+          Restore failed: {restoreResult.message ?? 'Unknown error'}
+          {#if restoreResult.conflicts?.length > 0}
+            <ul>{#each restoreResult.conflicts as c}<li class="mono">{c}</li>{/each}</ul>
+          {/if}
+        </div>
+      {/if}
+    {/if}
+  </div>
+{/if}
+
 <style>
-  .page-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+  .page-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+
+  .error-box {
+    background: #f8d7da; color: #721c24;
+    border: 1px solid #f5c6cb; border-radius: var(--radius); padding: 12px 16px;
+    margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .close-btn { background: none; border: none; color: #721c24; font-size: 18px; cursor: pointer; }
+
+  .mount-banner { padding: 12px 16px; margin-bottom: 16px; background: #fffbf0; border: 1px solid #fde68a; }
+  .mount-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; font-size: 13px; }
 
   .restore-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
+    margin-bottom: 16px;
   }
 
   .panel { padding: 16px; }
-  .panel-title { font-size: 13px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 12px; }
+  .panel-title {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 12px;
+  }
 
   .list-item {
     display: flex;
@@ -104,9 +356,69 @@
   .list-item:hover { background: var(--bg); }
   .list-item.selected { background: #dbeafe; color: #1d4ed8; }
 
-  .snapshot-item { cursor: default; }
+  .snapshot-item { font-size: 12px; }
 
   .center { display: flex; justify-content: center; padding: 20px; }
   .muted { color: var(--text-muted); font-size: 13px; }
-  .error-text { color: var(--red); font-size: 13px; }
+  .mono { font-family: monospace; font-size: 12px; }
+
+  .browser-panel { padding: 16px; margin-bottom: 16px; }
+
+  .archive-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+  .tab {
+    padding: 5px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: transparent; font-size: 12px; cursor: pointer; color: var(--text);
+  }
+  .tab-active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+
+  .breadcrumbs {
+    display: flex; align-items: center; gap: 2px;
+    background: var(--bg); padding: 6px 10px; border-radius: var(--radius-sm);
+    margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .crumb {
+    background: none; border: none; color: #2563eb; font-size: 13px;
+    cursor: pointer; padding: 1px 3px; border-radius: 3px;
+  }
+  .crumb:hover { background: #dbeafe; }
+  .crumb-sep { color: var(--text-muted); font-size: 13px; }
+
+  .file-list { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .file-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .file-row:last-child { border-bottom: none; }
+  .file-icon { font-size: 14px; }
+  .file-name {
+    background: none; border: none; text-align: left; cursor: pointer;
+    color: var(--text); font-size: 13px; flex: 1; display: flex; align-items: center; gap: 6px;
+  }
+  .file-name:hover { color: #2563eb; }
+
+  .restore-options { padding: 16px; }
+  .field-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .field-row label { color: var(--text); white-space: nowrap; min-width: 120px; }
+  .field-row input[type="text"] {
+    flex: 1; padding: 6px 10px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 13px; background: var(--bg); color: var(--text);
+  }
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; font-size: 13px; cursor: pointer;
+  }
+  .restore-btn { margin-top: 14px; }
+  .result-ok { margin-top: 12px; color: #166534; background: #dcfce7; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; }
+  .result-error { margin-top: 12px; color: #991b1b; background: #fee2e2; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; }
+  .result-error ul { margin: 6px 0 0; padding-left: 16px; }
+  .result-error li { font-family: monospace; font-size: 12px; }
+
+  .btn-ghost-sm {
+    background: transparent; border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: var(--radius-sm); font-size: 12px;
+    cursor: pointer; color: var(--text);
+  }
 </style>

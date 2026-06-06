@@ -8,6 +8,14 @@
 // Nav buttons render as "<emoji> Label" so use partial text match
 const navBtn = (label) => $(`button*=${label}`)
 
+async function closeFormIfOpen() {
+  const cancelBtn = await $('button=Cancel')
+  if (await cancelBtn.isDisplayed().catch(() => false)) {
+    await cancelBtn.click()
+    await $('h2=New Backup Profile').waitForDisplayed({ timeout: 3000, reverse: true })
+  }
+}
+
 describe('Backup Profiles page', () => {
   it('loads and shows the Profiles heading', async () => {
     const heading = await $('h1.page-title')
@@ -23,7 +31,8 @@ describe('Backup Profiles page', () => {
   it('shows all four sidebar navigation items', async () => {
     const items = await $$('.nav-item')
     expect(items.length).toBe(4)
-    const texts = await Promise.all(items.map(el => el.getText()))
+    // In WDIO v8, ChainablePromiseArray.map() returns a Promise directly
+    const texts = await items.map(el => el.getText())
     expect(texts.join(' ')).toMatch(/Profiles/)
     expect(texts.join(' ')).toMatch(/Activity/)
     expect(texts.join(' ')).toMatch(/Restore/)
@@ -32,6 +41,10 @@ describe('Backup Profiles page', () => {
 })
 
 describe('Add Profile form', () => {
+  afterEach(async () => {
+    await closeFormIfOpen()
+  })
+
   async function openForm() {
     const btn = await $('button*=Add Profile')
     await btn.click()
@@ -50,19 +63,17 @@ describe('Add Profile form', () => {
   it('opens when the + Add Profile button is clicked', async () => {
     await openForm()
     await expect($('h2=New Backup Profile')).toBeDisplayed()
-    await closeWithCancel()
   })
 
   it('contains all required form sections', async () => {
     await openForm()
 
     const sections = await $$('.section-title')
-    const titles = await Promise.all(sections.map(el => el.getText()))
+    // In WDIO v8, ChainablePromiseArray.map() returns a Promise directly
+    const titles = await sections.map(el => el.getText())
     expect(titles).toEqual(
       expect.arrayContaining(['GENERAL', 'PBS CONNECTION', 'BACKUP', 'SCHEDULE'])
     )
-
-    await closeWithCancel()
   })
 
   it('closes when Cancel is clicked', async () => {
@@ -91,8 +102,6 @@ describe('Add Profile form', () => {
     await expect(errorBox).toBeDisplayed()
     const msg = await errorBox.getText()
     expect(msg.toLowerCase()).toContain('required')
-
-    await closeWithCancel()
   })
 
   it('passes validation with all required fields filled', async () => {
@@ -103,7 +112,6 @@ describe('Add Profile form', () => {
     await $('input[placeholder="backups"]').setValue('test-store')
     await $('input[placeholder="tokenid=secret"]').setValue('root@pam!token=mysecret')
 
-    // Add a backup path
     const pathInput = await $('input[placeholder*="Documents"]')
     await pathInput.setValue('C:\\Users\\user\\Documents')
     await $('button=Add').click()
@@ -113,19 +121,13 @@ describe('Add Profile form', () => {
 
     await browser.pause(2000)
 
-    // If an error is shown, it must not be a validation error (field-required)
-    // It may be an IPC error if daemon is unreachable - that's acceptable here
+    // An IPC/network error is acceptable (daemon may be unreachable); a validation error is not
     const errorBox = await $('.error-box')
     const hasError = await errorBox.isDisplayed().catch(() => false)
     if (hasError) {
       const msg = await errorBox.getText()
       expect(msg.toLowerCase()).not.toContain('required')
     }
-
-    // Clean up
-    const cancelBtn = await $('button=Cancel')
-    const cancelVisible = await cancelBtn.isDisplayed().catch(() => false)
-    if (cancelVisible) await cancelBtn.click()
   })
 })
 

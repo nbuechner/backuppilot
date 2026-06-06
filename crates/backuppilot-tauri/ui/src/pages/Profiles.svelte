@@ -1,6 +1,7 @@
 <script>
-  import { listProfiles, listStatuses, runBackup, cancelBackup, deleteProfile } from '../lib/ipc.js';
+  import { listProfiles, listStatuses, runBackup, cancelBackup, deleteProfile, getProfile } from '../lib/ipc.js';
   import ProfileForm from '../lib/ProfileForm.svelte';
+  import { onDestroy } from 'svelte';
 
   let profiles    = $state([]);
   let statuses    = $state([]);
@@ -8,6 +9,7 @@
   let error       = $state('');
   let busy        = $state({});
   let showForm    = $state(false);
+  let editProfile = $state(null);  // profile object being edited
 
   async function load() {
     try {
@@ -26,17 +28,17 @@
 
   function badgeClass(st) {
     if (!st) return 'badge-idle';
-    if (st.is_running)                  return 'badge-running';
-    if (st.last_result === 'Success')    return 'badge-ok';
-    if (st.last_result === 'Failed')     return 'badge-error';
+    if (st.backup_in_progress)           return 'badge-running';
+    if (st.last_run?.status === 'Success') return 'badge-ok';
+    if (st.last_run?.status === 'Failed')  return 'badge-error';
     return 'badge-idle';
   }
 
   function badgeLabel(st) {
-    if (!st)                             return 'Never run';
-    if (st.is_running)                   return 'Running…';
-    if (st.last_result === 'Success')    return 'OK';
-    if (st.last_result === 'Failed')     return 'Failed';
+    if (!st)                               return 'Never run';
+    if (st.backup_in_progress)             return 'Running…';
+    if (st.last_run?.status === 'Success') return 'OK';
+    if (st.last_run?.status === 'Failed')  return 'Failed';
     return 'Idle';
   }
 
@@ -68,16 +70,29 @@
     await load();
   }
 
+  async function doEdit(id) {
+    try {
+      editProfile = await getProfile(id);
+      showForm = true;
+    } catch (e) {
+      error = String(e);
+    }
+  }
+
+  function openAddForm() {
+    editProfile = null;
+    showForm = true;
+  }
+
   function onKeydown(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'n' && !showForm) {
       e.preventDefault();
-      showForm = true;
+      openAddForm();
     }
   }
 
   load();
   const interval = setInterval(load, 5000);
-  import { onDestroy } from 'svelte';
   onDestroy(() => clearInterval(interval));
 </script>
 
@@ -85,14 +100,15 @@
 
 {#if showForm}
   <ProfileForm
-    onSaved={() => { showForm = false; load(); }}
-    onCancel={() => showForm = false}
+    profile={editProfile}
+    onSaved={() => { showForm = false; editProfile = null; load(); }}
+    onCancel={() => { showForm = false; editProfile = null; }}
   />
 {/if}
 
 <div class="page-header">
   <h1 class="page-title">Backup Profiles</h1>
-  <button class="btn-primary" onclick={() => showForm = true}>+ Add Profile</button>
+  <button class="btn-primary" onclick={openAddForm}>+ Add Profile</button>
 </div>
 
 {#if loading}
@@ -109,15 +125,18 @@
         <div class="profile-info">
           <span class="profile-name">{p.name}</span>
           <span class="profile-host">{p.pbs_server}</span>
+          {#if st?.progress_message}
+            <span class="progress-msg">{st.progress_message}</span>
+          {/if}
         </div>
         <div class="profile-meta">
           <span class="badge {badgeClass(st)}">{badgeLabel(st)}</span>
-          {#if st?.last_run_at}
-            <span class="last-run">{new Date(st.last_run_at * 1000).toLocaleString()}</span>
+          {#if st?.last_run?.started_at}
+            <span class="last-run">{new Date(st.last_run.started_at).toLocaleString()}</span>
           {/if}
         </div>
         <div class="profile-actions">
-          {#if st?.is_running}
+          {#if st?.backup_in_progress}
             <button class="btn-danger" disabled={busy[p.id]} onclick={() => doCancel(p.id)}>
               Cancel
             </button>
@@ -126,7 +145,8 @@
               {busy[p.id] ? 'Starting…' : 'Backup Now'}
             </button>
           {/if}
-          <button class="btn-ghost" onclick={() => doDelete(p.id, p.name)}>Delete</button>
+          <button class="btn-ghost" onclick={() => doEdit(p.id)}>Edit</button>
+          <button class="btn-ghost danger" onclick={() => doDelete(p.id, p.name)}>Delete</button>
         </div>
       </div>
     {/each}
@@ -168,6 +188,7 @@
   .profile-info { flex: 1; min-width: 0; }
   .profile-name { display: block; font-weight: 600; font-size: 14px; }
   .profile-host { display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .progress-msg { display: block; font-size: 12px; color: #1d4ed8; margin-top: 2px; }
 
   .profile-meta {
     display: flex;
@@ -179,4 +200,7 @@
   .last-run { font-size: 11px; color: var(--text-muted); }
 
   .profile-actions { display: flex; gap: 8px; }
+
+  .btn-ghost.danger { color: var(--red); }
+  .btn-ghost.danger:hover { background: #fee2e2; }
 </style>

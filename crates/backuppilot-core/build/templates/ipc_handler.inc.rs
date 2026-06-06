@@ -253,6 +253,20 @@ pub async fn dispatch(
             ser(&v)
         }
 
+        "get_settings" => {
+            let settings = backuppilot_core::app_settings::load_app_settings();
+            ser(&settings)
+        }
+
+        "save_settings" => {
+            let json = get_str(p, "settings_json")?;
+            let settings: backuppilot_core::app_settings::AppSettings =
+                serde_json::from_str(&json).map_err(|e| e.to_string())?;
+            backuppilot_core::app_settings::save_app_settings(&settings)
+                .map_err(|e| e.to_string())?;
+            Ok("null".into())
+        }
+
         other => Err(format!("unknown method: {other}")),
     }
 }
