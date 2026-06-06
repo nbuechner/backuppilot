@@ -8,6 +8,7 @@ members = [
     "crates/backuppilot-i18n",
     "crates/backuppilot-ipc",
     "crates/backuppilot-tauri",
+    "crates/backuppilot-probe",
 ]
 
 [workspace.package]
