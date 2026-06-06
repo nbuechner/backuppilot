@@ -90,13 +90,14 @@ async fn main() {
                 // verify catalog can be listed for the most recent snapshot
                 if let Some(snap) = snaps.first() {
                     let snap_path = snap["path"].as_str().unwrap_or("");
-                    match ipc("list_catalog", serde_json::json!({
+                    let req_inner = serde_json::json!({
                         "profile_id": id,
                         "snapshot": snap_path,
                         "archive_name": "",
                         "parent_path": "/",
                         "force_refresh": false,
-                    })).await {
+                    });
+                    match ipc("list_catalog", serde_json::json!({ "request_json": req_inner.to_string() })).await {
                         Ok(cat) => {
                             let archives = cat["archives"].as_array().map(|a| a.len()).unwrap_or(0);
                             let entries  = cat["entries"].as_array().map(|a| a.len()).unwrap_or(0);
