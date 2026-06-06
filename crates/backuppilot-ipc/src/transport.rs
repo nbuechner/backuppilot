@@ -135,9 +135,20 @@ impl IpcServer {
             // session (interactive, SSH, Task Scheduler each have separate sessions).
             #[allow(unsafe_code)]
             let first = unsafe {
+                use windows_sys::Win32::Security::SECURITY_ATTRIBUTES;
                 let sd = pipe_security_descriptor_allow_all()
                     .unwrap_or(core::ptr::null_mut());
-                opts.create_with_security_attributes_raw(PIPE_NAME, sd)
+                let mut sa = SECURITY_ATTRIBUTES {
+                    nLength: core::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
+                    lpSecurityDescriptor: sd,
+                    bInheritHandle: 0,
+                };
+                let sa_ptr = if sd.is_null() {
+                    core::ptr::null_mut()
+                } else {
+                    (&mut sa as *mut SECURITY_ATTRIBUTES).cast::<core::ffi::c_void>()
+                };
+                opts.create_with_security_attributes_raw(PIPE_NAME, sa_ptr)
                     .map_err(|e| IpcError::Connect(format!("pipe already in use: {e}")))?
             };
             return Ok(Self { pipe_name: PIPE_NAME.to_string(), first_instance: Some(first) });
