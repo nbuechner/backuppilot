@@ -245,7 +245,8 @@ $allArgs = $args
 $env:WSLENV = "PBS_PASSWORD/u:PBS_REPOSITORY/u:PBS_HOST/u:PBS_PORT/u:PBS_DATASTORE/u:PBS_FINGERPRINT/u"
 
 # Translate archive-spec paths: "archive.pxar:C:\path" -> "archive.pxar:/mnt/c/path"
-$translated = $allArgs | ForEach-Object {
+# @() forces an array so that splatting @translated passes strings, not characters.
+$translated = @($allArgs | ForEach-Object {
     $a = $_
     if ($a -match '^([^:]+\.pxar):(.+)$') {
         $archive  = $Matches[1]
@@ -255,7 +256,7 @@ $translated = $allArgs | ForEach-Object {
     } else {
         $a
     }
-}
+})
 
 & wsl proxmox-backup-client @translated
 exit $LASTEXITCODE
