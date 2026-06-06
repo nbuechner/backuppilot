@@ -131,16 +131,9 @@ pub struct PbsClient;
 
 impl PbsClient {
     pub async fn is_available() -> bool {
-        // pbs_client_path() caches the result in a OnceLock, avoiding repeated WSL probes.
-        // It may block (spawns wsl.exe synchronously on Windows); run in a blocking thread.
-        let binary = tokio::time::timeout(
-            Duration::from_secs(60),
-            tokio::task::spawn_blocking(crate::paths::pbs_client_path_owned),
-        )
-        .await
-        .ok()
-        .and_then(|r| r.ok())
-        .unwrap_or_else(|| std::path::PathBuf::from("proxmox-backup-client"));
+        // pbs_client_path() returns the cached path (non-blocking) or the bare binary name.
+        // The cache is pre-populated by init_pbs_client_path() at daemon startup.
+        let binary = crate::paths::pbs_client_path().to_path_buf();
 
         if probe_pbs_binary(&binary).await {
             return true;

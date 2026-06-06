@@ -74,19 +74,39 @@ pub fn ensure_data_dirs() -> std::io::Result<()> {
 
 static PBS_CLIENT_PATH: OnceLock<PathBuf> = OnceLock::new();
 
-/// Resolved `proxmox-backup-client` executable (cached).
+/// Resolved `proxmox-backup-client` executable (non-blocking).
 ///
-/// Lookup order: `BACKUPPILOT_PBS_CLIENT`, Flatpak-Wrapper, `/usr/bin/…`, `/usr/local/bin/…`, `PATH`.
+/// Returns the cached path if already resolved, otherwise falls back to the bare binary name.
+/// Call [`init_pbs_client_path`] at startup to populate the cache asynchronously.
 pub fn pbs_client_path() -> &'static Path {
     PBS_CLIENT_PATH
-        .get_or_init(resolve_pbs_client_binary)
-        .as_path()
+        .get()
+        .map(|p| p.as_path())
+        .unwrap_or_else(|| Path::new("proxmox-backup-client"))
 }
 
 /// Same as [`pbs_client_path`] but returns an owned `PathBuf`.
-/// Useful in `spawn_blocking` closures that need `'static` ownership.
 pub fn pbs_client_path_owned() -> std::path::PathBuf {
     pbs_client_path().to_path_buf()
+}
+
+/// Resolves and caches the PBS client binary path with a timeout.
+///
+/// Safe to call from async context — resolution runs in a blocking thread.
+/// On Windows with WSL, detection may take several seconds; the timeout prevents
+/// a hanging `wsl.exe` from blocking the caller indefinitely.
+pub async fn init_pbs_client_path() {
+    if PBS_CLIENT_PATH.get().is_some() {
+        return;
+    }
+    let result = tokio::time::timeout(
+        std::time::Duration::from_secs(30),
+        tokio::task::spawn_blocking(resolve_pbs_client_binary),
+    )
+    .await;
+    if let Ok(Ok(path)) = result {
+        let _ = PBS_CLIENT_PATH.set(path);
+    }
 }
 
 /// True when running inside a Flatpak sandbox (updates are delivered via Flathub).

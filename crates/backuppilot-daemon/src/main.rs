@@ -7,7 +7,7 @@ mod service;
 mod update_monitor;
 
 use anyhow::Context;
-use backuppilot_core::{load_app_settings, Database, UiLanguage};
+use backuppilot_core::{load_app_settings, paths, Database, UiLanguage};
 use backuppilot_i18n::{self, UiLanguage as I18nLanguage};
 use backuppilot_ipc::IpcServer;
 use tracing::info;
@@ -36,6 +36,11 @@ async fn main() -> anyhow::Result<()> {
         info!("BackupPilot daemon already running — exiting");
         return Ok(());
     }
+
+    // Resolve and cache the PBS client binary path before serving any requests.
+    // On Windows this may probe WSL; doing it here (with a timeout) prevents
+    // the OnceLock from being held indefinitely by a hanging wsl.exe probe.
+    paths::init_pbs_client_path().await;
 
     let db = Database::open().context("failed to open database")?;
     let service = DaemonService::new(db);
