@@ -53,26 +53,10 @@ jobs:
           path: target/release/bundle/nsis/*.exe
           if-no-files-found: error
 
-  # ── Linux: .deb packages ─────────────────────────────────────────────────────
-  # ubuntu-24.04: Tauri (WebKitGTK) build — runs on GTK 4.14 / libadwaita 1.4
-  # ubuntu-26.04: GTK native build — requires GTK 4.16+ / libadwaita 1.6+
-  build-linux:
-    name: Linux .deb (${{ matrix.runner }})
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: ubuntu-24.04
-            suffix: ubuntu2404
-            ui: tauri
-            gui_bin: backuppilot-tauri
-            depends: "proxmox-backup-client, fuse3, libwebkit2gtk-4.1-0"
-          - runner: ubuntu-26.04
-            suffix: ubuntu2604
-            ui: gtk
-            gui_bin: backuppilot
-            depends: "proxmox-backup-client, fuse3, libadwaita-1-0 (>= 1.6)"
+  # ── Linux ubuntu-24.04: Tauri / WebKitGTK ───────────────────────────────────
+  build-linux-tauri:
+    name: Linux .deb (ubuntu-24.04 / Tauri)
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -84,8 +68,7 @@ jobs:
         with:
           workspaces: ". -> target"
 
-      - name: Install system dependencies (Tauri / ubuntu-24.04)
-        if: matrix.ui == 'tauri'
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -97,71 +80,48 @@ jobs:
             pkg-config \
             libssl-dev
 
-      - name: Install system dependencies (GTK / ubuntu-26.04)
-        if: matrix.ui == 'gtk'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-4-dev \
-            libadwaita-1-dev \
-            libdbus-1-dev \
-            pkg-config \
-            libssl-dev
-
-      - name: Set up Node (Tauri only)
-        if: matrix.ui == 'tauri'
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: crates/backuppilot-tauri/ui/package-lock.json
 
-      - name: Install frontend dependencies (Tauri only)
-        if: matrix.ui == 'tauri'
+      - name: Install frontend dependencies
         working-directory: crates/backuppilot-tauri/ui
         run: npm ci
 
-      - name: Build frontend (Tauri only)
-        if: matrix.ui == 'tauri'
+      - name: Build frontend
         working-directory: crates/backuppilot-tauri/ui
         run: npm run build
 
-      - name: Build binaries (Tauri)
-        if: matrix.ui == 'tauri'
+      - name: Build binaries
         run: cargo build -p backuppilot-daemon -p backuppilot-cli -p backuppilot-tauri --release
-
-      - name: Build binaries (GTK)
-        if: matrix.ui == 'gtk'
-        run: cargo build -p backuppilot-daemon -p backuppilot-gui -p backuppilot-cli --release
 
       - name: Package as .deb
         run: |
           set -e
           VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/')
-          PKG="backuppilot_${VERSION}_${{ matrix.suffix }}_amd64"
+          PKG="backuppilot_${VERSION}_ubuntu2404_amd64"
 
-          mkdir -p "$PKG/DEBIAN"
-          mkdir -p "$PKG/usr/bin"
-          mkdir -p "$PKG/usr/lib/systemd/user"
-          mkdir -p "$PKG/usr/share/applications"
-          mkdir -p "$PKG/usr/share/icons/hicolor/256x256/apps"
-          mkdir -p "$PKG/usr/share/icons/hicolor/512x512/apps"
+          mkdir -p "$PKG/DEBIAN" "$PKG/usr/bin" "$PKG/usr/lib/systemd/user" \
+                   "$PKG/usr/share/applications" \
+                   "$PKG/usr/share/icons/hicolor/256x256/apps" \
+                   "$PKG/usr/share/icons/hicolor/512x512/apps"
 
-          cp target/release/${{ matrix.gui_bin }} "$PKG/usr/bin/backuppilot"
-          cp target/release/backuppilot-daemon    "$PKG/usr/bin/"
-          cp target/release/backuppilot-cli       "$PKG/usr/bin/"
-          cp data/backuppilot-daemon.service      "$PKG/usr/lib/systemd/user/"
+          cp target/release/backuppilot-tauri  "$PKG/usr/bin/backuppilot"
+          cp target/release/backuppilot-daemon "$PKG/usr/bin/"
+          cp target/release/backuppilot-cli    "$PKG/usr/bin/"
+          cp data/backuppilot-daemon.service   "$PKG/usr/lib/systemd/user/"
           cp data/ch.onesystems.backuppilot.desktop "$PKG/usr/share/applications/"
           cp data/icons/hicolor/256x256/apps/ch.onesystems.backuppilot.png \
              "$PKG/usr/share/icons/hicolor/256x256/apps/"
           cp data/icons/hicolor/512x512/apps/ch.onesystems.backuppilot.png \
              "$PKG/usr/share/icons/hicolor/512x512/apps/"
 
-          printf 'Package: backuppilot\nVersion: %s\nArchitecture: amd64\nMaintainer: BackupPilot Contributors <noreply@buechner.me>\nDepends: ${{ matrix.depends }}\nDescription: BackupPilot - Proxmox Backup Server GUI client\n Provides scheduled backups, restore, snapshot browsing, and\n read-only FUSE mounts of PBS archives.\n' "$VERSION" > "$PKG/DEBIAN/control"
-
+          printf 'Package: backuppilot\nVersion: %s\nArchitecture: amd64\nMaintainer: BackupPilot Contributors <noreply@buechner.me>\nDepends: proxmox-backup-client, fuse3, libwebkit2gtk-4.1-0\nDescription: BackupPilot - Proxmox Backup Server GUI client\n Provides scheduled backups, restore, snapshot browsing, and\n read-only FUSE mounts of PBS archives.\n' "$VERSION" > "$PKG/DEBIAN/control"
           printf '#!/bin/sh\nset -e\nsystemctl --user daemon-reload 2>/dev/null || true\nsystemctl --user enable backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user start backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/postinst"
           chmod 755 "$PKG/DEBIAN/postinst"
-
           printf '#!/bin/sh\nset -e\nsystemctl --user stop backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user disable backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/prerm"
           chmod 755 "$PKG/DEBIAN/prerm"
 
@@ -170,16 +130,83 @@ jobs:
       - name: Upload .deb package
         uses: actions/upload-artifact@v4
         with:
-          name: backuppilot-linux-deb-${{ matrix.suffix }}
+          name: backuppilot-linux-deb-ubuntu2404
+          path: "*.deb"
+          if-no-files-found: error
+
+  # ── Linux ubuntu-26.04: GTK native (runs inside ubuntu:26.04 container) ─────
+  build-linux-gtk:
+    name: Linux .deb (ubuntu-26.04 / GTK)
+    runs-on: ubuntu-24.04
+    container: ubuntu:26.04
+    steps:
+      - name: Install prerequisites
+        run: apt-get update && apt-get install -y git curl
+
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+
+      - name: Install system dependencies
+        run: |
+          apt-get install -y \
+            libgtk-4-dev \
+            libadwaita-1-dev \
+            libdbus-1-dev \
+            pkg-config \
+            libssl-dev \
+            build-essential
+
+      - name: Build binaries
+        run: cargo build -p backuppilot-daemon -p backuppilot-gui -p backuppilot-cli --release
+
+      - name: Package as .deb
+        run: |
+          set -e
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/')
+          PKG="backuppilot_${VERSION}_ubuntu2604_amd64"
+
+          mkdir -p "$PKG/DEBIAN" "$PKG/usr/bin" "$PKG/usr/lib/systemd/user" \
+                   "$PKG/usr/share/applications" \
+                   "$PKG/usr/share/icons/hicolor/256x256/apps" \
+                   "$PKG/usr/share/icons/hicolor/512x512/apps"
+
+          cp target/release/backuppilot        "$PKG/usr/bin/"
+          cp target/release/backuppilot-daemon "$PKG/usr/bin/"
+          cp target/release/backuppilot-cli    "$PKG/usr/bin/"
+          cp data/backuppilot-daemon.service   "$PKG/usr/lib/systemd/user/"
+          cp data/ch.onesystems.backuppilot.desktop "$PKG/usr/share/applications/"
+          cp data/icons/hicolor/256x256/apps/ch.onesystems.backuppilot.png \
+             "$PKG/usr/share/icons/hicolor/256x256/apps/"
+          cp data/icons/hicolor/512x512/apps/ch.onesystems.backuppilot.png \
+             "$PKG/usr/share/icons/hicolor/512x512/apps/"
+
+          printf 'Package: backuppilot\nVersion: %s\nArchitecture: amd64\nMaintainer: BackupPilot Contributors <noreply@buechner.me>\nDepends: proxmox-backup-client, fuse3, libadwaita-1-0 (>= 1.6)\nDescription: BackupPilot - Proxmox Backup Server GUI client\n Provides scheduled backups, restore, snapshot browsing, and\n read-only FUSE mounts of PBS archives.\n' "$VERSION" > "$PKG/DEBIAN/control"
+          printf '#!/bin/sh\nset -e\nsystemctl --user daemon-reload 2>/dev/null || true\nsystemctl --user enable backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user start backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/postinst"
+          chmod 755 "$PKG/DEBIAN/postinst"
+          printf '#!/bin/sh\nset -e\nsystemctl --user stop backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user disable backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/prerm"
+          chmod 755 "$PKG/DEBIAN/prerm"
+
+          dpkg-deb --build "$PKG"
+
+      - name: Upload .deb package
+        uses: actions/upload-artifact@v4
+        with:
+          name: backuppilot-linux-deb-ubuntu2604
           path: "*.deb"
           if-no-files-found: error
 
   # ── Release: attach artifacts on version tags ────────────────────────────────
   release:
     name: Create GitHub Release
-    needs: [build-windows, build-linux]
+    needs: [build-windows, build-linux-tauri, build-linux-gtk]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:
