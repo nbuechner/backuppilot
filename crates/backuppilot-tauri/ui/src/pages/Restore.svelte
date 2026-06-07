@@ -1,5 +1,7 @@
 <script>
-  import { listProfiles, listSnapshots, listCatalog, restoreArchive, listActiveMounts, unmountSnapshot } from '../lib/ipc.js';
+  import { listProfiles, listSnapshots, listCatalog, restoreArchive,
+           listActiveMounts, mountSnapshot, unmountSnapshot,
+           checkFuseAvailable, installFuse3 } from '../lib/ipc.js';
   import { open as openDialog } from '@tauri-apps/plugin-dialog';
   import { onDestroy } from 'svelte';
 
@@ -27,6 +29,10 @@
   let loadingCatalog   = $state(false);
   let restoring        = $state(false);
   let restoreResult    = $state(null);
+  let mounting         = $state(false);
+  let mountResult      = $state(null);
+  let installingFuse3  = $state(false);
+  let fuseCheck        = $state(null); // FuseCheckResult
   let error            = $state('');
 
   async function loadProfiles() {
@@ -150,6 +156,54 @@
     }
   }
 
+  async function doMount() {
+    if (!selectedProfile || !selectedSnapshot || !selectedArchive) return;
+    mounting = true;
+    mountResult = null;
+    try {
+      const result = await mountSnapshot({
+        profile_id: selectedProfile.id,
+        snapshot: selectedSnapshot.path,
+        archive_name: selectedArchive,
+        source_label: selectedArchive,
+        encryption_key_id: null,
+      });
+      mountResult = result;
+      if (result.ok) {
+        activeMounts = await listActiveMounts();
+      }
+    } catch (e) {
+      error = String(e);
+    } finally {
+      mounting = false;
+    }
+  }
+
+  async function doInstallFuse3() {
+    installingFuse3 = true;
+    try {
+      const result = await installFuse3();
+      if (result.ok) {
+        fuseCheck = await checkFuseAvailable();
+        mountResult = null;
+      } else {
+        error = result.message ?? 'fuse3 install failed.';
+      }
+    } catch (e) {
+      error = String(e);
+    } finally {
+      installingFuse3 = false;
+    }
+  }
+
+  async function loadFuseCheck() {
+    try {
+      fuseCheck = await checkFuseAvailable();
+    } catch {
+      fuseCheck = null;
+    }
+  }
+
   function formatSnapshotDate(s) {
     // path = "host/{backup_id}/{ISO8601}"
     const ts = s.path?.split('/')[2];
@@ -163,6 +217,7 @@
   }
 
   loadProfiles();
+  loadFuseCheck();
   const interval = setInterval(() => listActiveMounts().then(m => activeMounts = m).catch(() => {}), 10000);
   onDestroy(() => clearInterval(interval));
 </script>
@@ -296,10 +351,10 @@
 
 </div>
 
-<!-- Step 4: Restore options — always below the 3-column grid -->
+<!-- Step 4: Restore / Mount options — always below the 3-column grid -->
 {#if selectedSnapshot}
   <div class="card restore-options">
-    <h2 class="panel-title">4. Restore</h2>
+    <h2 class="panel-title">4. Restore or Mount</h2>
 
     {#if selectedPaths.size > 0}
       <p class="muted">{selectedPaths.size} file(s) selected. Leave empty to restore entire archive.</p>
@@ -318,10 +373,33 @@
       <input type="checkbox" bind:checked={overwrite} />
     </label>
 
-    <button class="btn-primary restore-btn" onclick={doRestore}
-      disabled={restoring || !targetDir.trim()}>
-      {restoring ? 'Restoring…' : 'Start Restore'}
-    </button>
+    <div class="action-row">
+      <button class="btn-primary" onclick={doRestore}
+        disabled={restoring || !targetDir.trim()}>
+        {restoring ? 'Restoring…' : 'Start Restore'}
+      </button>
+
+      <div class="mount-action">
+        {#if fuseCheck === null}
+          <button class="btn-ghost" disabled>Mount (checking…)</button>
+        {:else if !fuseCheck.available}
+          <button class="btn-ghost"
+            title={fuseCheck.reason ?? 'FUSE not available'}
+            disabled={!fuseCheck.can_install || !selectedArchive || installingFuse3}
+            onclick={fuseCheck.can_install ? doInstallFuse3 : undefined}>
+            {installingFuse3 ? 'Installing fuse3…' : (fuseCheck.can_install ? 'Install fuse3 & Mount' : 'Mount (not supported)')}
+          </button>
+          {#if fuseCheck.reason && !fuseCheck.can_install}
+            <span class="fuse-reason">{fuseCheck.reason}</span>
+          {/if}
+        {:else}
+          <button class="btn-ghost" onclick={doMount}
+            disabled={mounting || !selectedArchive}>
+            {mounting ? 'Mounting…' : 'Mount read-only'}
+          </button>
+        {/if}
+      </div>
+    </div>
 
     {#if restoreResult}
       {#if restoreResult.ok}
@@ -333,6 +411,23 @@
             <ul>{#each restoreResult.conflicts as c}<li class="mono">{c}</li>{/each}</ul>
           {/if}
         </div>
+      {/if}
+    {/if}
+
+    {#if mountResult}
+      {#if mountResult.ok}
+        <div class="result-ok">✓ Mounted at {mountResult.mount?.mount_point ?? 'unknown path'}.</div>
+      {:else if mountResult.needs_fuse3}
+        <div class="result-error">
+          fuse3 is required for mounting.
+          {#if fuseCheck?.can_install}
+            <button class="btn-inline" onclick={doInstallFuse3} disabled={installingFuse3}>
+              {installingFuse3 ? 'Installing…' : 'Install fuse3'}
+            </button>
+          {/if}
+        </div>
+      {:else}
+        <div class="result-error">Mount failed: {mountResult.message ?? 'Unknown error'}</div>
       {/if}
     {/if}
   </div>
@@ -440,15 +535,34 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 10px 0; font-size: 13px; cursor: pointer;
   }
-  .restore-btn { margin-top: 14px; }
+  .action-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .mount-action { display: flex; align-items: center; gap: 8px; }
+  .fuse-reason { font-size: 12px; color: var(--text-muted); }
   .result-ok { margin-top: 12px; color: #166534; background: #dcfce7; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; }
-  .result-error { margin-top: 12px; color: #991b1b; background: #fee2e2; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; }
+  .result-error {
+    margin-top: 12px; color: #991b1b; background: #fee2e2; padding: 10px 14px;
+    border-radius: var(--radius-sm); font-size: 13px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
   .result-error ul { margin: 6px 0 0; padding-left: 16px; }
   .result-error li { font-family: monospace; font-size: 12px; }
+  .btn-inline {
+    background: transparent; border: 1px solid #991b1b; color: #991b1b;
+    padding: 3px 10px; border-radius: var(--radius-sm); font-size: 12px;
+    cursor: pointer;
+  }
+  .btn-inline:hover { background: #fee2e2; }
 
   .btn-ghost-sm {
     background: transparent; border: 1px solid var(--border);
     padding: 3px 10px; border-radius: var(--radius-sm); font-size: 12px;
     cursor: pointer; color: var(--text);
   }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border);
+    padding: 8px 18px; border-radius: var(--radius-sm); font-size: 13px;
+    font-weight: 500; cursor: pointer; color: var(--text);
+  }
+  .btn-ghost:hover:not(:disabled) { background: var(--bg); }
+  .btn-ghost:disabled { opacity: 0.5; cursor: default; }
 </style>

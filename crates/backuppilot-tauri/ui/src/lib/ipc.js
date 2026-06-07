@@ -28,6 +28,8 @@ export const listRunsForProfile  = (profileId, limit) => ipcCall('list_runs_for_
 export const listSnapshots       = (profileId)  => ipcCall('list_snapshots',          { profile_id: profileId });
 export const listCatalog         = (req)        => ipcCall('list_catalog',            { request_json: JSON.stringify(req) });
 export const restoreArchive      = (req)        => ipcCall('restore_archive',         { request_json: JSON.stringify(req) });
+export const checkFuseAvailable  = ()           => ipcCall('check_fuse_available');
+export const installFuse3        = ()           => ipcCall('install_fuse3');
 export const listActiveMounts    = ()           => ipcCall('list_active_mounts');
 export const mountSnapshot       = (req)        => ipcCall('mount_snapshot',          { request_json: JSON.stringify(req) });
 export const unmountSnapshot     = (mountId)    => ipcCall('unmount_snapshot',        { mount_id: mountId });

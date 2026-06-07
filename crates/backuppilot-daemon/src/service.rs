@@ -71,6 +71,38 @@ impl DaemonService {
         Ok(self.mounts.list_active().await)
     }
 
+    pub fn check_fuse_available(&self) -> backuppilot_core::FuseCheckResult {
+        backuppilot_core::check_fuse()
+    }
+
+    pub async fn install_fuse3(&self) -> Result<backuppilot_core::InstallFuse3Result> {
+        use backuppilot_core::fuse3_install_script;
+        let script = fuse3_install_script().ok_or_else(|| {
+            backuppilot_core::CoreError::PbsCommand(
+                "Automatic fuse3 install is not supported on this system.".into(),
+            )
+        })?;
+
+        let tmp = std::env::temp_dir().join("backuppilot-install-fuse3.sh");
+        std::fs::write(&tmp, &script).map_err(backuppilot_core::CoreError::Io)?;
+
+        let output = tokio::process::Command::new("pkexec")
+            .arg("bash")
+            .arg(&tmp)
+            .output()
+            .await
+            .map_err(backuppilot_core::CoreError::Io)?;
+
+        let ok = output.status.success();
+        let message = if ok {
+            None
+        } else {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            Some(format!("Install failed: {}", stderr.trim()))
+        };
+        Ok(backuppilot_core::InstallFuse3Result { ok, message })
+    }
+
     pub async fn mount_snapshot(
         &self,
         request: MountSnapshotRequest,

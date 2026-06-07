@@ -55,6 +55,7 @@ pub use pbs_install_result::{
     PbsInstallResultStatus, PBS_CLIENT_INSTALL_DISPLAY, PBS_CLIENT_INSTALL_KIND,
 };
 pub use pbs_install::{
+    fuse3_install_script, InstallFuse3Result,
     PbsClientInstallGuide, PbsClientInstallMethod, PBS_CLIENT_COPR_URL, PBS_CLIENT_DOC_URL,
 };
 pub use pbs_repository::{normalize_pbs_host, PbsRepositoryParts, RepositoryParseError};
@@ -104,8 +105,8 @@ pub use pbs::{
 };
 pub use mount_manager::MountManager;
 pub use pbs_mount::{
-    force_unmount, fuse_available, ActiveMount, MountSnapshotRequest, MountSnapshotResult,
-    UnmountSnapshotResult,
+    check_fuse, force_unmount, fuse_available, ActiveMount, FuseCheckResult,
+    MountSnapshotRequest, MountSnapshotResult, UnmountSnapshotResult,
 };
 pub use updates::{
     app_update_checks_enabled, builtin_app_updates_enabled, can_install_update_packages,

@@ -1,6 +1,51 @@
 //! Install guides for `proxmox-backup-client` (APT on Debian/Ubuntu, COPR on Fedora/RHEL).
 
 use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+
+/// Result of an automatic fuse3 install attempt.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstallFuse3Result {
+    pub ok: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
+}
+
+/// Shell script to install `fuse3` using the system package manager.
+/// Returns `None` on systems where automatic install is not supported.
+pub fn fuse3_install_script() -> Option<String> {
+    let guide = PbsClientInstallGuide::detect();
+    match guide.method {
+        PbsClientInstallMethod::Apt => Some(fuse3_apt_script()),
+        PbsClientInstallMethod::DnfCopr => Some(fuse3_dnf_script()),
+        PbsClientInstallMethod::Manual => None,
+    }
+}
+
+fn fuse3_apt_script() -> String {
+    r#"#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${EUID:-}" -ne 0 ]]; then
+  exec pkexec -- "$0" "$@"
+fi
+export DEBIAN_FRONTEND=noninteractive
+apt-get install -y --no-install-recommends fuse3
+echo "fuse3 installed."
+"#
+    .to_string()
+}
+
+fn fuse3_dnf_script() -> String {
+    r#"#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${EUID:-}" -ne 0 ]]; then
+  exec pkexec -- "$0" "$@"
+fi
+dnf install -y fuse3
+echo "fuse3 installed."
+"#
+    .to_string()
+}
 
 pub const PBS_CLIENT_DOC_URL: &str =
     "https://pbs.proxmox.com/docs/installation.html#_client_only_repositories";

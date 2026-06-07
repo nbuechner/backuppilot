@@ -44,6 +44,52 @@ pub struct MountSnapshotResult {
     pub message: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mount: Option<ActiveMount>,
+    /// Set when the failure is specifically due to fuse3 not being installed.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub needs_fuse3: bool,
+}
+
+/// Result of [`check_fuse`].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FuseCheckResult {
+    pub available: bool,
+    /// Human-readable reason when not available.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+    /// Whether automatic fuse3 install is offered on this system.
+    pub can_install: bool,
+}
+
+/// Probes FUSE availability in detail for the UI.
+pub fn check_fuse() -> FuseCheckResult {
+    if cfg!(windows) {
+        return FuseCheckResult {
+            available: false,
+            reason: Some("Mount via FUSE is not supported on Windows.".into()),
+            can_install: false,
+        };
+    }
+
+    let dev_fuse = Path::new("/dev/fuse").exists();
+    let has_mount = which_exists("fusermount")
+        || which_exists("fusermount3")
+        || which_exists("umount");
+
+    if dev_fuse && has_mount {
+        return FuseCheckResult { available: true, reason: None, can_install: false };
+    }
+
+    let reason = if !dev_fuse {
+        "fuse3 is not installed (/dev/fuse not found).".into()
+    } else {
+        "fusermount3 not found (install the fuse3 package).".into()
+    };
+
+    FuseCheckResult {
+        available: false,
+        reason: Some(reason),
+        can_install: !cfg!(windows),
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

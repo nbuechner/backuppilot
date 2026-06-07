@@ -234,6 +234,16 @@ pub async fn dispatch(
 
         "is_onboarding_completed" => Ok(service.is_onboarding_completed().to_string()),
 
+        "check_fuse_available" => {
+            let v = service.check_fuse_available();
+            ser(&v)
+        }
+
+        "install_fuse3" => {
+            let v = service.install_fuse3().await.map_err(|e| e.to_string())?;
+            ser(&v)
+        }
+
         "list_active_mounts" => {
             let v = service.list_active_mounts().await.map_err(|e| e.to_string())?;
             ser(&v)

@@ -60,10 +60,11 @@ impl MountManager {
             return Ok(MountSnapshotResult {
                 ok: false,
                 message: Some(
-                    "FUSE is not available (install fuse3, user must be allowed to use FUSE)."
+                    "FUSE is not available. Install the fuse3 package and ensure /dev/fuse exists."
                         .into(),
                 ),
                 mount: None,
+                needs_fuse3: true,
             });
         }
 
@@ -75,6 +76,7 @@ impl MountManager {
                     ok: true,
                     message: None,
                     mount: Some(existing.info.clone()),
+                    needs_fuse3: false,
                 });
             }
         }
@@ -103,6 +105,7 @@ impl MountManager {
                         .into(),
                 ),
                 mount: None,
+                needs_fuse3: false,
             });
         }
 
@@ -141,6 +144,7 @@ impl MountManager {
             ok: true,
             message: None,
             mount: Some(info),
+            needs_fuse3: false,
         })
     }
 
