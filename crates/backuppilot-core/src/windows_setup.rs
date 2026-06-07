@@ -52,8 +52,9 @@ pub fn check_windows_setup() -> WslSetupStatus {
         {
             Ok(out) if out.status.success() => {
                 let raw = String::from_utf8_lossy(&out.stdout).trim().to_string();
-                // e.g. "proxmox-backup-client 3.3.1"
-                let version = raw.split_whitespace().nth(1).map(str::to_string);
+                let version = raw.split_whitespace()
+                    .find(|s| s.starts_with(|c: char| c.is_ascii_digit()))
+                    .map(str::to_string);
                 (true, version)
             }
             _ => (false, None),
