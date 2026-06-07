@@ -1,16 +1,20 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import Profiles        from './pages/Profiles.svelte';
   import Activity        from './pages/Activity.svelte';
   import Restore         from './pages/Restore.svelte';
   import Settings        from './pages/Settings.svelte';
   import EncryptionKeys  from './pages/EncryptionKeys.svelte';
   import ProfileForm     from './lib/ProfileForm.svelte';
-  import { getSettings } from './lib/ipc.js';
+  import { getSettings, listActiveMounts, unmountSnapshot } from './lib/ipc.js';
   import { applyColorScheme } from './lib/theme.js';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
+  import { confirm } from '@tauri-apps/plugin-dialog';
 
   let page = $state('profiles');
   let advancedMode = $state(false);
+
+  let unlistenClose;
 
   onMount(async () => {
     try {
@@ -18,7 +22,31 @@
       applyColorScheme(s.appearance.color_scheme);
       advancedMode = s.appearance.advanced_mode ?? false;
     } catch { /* daemon not ready yet; defaults stay */ }
+
+    const appWindow = getCurrentWindow();
+    unlistenClose = await appWindow.onCloseRequested(async (event) => {
+      event.preventDefault();
+      try {
+        const s = await getSettings();
+        if (s.tray.ask_unmount_on_quit) {
+          const mounts = await listActiveMounts();
+          if (mounts.length > 0) {
+            const unmount = await confirm(
+              `You have ${mounts.length} active mount(s). Unmount before closing?`,
+              { title: 'Active Mounts', okLabel: 'Unmount & Close', cancelLabel: 'Cancel' }
+            );
+            if (!unmount) return;
+            for (const m of mounts) {
+              await unmountSnapshot(m.id).catch(() => {});
+            }
+          }
+        }
+      } catch { /* fall through and close */ }
+      await appWindow.destroy();
+    });
   });
+
+  onDestroy(() => { if (unlistenClose) unlistenClose(); });
 
   // Profile form state lives here so ProfileForm's position:fixed overlay
   // renders as a sibling of .layout, not inside .content (overflow-y:auto),

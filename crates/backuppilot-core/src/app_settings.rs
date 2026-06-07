@@ -142,6 +142,9 @@ pub struct TraySettings {
     pub pause_all_backups: bool,
     #[serde(default = "default_true")]
     pub close_to_tray: bool,
+    /// Ask to unmount active FUSE mounts when closing the app.
+    #[serde(default = "default_true")]
+    pub ask_unmount_on_quit: bool,
 }
 
 impl Default for TraySettings {
@@ -150,6 +153,7 @@ impl Default for TraySettings {
             show_tray_icon: true,
             pause_all_backups: false,
             close_to_tray: true,
+            ask_unmount_on_quit: true,
         }
     }
 }

@@ -184,6 +184,16 @@
     </label>
   </div>
 
+  <!-- Mounts -->
+  <div class="card section">
+    <h2 class="section-header">Mounts</h2>
+    <label class="toggle-row">
+      <span>Ask to unmount when closing</span>
+      <input type="checkbox" bind:checked={settings.tray.ask_unmount_on_quit} onchange={save} />
+    </label>
+    <p class="section-desc">When active FUSE mounts exist, ask whether to unmount them before the app closes.</p>
+  </div>
+
   <!-- Log Retention -->
   <div class="card section">
     <h2 class="section-header">Log Retention</h2>
