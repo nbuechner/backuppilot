@@ -689,8 +689,8 @@ fn confirm_delete_key(key_id: i64, name: &str, toast: ToastOverlay) {
         return;
     };
     let alert = libadwaita::AlertDialog::builder()
-        .heading(&tr_fmt("Delete key «{name}»?", &[("name", name)]))
-        .body(&tr("Profiles using this key must be changed first."))
+        .heading(&tr_fmt("Delete key \"{name}\"?", &[("name", name)]))
+        .body(&tr("The key file will be permanently deleted. Make sure you have a backup copy if you may need to restore encrypted snapshots."))
         .build();
     alert.add_response("cancel", &tr("Cancel"));
     alert.add_response("delete", &tr("Delete"));

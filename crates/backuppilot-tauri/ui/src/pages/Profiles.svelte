@@ -1,5 +1,6 @@
 <script>
   import { listProfiles, listStatuses, runBackup, cancelBackup, deleteProfile, getProfile } from '../lib/ipc.js';
+  import { confirm } from '@tauri-apps/plugin-dialog';
   import { onDestroy } from 'svelte';
 
   let { onOpenForm, reloadKey = 0 } = $props();
@@ -69,7 +70,11 @@
   }
 
   async function doDelete(id, name) {
-    if (!confirm(`Delete profile "${name}"?`)) return;
+    const ok = await confirm(`Delete profile "${name}"? This cannot be undone.`, {
+      title: 'Delete Profile',
+      kind: 'warning',
+    });
+    if (!ok) return;
     await deleteProfile(id);
     await load();
   }
