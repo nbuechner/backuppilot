@@ -31,9 +31,6 @@
       "icons/128x128@2x.png",
       "icons/icon.png"
     ],
-    "resources": {
-      "../../target/release/backuppilot-daemon.exe": "./"
-    },
     "windows": {
       "nsis": {
         "installerIcon": "icons/icon.ico",
