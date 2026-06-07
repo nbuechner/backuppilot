@@ -169,6 +169,24 @@ mod platform {
     }
 }
 
+/// Registers "BackupPilot" as a Windows AUMID so WinRT toast notifications
+/// display the correct app name instead of falling back to PowerShell.
+/// Safe to call multiple times; silently ignores registry errors.
+#[cfg(windows)]
+pub fn register_windows_aumid() {
+    use winreg::enums::{HKEY_CURRENT_USER, KEY_WRITE};
+    use winreg::RegKey;
+
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+    let path = r"SOFTWARE\Classes\AppUserModelId\BackupPilot";
+    if let Ok((key, _)) = hkcu.create_subkey_with_flags(path, KEY_WRITE) {
+        let _ = key.set_value("DisplayName", &APP_NAME);
+    }
+}
+
+#[cfg(not(windows))]
+pub fn register_windows_aumid() {}
+
 // ── Windows implementation (WinRT via notify-rust) ───────────────────────────
 
 #[cfg(windows)]
@@ -180,7 +198,7 @@ mod platform {
     }
 
     /// Windows toasts cannot be silently replaced by ID, so progress updates
-    /// are suppressed — only the initial and final notifications are shown.
+    /// are suppressed -- only the initial and final notifications are shown.
     pub(super) fn start_progress_notification(summary: &str, body: &str) -> Option<u32> {
         show_toast(summary, body);
         Some(0) // non-None means "notifier is active"

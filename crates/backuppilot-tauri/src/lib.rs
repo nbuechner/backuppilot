@@ -5,6 +5,7 @@ mod tray;
 pub fn run() {
     tracing_subscriber::fmt::init();
 
+    backuppilot_core::notify::register_windows_aumid();
     daemon::ensure_daemon_running();
 
     tauri::Builder::default()

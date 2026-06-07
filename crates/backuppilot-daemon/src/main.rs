@@ -24,6 +24,7 @@ async fn main() -> anyhow::Result<()> {
         FreeConsole();
     }
 
+    backuppilot_core::notify::register_windows_aumid();
     backuppilot_i18n::init();
     apply_language(&load_app_settings());
 

@@ -32,3 +32,5 @@ libc = "0.2"
 keyring = "3"
 # WinRT toast notifications — replaces notify-send on Windows.
 notify-rust = { version = "4", default-features = false }
+# Write HKCU registry keys (AUMID registration for toast notifications).
+winreg = "0.55"
