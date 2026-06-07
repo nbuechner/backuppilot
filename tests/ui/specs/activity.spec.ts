@@ -28,9 +28,16 @@ describe('Activity page', () => {
         const activityTab = await $('.nav-item*=Activity');
         await activityTab.waitForClickable({ timeout: 10_000 });
         await activityTab.click();
+
+        // The Activity page sets loading=true on mount and has setInterval(load,15000).
+        // If the first load() hangs (IPC delay on cold start), the interval's second
+        // call fires at T+15s and clears the spinner. Use 30s to survive this race.
         await browser.waitUntil(
-            async () => !(await $('.spinner').isExisting()),
-            { timeout: 15_000, timeoutMsg: 'Activity page spinner did not clear' }
+            async () => {
+                if (await $('.error-box').isExisting()) return true; // IPC error shown, loading=false
+                return !(await $('.spinner').isExisting());
+            },
+            { timeout: 30_000, timeoutMsg: 'Activity page spinner did not clear' }
         );
         await browser.pause(300);
     });
