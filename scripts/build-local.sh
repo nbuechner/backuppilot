@@ -292,9 +292,11 @@ cargo build \
 T="/build/target/${TARGET}/release"
 
 # Phase 2: build the self-extracting installer (embeds the three exes above)
+# WebView2Loader.dll is placed next to the tauri exe by webview2-com-sys at build time.
 BACKUPPILOT_DAEMON_EXE="$T/backuppilot-daemon.exe" \
 BACKUPPILOT_GUI_EXE="$T/backuppilot-tauri.exe" \
 BACKUPPILOT_CLI_EXE="$T/backuppilot-cli.exe" \
+BACKUPPILOT_WEBVIEW2_DLL="$T/WebView2Loader.dll" \
   cargo build \
     --locked \
     -p backuppilot-installer \

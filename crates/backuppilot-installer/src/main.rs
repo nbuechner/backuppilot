@@ -20,9 +20,11 @@ mod install {
         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\BackupPilot";
 
     // Binaries embedded at compile time.
-    const DAEMON: &[u8] = include_bytes!(env!("BACKUPPILOT_DAEMON_EXE"));
-    const GUI: &[u8]    = include_bytes!(env!("BACKUPPILOT_GUI_EXE"));
-    const CLI: &[u8]    = include_bytes!(env!("BACKUPPILOT_CLI_EXE"));
+    const DAEMON:     &[u8] = include_bytes!(env!("BACKUPPILOT_DAEMON_EXE"));
+    const GUI:        &[u8] = include_bytes!(env!("BACKUPPILOT_GUI_EXE"));
+    const CLI:        &[u8] = include_bytes!(env!("BACKUPPILOT_CLI_EXE"));
+    // Required by the Tauri GUI on Windows — must live next to the exe.
+    const WEBVIEW2:   &[u8] = include_bytes!(env!("BACKUPPILOT_WEBVIEW2_DLL"));
 
     fn install_dir() -> PathBuf {
         let local = std::env::var("LOCALAPPDATA").expect("LOCALAPPDATA not set");
@@ -210,9 +212,10 @@ mod install {
         stop_gui();
 
         let files = [
-            ("backuppilot-daemon.exe",   DAEMON),
-            ("backuppilot.exe",          GUI),
-            ("backuppilot-cli.exe",      CLI),
+            ("backuppilot-daemon.exe", DAEMON),
+            ("backuppilot.exe",        GUI),
+            ("backuppilot-cli.exe",    CLI),
+            ("WebView2Loader.dll",     WEBVIEW2),
         ];
         for (name, bytes) in &files {
             if let Err(e) = write_file(&dir, name, bytes) {
