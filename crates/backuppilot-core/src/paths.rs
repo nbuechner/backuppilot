@@ -219,10 +219,11 @@ pub fn resolve_pbs_client_binary() -> PathBuf {
     #[cfg(windows)]
     {
         // If the WSL wrapper was already written (e.g. detected in a previous session),
-        // use it directly without re-probing WSL. Avoids S4U/service context failures
-        // where data_dir() may resolve to the system profile (Session 0) instead of
-        // the user's AppData.
+        // refresh it (cheap write) to pick up any template changes, then use it directly.
+        // This avoids S4U/service context failures where data_dir() may resolve to the
+        // system profile (Session 0) instead of the interactive user's AppData.
         if let Some(prebuilt) = find_wsl_wrapper_in_any_profile() {
+            let _ = ensure_wsl_pbs_wrapper(); // refresh content in place
             return prebuilt;
         }
         if let Some(wsl_wrapper) = resolve_wsl_pbs_client() {
@@ -304,7 +305,7 @@ pub fn ensure_wsl_pbs_wrapper() -> std::io::Result<PathBuf> {
 $allArgs = $args
 
 # Forward PBS_ environment variables into WSL via WSLENV
-$env:WSLENV = "PBS_PASSWORD/u:PBS_REPOSITORY/u:PBS_HOST/u:PBS_PORT/u:PBS_DATASTORE/u:PBS_FINGERPRINT/u"
+$env:WSLENV = "PBS_PASSWORD/u:PBS_REPOSITORY/u:PBS_HOST/u:PBS_PORT/u:PBS_DATASTORE/u:PBS_FINGERPRINT/u:PBS_ENCRYPTION_PASSWORD/u"
 
 function ConvertTo-WslPath {
     param([string]$WinPath)
@@ -317,7 +318,7 @@ function ConvertTo-WslPath {
     return $WinPath
 }
 
-# Translate archive-spec paths: "archive.pxar:C:\path" -> "archive.pxar:/mnt/c/path"
+# Translate paths: archive specs "archive.pxar:C:\path" and standalone "C:\path" args
 # @() forces an array so that splatting @translated passes strings, not characters.
 $translated = @($allArgs | ForEach-Object {
     $a = $_
@@ -326,6 +327,8 @@ $translated = @($allArgs | ForEach-Object {
         $winPath = $Matches[2]
         $wslPath = ConvertTo-WslPath $winPath
         "${archive}:${wslPath}"
+    } elseif ($a -match '^[A-Za-z]:\\') {
+        ConvertTo-WslPath $a
     } else {
         $a
     }
