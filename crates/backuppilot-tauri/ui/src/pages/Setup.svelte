@@ -43,7 +43,19 @@
 
   // Commands shown to the user
   const CMD_ENABLE_WSL = `# Run in PowerShell as Administrator:\nwsl --install\n# Then restart Windows`;
-  const CMD_INSTALL_PBS = `# Run these inside a WSL terminal (Ubuntu):\nwget -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg \\\n  https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg\n\necho "deb http://download.proxmox.com/debian/pbs-client bookworm main" | \\\n  sudo tee /etc/apt/sources.list.d/pbs-client.list\n\nsudo apt update && sudo apt install -y proxmox-backup-client`;
+
+  // Auto-detects Ubuntu version and picks bookworm (24.04) or trixie (26.04+)
+  const CMD_INSTALL_PBS =
+`. /etc/os-release
+VER=$(echo "$VERSION_ID" | awk -F. '{printf "%d%02d",$1,$2}')
+REPO=$([ "$VER" -le 2404 ] && echo bookworm || echo trixie)
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-\${REPO}.gpg \\
+  | sudo tee /etc/apt/keyrings/proxmox-release-\${REPO}.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/keyrings/proxmox-release-\${REPO}.gpg] http://download.proxmox.com/debian/pbs-client \${REPO} main" \\
+  | sudo tee /etc/apt/sources.list.d/pbs-client.list
+sudo apt-get update && sudo apt-get install -y proxmox-backup-client`;
+
   const CMD_INSTALL_FUSE = `# Run inside a WSL terminal:\nsudo apt install -y fuse3`;
 </script>
 
@@ -111,10 +123,7 @@
         Open a WSL terminal and run:</p>
       <div class="cmd-block">
         <pre>{CMD_INSTALL_PBS}</pre>
-        <button class="copy-btn"
-          onclick={() => copyText(
-            'wget -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg\necho "deb http://download.proxmox.com/debian/pbs-client bookworm main" | sudo tee /etc/apt/sources.list.d/pbs-client.list\nsudo apt update && sudo apt install -y proxmox-backup-client',
-            'pbs')}>
+        <button class="copy-btn" onclick={() => copyText(CMD_INSTALL_PBS, 'pbs')}>
           {copied === 'pbs' ? 'Copied!' : 'Copy'}
         </button>
       </div>

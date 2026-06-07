@@ -18,10 +18,14 @@
   let isWindows = $state(false);
   let pbsBannerDismissed = $state(false);
 
-  const CMD_INSTALL_PBS_LINUX = `# Add Proxmox repository (Debian/Ubuntu)
-curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg \\
-  | sudo tee /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg >/dev/null
-echo "deb http://download.proxmox.com/debian/pbs-client bookworm main" \\
+  const CMD_INSTALL_PBS_LINUX =
+`. /etc/os-release
+VER=$(echo "$VERSION_ID" | awk -F. '{printf "%d%02d",$1,$2}')
+REPO=$([ "$VER" -le 2404 ] && echo bookworm || echo trixie)
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-\${REPO}.gpg \\
+  | sudo tee /etc/apt/keyrings/proxmox-release-\${REPO}.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/keyrings/proxmox-release-\${REPO}.gpg] http://download.proxmox.com/debian/pbs-client \${REPO} main" \\
   | sudo tee /etc/apt/sources.list.d/pbs-client.list
 sudo apt-get update && sudo apt-get install -y proxmox-backup-client`;
 
