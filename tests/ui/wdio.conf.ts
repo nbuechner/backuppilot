@@ -37,6 +37,8 @@ export const config: Options.Testrunner = {
     framework: 'mocha',
     reporters: ['spec'],
     mochaOpts: {
-        timeout: 60_000,
+        // 3 minutes: cold WSL probe on first spec can take ~30s, and some restore/catalog
+        // waitUntil calls are set to 90–120s; the mocha timeout must exceed the longest chain.
+        timeout: 180_000,
     },
 };
