@@ -9,9 +9,9 @@ use crate::pbs_install_result::{
 };
 use crate::pbs_repository::PbsRepositoryParts;
 use crate::encryption::{
-    create_encryption_key_record, delete_encryption_key_files, import_encryption_key_record,
-    key_absolute_path, read_key_fingerprint, redact_encryption_key, CreateEncryptionKeyInput,
-    EncryptionKey, ImportEncryptionKeyInput,
+    create_encryption_key_record, delete_encryption_key_files, generate_key_password,
+    import_encryption_key_record, key_absolute_path, read_key_fingerprint, redact_encryption_key,
+    CreateEncryptionKeyInput, EncryptionKey, ImportEncryptionKeyInput,
 };
 use crate::profile::{
     ActivityLogEntry, BackupConditions, BackupProfile, BackupRun, HealthCheck, NewProfile,
@@ -220,6 +220,18 @@ impl Database {
                 "an encryption key named «{name}» already exists — choose another name or delete the existing key"
             )));
         }
+
+        // Auto-generate a password when none was supplied (e.g. from the GUI form).
+        let owned;
+        let input: &CreateEncryptionKeyInput = if input.password.is_empty() {
+            owned = CreateEncryptionKeyInput {
+                password: generate_key_password(),
+                ..input.clone()
+            };
+            &owned
+        } else {
+            input
+        };
 
         let now = Utc::now().to_rfc3339();
         let tx = self.conn.unchecked_transaction()?;

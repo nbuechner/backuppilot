@@ -57,9 +57,26 @@ pub struct EncryptionKeyProfileUsage {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateEncryptionKeyInput {
     pub name: String,
+    /// If empty the daemon auto-generates a strong password and stores it in the OS keyring.
+    #[serde(default)]
     pub password: String,
     #[serde(default)]
     pub password_hint: Option<String>,
+}
+
+/// Generates a random 64-char hex password from OS entropy sources.
+pub fn generate_key_password() -> String {
+    use sha2::{Digest, Sha256};
+    let mut h = Sha256::new();
+    let t = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default();
+    h.update(t.as_nanos().to_le_bytes());
+    h.update(std::process::id().to_le_bytes());
+    // Stack address provides ASLR entropy
+    let addr: usize = &h as *const _ as usize;
+    h.update(addr.to_le_bytes());
+    hex::encode(h.finalize())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -410,12 +427,13 @@ fn run_key_create(path: &Path, password: &str, hint: Option<&str>) -> Result<()>
         create_cmd.push_str(&format!(" --hint={}", shell_escape_single(h.trim())));
     }
 
+    #[cfg(not(windows))]
     if let Ok(out) = run_key_create_via_script(&create_cmd, password).map(|o| o.status.success()) {
         if out && path.is_file() && path.metadata().map(|m| m.len()).unwrap_or(0) > 0 {
             return Ok(());
         }
     }
-
+    #[cfg(not(windows))]
     warn!("script key create did not produce a key file, trying direct PBS call");
     let mut cmd = StdCommand::new(pbs);
     cmd.arg("key").arg("create").arg(path);
@@ -423,6 +441,11 @@ fn run_key_create(path: &Path, password: &str, hint: Option<&str>) -> Result<()>
         cmd.arg(format!("--hint={}", h.trim()));
     }
     cmd.env("PBS_ENCRYPTION_PASSWORD", password);
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+    }
     let out = cmd.output().map_err(CoreError::Io)?;
     if out.status.success() && path.is_file() && path.metadata().map(|m| m.len()).unwrap_or(0) > 0 {
         return Ok(());
