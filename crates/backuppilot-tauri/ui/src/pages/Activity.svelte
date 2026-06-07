@@ -1,31 +1,57 @@
 <script>
   import { listRecentActivity, listProfiles } from '../lib/ipc.js';
   import { onDestroy } from 'svelte';
+  import { writable, derived } from 'svelte/store';
 
-  let entries   = $state(null);
-  let profiles  = $state(null);
-  let error     = $state('');
-  let selected  = $state(null);
+  // Async-updated state via writable stores — .set() calls subscribers synchronously,
+  // bypassing the Svelte 5 runes batch-microtask path that silently drops async updates.
+  const entries  = writable(null);
+  const profiles = writable(null);
+  const error    = writable('');
 
-  let loading = $derived(entries === null && profiles === null && !error);
+  // loading = true until data arrives or an error is set
+  const loading = derived([entries, profiles, error],
+    ([$e, $p, $err]) => $e === null && $p === null && !$err);
 
-  // Filters
+  let selected   = $state(null);
+
+  // Filter state (synchronous, user-driven — $state is fine here)
   let filterProfile = $state('all');
   let filterStatus  = $state('all');
   let filterSearch  = $state('');
+
+  // filtered mixes store ($entries) and rune state; use $derived which auto-subscribes
+  // to both via the reactive context it runs in.
+  let filtered = $derived(
+    ($entries ?? []).filter(e => {
+      if (filterProfile !== 'all' && String(e.profile_id) !== filterProfile) return false;
+      if (filterStatus !== 'all' && e.run.status !== filterStatus) return false;
+      if (filterSearch) {
+        const q = filterSearch.toLowerCase();
+        if (!e.profile_name?.toLowerCase().includes(q) &&
+            !e.run.error_message?.toLowerCase().includes(q) &&
+            !e.run.snapshot_id?.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    })
+  );
 
   async function load() {
     const timeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Activity load timed out — daemon may be unresponsive')), 20_000)
     );
     try {
-      [entries, profiles] = await Promise.race([
+      const [ents, profs] = await Promise.race([
         Promise.all([listRecentActivity(200), listProfiles()]),
         timeout,
       ]);
-      error = '';
+      entries.set(ents ?? []);
+      profiles.set(profs ?? []);
+      error.set('');
     } catch (e) {
-      error = String(e);
+      error.set(String(e));
+      entries.set([]);
+      profiles.set([]);
     }
   }
 
@@ -57,18 +83,6 @@
     return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
   }
 
-  let filtered = $derived((entries ?? []).filter(e => {
-    if (filterProfile !== 'all' && String(e.profile_id) !== filterProfile) return false;
-    if (filterStatus !== 'all' && e.run.status !== filterStatus) return false;
-    if (filterSearch) {
-      const q = filterSearch.toLowerCase();
-      if (!e.profile_name?.toLowerCase().includes(q) &&
-          !e.run.error_message?.toLowerCase().includes(q) &&
-          !e.run.snapshot_id?.toLowerCase().includes(q)) return false;
-    }
-    return true;
-  }));
-
   load();
   const interval = setInterval(load, 15000);
   onDestroy(() => clearInterval(interval));
@@ -78,14 +92,14 @@
   <h1 class="page-title">Recent Activity</h1>
 </div>
 
-{#if error}
-  <div class="error-box">{error}</div>
+{#if $error}
+  <div class="error-box">{$error}</div>
 {/if}
 
 <div class="filters card">
   <select bind:value={filterProfile}>
     <option value="all">All profiles</option>
-    {#each (profiles ?? []) as p}
+    {#each ($profiles ?? []) as p}
       <option value={String(p.id)}>{p.name}</option>
     {/each}
   </select>
@@ -102,7 +116,7 @@
   <input class="search-input" type="text" placeholder="Search…" bind:value={filterSearch} />
 </div>
 
-{#if loading}
+{#if $loading}
   <div class="center"><span class="spinner"></span></div>
 {:else if filtered.length === 0}
   <div class="empty">No activity entries match the current filters.</div>
