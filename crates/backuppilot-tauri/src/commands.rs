@@ -5,8 +5,10 @@ pub async fn ipc_call(
     method: String,
     params: serde_json::Value,
 ) -> Result<serde_json::Value, String> {
-    let raw = backuppilot_ipc::IpcClient::call(&method, params)
+    let call = backuppilot_ipc::IpcClient::call(&method, params);
+    let raw = tokio::time::timeout(std::time::Duration::from_secs(15), call)
         .await
+        .map_err(|_| format!("daemon did not respond to '{method}' within 15 s"))?
         .map_err(|e| e.to_string())?;
     serde_json::from_str(&raw).map_err(|e| e.to_string())
 }
