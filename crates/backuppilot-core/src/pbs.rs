@@ -7,7 +7,7 @@ use std::time::Duration;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tokio::time::timeout;
-use tracing::{debug, warn};
+use tracing::{debug, error, warn};
 
 use crate::encryption::{apply_encryption_to_command, normalize_fingerprint, EncryptionCliMode};
 use crate::error::{CoreError, Result};
@@ -143,19 +143,43 @@ impl PbsClient {
         let binary = crate::paths::pbs_client_path().to_path_buf();
 
         // On Windows the cached path is the WSL wrapper script.  If it was deleted
-        // (e.g. by wipe_all_local_data), regenerate it before probing.
+        // (e.g. after wipe_all_local_data) or if init_pbs_client_path timed out on
+        // a cold WSL start (leaving the cache unset → bare "proxmox-backup-client"),
+        // regenerate the wrapper and probe it directly.
         #[cfg(windows)]
-        if !binary.exists() {
-            let _ = crate::paths::ensure_wsl_pbs_wrapper();
+        {
+            let probe_path = if !binary.exists() {
+                match crate::paths::ensure_wsl_pbs_wrapper() {
+                    Ok(p) => {
+                        debug!("WSL wrapper regenerated at {:?}", p);
+                        p
+                    }
+                    Err(e) => {
+                        error!("Failed to regenerate WSL wrapper: {e}");
+                        binary.clone()
+                    }
+                }
+            } else {
+                binary.clone()
+            };
+            if probe_pbs_binary(&probe_path).await {
+                return true;
+            }
+            if std::env::var_os("FLATPAK_ID").is_some() {
+                return probe_flatpak_host_pbs().await;
+            }
+            return false;
         }
-
-        if probe_pbs_binary(&binary).await {
-            return true;
+        #[cfg(not(windows))]
+        {
+            if probe_pbs_binary(&binary).await {
+                return true;
+            }
+            if std::env::var_os("FLATPAK_ID").is_some() {
+                return probe_flatpak_host_pbs().await;
+            }
+            false
         }
-        if std::env::var_os("FLATPAK_ID").is_some() {
-            return probe_flatpak_host_pbs().await;
-        }
-        false
     }
 
     /// Verifies PBS is reachable and credentials work (same check as profile verification).
