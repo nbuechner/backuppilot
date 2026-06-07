@@ -12,7 +12,9 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use crate::encryption::{apply_encryption_to_command, EncryptionCliMode};
 use crate::error::{CoreError, Result};
-use crate::paths::{ensure_data_dirs, pbs_client_path};
+#[cfg(not(windows))]
+use crate::paths::ensure_data_dirs;
+use crate::paths::pbs_client_path;
 use crate::pbs::{apply_pbs_client_env, PbsClient};
 use crate::pbs_repository::PbsRepositoryParts;
 use crate::profile::BackupProfile;
