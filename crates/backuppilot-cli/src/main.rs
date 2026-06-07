@@ -143,6 +143,10 @@ async fn main() -> ExitCode {
 
     i18n::init_from_app_settings();
 
+    // Resolve the PBS client binary path (WSL wrapper on Windows) before dispatching
+    // any command that may need it. Mirrors what the daemon does at startup.
+    backuppilot_core::paths::init_pbs_client_path().await;
+
     if !matches!(cli.command, Commands::CheckUpdate) {
         update_notice::maybe_print_update_notice(&cli).await;
     }

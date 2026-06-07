@@ -13,10 +13,11 @@ describe('Activity page', () => {
         const activityTab = await $('.nav-item*=Activity');
         await activityTab.waitForClickable({ timeout: 10_000 });
         await activityTab.click();
-        // Wait for spinner to disappear (data loaded or empty)
+        // Wait for spinner to disappear. activity.spec.ts runs first in the suite,
+        // so the daemon may be doing its cold WSL probe (up to ~30s).
         await browser.waitUntil(
             async () => !(await $('.spinner').isExisting()),
-            { timeout: 15_000, timeoutMsg: 'Activity page spinner did not clear' }
+            { timeout: 60_000, timeoutMsg: 'Activity page spinner did not clear' }
         );
         await browser.pause(300);
     });
