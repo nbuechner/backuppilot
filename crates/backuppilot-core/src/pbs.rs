@@ -42,7 +42,6 @@ async fn probe_pbs_binary(path: &Path) -> bool {
 pub(crate) fn spawn_pbs_command(binary: &Path) -> Command {
     #[cfg(windows)]
     {
-        use std::os::windows::process::CommandExt;
         const CREATE_NO_WINDOW: u32 = 0x0800_0000;
         let ext = binary
             .extension()

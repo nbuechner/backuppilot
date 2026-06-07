@@ -408,7 +408,7 @@ fn run_script_with_password_lines(cmd: &str, lines: &[&str]) -> Result<std::proc
     child.wait_with_output().map_err(CoreError::Io)
 }
 
-fn run_key_create(path: &Path, password: &str, hint: Option<&str>) -> Result<()> {
+fn run_key_create(path: &Path, _password: &str, hint: Option<&str>) -> Result<()> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(CoreError::Io)?;
     }
@@ -417,41 +417,58 @@ fn run_key_create(path: &Path, password: &str, hint: Option<&str>) -> Result<()>
     }
 
     let pbs = pbs_client_path();
-    let pbs_display = pbs.display().to_string();
-    let mut create_cmd = format!(
-        "{} key create {}",
-        shell_escape_single(&pbs_display),
-        shell_escape_single(&path.display().to_string()),
-    );
-    if let Some(h) = hint.filter(|s| !s.trim().is_empty()) {
-        create_cmd.push_str(&format!(" --hint={}", shell_escape_single(h.trim())));
-    }
 
     #[cfg(not(windows))]
-    if let Ok(out) = run_key_create_via_script(&create_cmd, password).map(|o| o.status.success()) {
-        if out && path.is_file() && path.metadata().map(|m| m.len()).unwrap_or(0) > 0 {
-            return Ok(());
+    {
+        let pbs_display = pbs.display().to_string();
+        let mut create_cmd = format!(
+            "{} key create {}",
+            shell_escape_single(&pbs_display),
+            shell_escape_single(&path.display().to_string()),
+        );
+        if let Some(h) = hint.filter(|s| !s.trim().is_empty()) {
+            create_cmd.push_str(&format!(" --hint={}", shell_escape_single(h.trim())));
         }
+
+        if let Ok(out) = run_key_create_via_script(&create_cmd, _password).map(|o| o.status.success()) {
+            if out && path.is_file() && path.metadata().map(|m| m.len()).unwrap_or(0) > 0 {
+                return Ok(());
+            }
+        }
+        warn!("script key create did not produce a key file, trying direct PBS call");
     }
+
+    // Build the command.  On Windows the PBS client is a .cmd wrapper that requires
+    // `cmd /c` to execute — we build the subprocess explicitly so that CREATE_NO_WINDOW
+    // is honoured and no console window flashes up.
+    #[cfg(windows)]
+    let mut cmd = {
+        use std::os::windows::process::CommandExt;
+        let ext = pbs.extension().and_then(|e| e.to_str()).unwrap_or("");
+        let mut c = if ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat") {
+            let mut c = StdCommand::new("cmd");
+            c.args([std::ffi::OsStr::new("/c"), pbs.as_os_str()]);
+            c
+        } else {
+            StdCommand::new(&pbs)
+        };
+        c.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+        c
+    };
     #[cfg(not(windows))]
-    warn!("script key create did not produce a key file, trying direct PBS call");
-    let mut cmd = StdCommand::new(pbs);
+    let mut cmd = StdCommand::new(&pbs);
+
     cmd.arg("key").arg("create").arg(path);
     if let Some(h) = hint.filter(|s| !s.trim().is_empty()) {
         cmd.arg(format!("--hint={}", h.trim()));
     }
-    // On Windows (WSL wrapper, no PTY available) use --kdf none to avoid
-    // the interactive passphrase prompt that fails with "no tty".
-    // The key data itself is still 32 random bytes and protects backups.
+    // On Windows (WSL wrapper, no PTY available) use --kdf none to skip the
+    // interactive passphrase prompt. Key data is still 32 random bytes.
     #[cfg(windows)]
     cmd.arg("--kdf").arg("none");
     #[cfg(not(windows))]
-    cmd.env("PBS_ENCRYPTION_PASSWORD", password);
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
-    }
+    cmd.env("PBS_ENCRYPTION_PASSWORD", _password);
+
     let out = cmd.output().map_err(CoreError::Io)?;
     if out.status.success() && path.is_file() && path.metadata().map(|m| m.len()).unwrap_or(0) > 0 {
         return Ok(());

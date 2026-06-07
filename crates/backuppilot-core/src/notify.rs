@@ -10,10 +10,10 @@
 use std::time::{Duration, Instant};
 
 use crate::app_settings::load_app_settings;
-use crate::ids::ICON_NAME as ICON;
 
 const APP_NAME: &str = "BackupPilot";
 const PROGRESS_MIN_INTERVAL: Duration = Duration::from_secs(2);
+#[cfg(not(windows))]
 const FINISH_EXPIRE_MS: u32 = 10_000;
 
 // ── Public surface ────────────────────────────────────────────────────────────
@@ -90,7 +90,8 @@ fn truncate_notification_body(text: &str) -> String {
 #[cfg(not(windows))]
 mod platform {
     use std::process::{Command, Stdio};
-    use super::{APP_NAME, FINISH_EXPIRE_MS, ICON};
+    use crate::ids::ICON_NAME as ICON;
+    use super::{APP_NAME, FINISH_EXPIRE_MS};
 
     pub(super) fn send_notification(summary: &str, body: &str, _expire: bool) {
         let _ = spawn_notify_send(summary, body, None, FINISH_EXPIRE_MS, &[]);
@@ -172,7 +173,7 @@ mod platform {
 
 #[cfg(windows)]
 mod platform {
-    use super::{APP_NAME, FINISH_EXPIRE_MS};
+    use super::APP_NAME;
 
     pub(super) fn send_notification(summary: &str, body: &str, _expire: bool) {
         show_toast(summary, body);
