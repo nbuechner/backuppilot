@@ -786,8 +786,16 @@ impl DaemonService {
         &self,
         input: CredentialVerifyInput,
     ) -> CredentialVerifyResult {
+        let repository = if let Some(profile_id) = input.profile_id {
+            match backuppilot_core::secrets::hydrate_profile_repository(profile_id, &input.repository) {
+                Ok(r) => r,
+                Err(e) => return CredentialVerifyResult { ok: false, message: Some(e.to_string()) },
+            }
+        } else {
+            input.repository.clone()
+        };
         PbsClient::verify_credentials(
-            &input.repository,
+            &repository,
             input.namespace.as_deref(),
             input.server_fingerprint.as_deref(),
         )

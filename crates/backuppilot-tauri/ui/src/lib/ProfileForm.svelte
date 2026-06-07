@@ -62,6 +62,9 @@
         }),
         namespace: namespace.trim() || null,
         server_fingerprint: pbsFingerprint.trim() || null,
+        // Pass the profile id when editing so the daemon can hydrate
+        // the stored token secret from the keyring.
+        profile_id: isEdit ? profile.id : null,
       });
       testResult = result;
     } catch (e) {

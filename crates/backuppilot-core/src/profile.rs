@@ -263,6 +263,10 @@ pub struct CredentialVerifyInput {
     pub namespace: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub server_fingerprint: Option<String>,
+    /// When set, the stored credential secret is hydrated from the keyring
+    /// before verification (used when editing an existing profile).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub profile_id: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
