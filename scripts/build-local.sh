@@ -228,6 +228,85 @@ EOF
   fi
 }
 
+# ── Windows: cross-compile + self-extracting Rust installer ──────────────────
+build_windows_cross() {
+  echo ""
+  echo "=== Windows cross-compile (MinGW -> x86_64-pc-windows-gnu) ==="
+
+  read -r -d '' SCRIPT << 'EOF' || true
+set -e
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -q
+apt-get install -y -q --no-install-recommends \
+  curl ca-certificates build-essential \
+  mingw-w64 gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64 \
+  pkg-config libssl-dev
+
+if [ ! -f /root/.cargo/bin/rustup ]; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --profile minimal --no-modify-path
+fi
+export PATH="/root/.cargo/bin:$PATH"
+rustup default stable 2>/dev/null || rustup toolchain install stable --no-self-update
+rustup target add x86_64-pc-windows-gnu
+
+if ! command -v node &>/dev/null; then
+  curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  apt-get install -y nodejs
+fi
+
+cd /src
+
+# Phase 1: build frontend and the three app binaries
+cd crates/backuppilot-tauri/ui && npm ci --prefer-offline && npm run build && cd /src
+
+TARGET=x86_64-pc-windows-gnu
+cargo build \
+  -p backuppilot-daemon \
+  -p backuppilot-cli \
+  -p backuppilot-tauri \
+  --target $TARGET \
+  --release
+
+T="/build/target/${TARGET}/release"
+
+# Phase 2: build the self-extracting installer (embeds the three exes above)
+BACKUPPILOT_DAEMON_EXE="$T/backuppilot-daemon.exe" \
+BACKUPPILOT_GUI_EXE="$T/backuppilot-tauri.exe" \
+BACKUPPILOT_CLI_EXE="$T/backuppilot-cli.exe" \
+  cargo build \
+    -p backuppilot-installer \
+    --target $TARGET \
+    --release
+
+VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/')
+OUTNAME="BackupPilot-${VERSION}-Setup.exe"
+cp "$T/backuppilot-installer.exe" "/dist/$OUTNAME"
+echo "Done: $OUTNAME"
+EOF
+
+  if [[ "$BUILDER" == "lxd" ]]; then
+    mkdir -p \
+      "$LXD_CACHE/cargo-win" \
+      "$LXD_CACHE/target-win" \
+      "$LXD_CACHE/node-win"
+    EXTRA='
+      lxc config device add "$cname" node disk source="'"$LXD_CACHE"'/node-win" path=/src/crates/backuppilot-tauri/ui/node_modules shift=true
+    '
+    lxd_run "win" "ubuntu:24.04" "$SCRIPT" "$EXTRA"
+  else
+    docker run --rm \
+      -v "$REPO:/src" \
+      -v "backuppilot-target-win:/build/target" \
+      -v "backuppilot-cargo-win:/root/.cargo" \
+      -v "backuppilot-node-win:/src/crates/backuppilot-tauri/ui/node_modules" \
+      -v "$DIST:/dist" \
+      -e CARGO_TARGET_DIR=/build/target \
+      ubuntu:24.04 \
+      bash -c "$SCRIPT"
+  fi
+}
+
 # ── Windows: NSIS installer via SSH ──────────────────────────────────────────
 build_windows() {
   echo ""
@@ -258,11 +337,13 @@ build_windows() {
 }
 
 case "$TARGET" in
-  ubuntu2404) build_2404 ;;
-  ubuntu2604) build_2604 ;;
-  windows)    build_windows ;;
-  all)        build_2404; build_2604; build_windows ;;
-  *) echo "Usage: $0 [ubuntu2404|ubuntu2604|windows|all]"; exit 1 ;;
+  ubuntu2404)     build_2404 ;;
+  ubuntu2604)     build_2604 ;;
+  windows)        build_windows ;;
+  windows-cross)  build_windows_cross ;;
+  all)            build_2404; build_2604; build_windows ;;
+  all-cross)      build_2404; build_2604; build_windows_cross ;;
+  *) echo "Usage: $0 [ubuntu2404|ubuntu2604|windows|windows-cross|all|all-cross]"; exit 1 ;;
 esac
 
 echo ""
