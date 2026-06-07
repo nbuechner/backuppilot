@@ -2,11 +2,12 @@
   import { listRecentActivity, listProfiles } from '../lib/ipc.js';
   import { onDestroy } from 'svelte';
 
-  let entries   = $state([]);
-  let profiles  = $state([]);
-  let loading   = $state(true);
+  let entries   = $state(null);
+  let profiles  = $state(null);
   let error     = $state('');
   let selected  = $state(null);
+
+  let loading = $derived(entries === null && profiles === null && !error);
 
   // Filters
   let filterProfile = $state('all');
@@ -23,10 +24,8 @@
         timeout,
       ]);
       error = '';
-      loading = false;
     } catch (e) {
       error = String(e);
-      loading = false;
     }
   }
 
@@ -58,7 +57,7 @@
     return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
   }
 
-  let filtered = $derived(entries.filter(e => {
+  let filtered = $derived((entries ?? []).filter(e => {
     if (filterProfile !== 'all' && String(e.profile_id) !== filterProfile) return false;
     if (filterStatus !== 'all' && e.run.status !== filterStatus) return false;
     if (filterSearch) {
@@ -86,7 +85,7 @@
 <div class="filters card">
   <select bind:value={filterProfile}>
     <option value="all">All profiles</option>
-    {#each profiles as p}
+    {#each (profiles ?? []) as p}
       <option value={String(p.id)}>{p.name}</option>
     {/each}
   </select>
