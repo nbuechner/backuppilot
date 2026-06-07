@@ -28,15 +28,17 @@
   }
 
   function statusClass(status) {
-    if (status === 'Failed' || status === 'Cancelled') return 'level-error';
-    if (status === 'Skipped') return 'level-warn';
+    const s = status?.toLowerCase();
+    if (s === 'failed' || s === 'cancelled') return 'level-error';
+    if (s === 'skipped') return 'level-warn';
     return 'level-info';
   }
 
   function statusBadgeClass(status) {
-    if (status === 'Success') return 'badge badge-ok';
-    if (status === 'Failed')  return 'badge badge-error';
-    if (status === 'Running') return 'badge badge-running';
+    const s = status?.toLowerCase();
+    if (s === 'success') return 'badge badge-ok';
+    if (s === 'failed')  return 'badge badge-error';
+    if (s === 'running') return 'badge badge-running';
     return 'badge badge-idle';
   }
 

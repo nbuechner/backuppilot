@@ -61,7 +61,8 @@ describe('Activity page', () => {
 
             expect(await badge.isExisting()).toBe(true);
             const badgeText = await badge.getText();
-            expect(['Success', 'Failed', 'Skipped', 'Running', 'Cancelled']).toContain(badgeText.trim());
+            const validStatuses = ['success', 'failed', 'skipped', 'running', 'cancelled'];
+            expect(validStatuses).toContain(badgeText.trim().toLowerCase());
         }
     });
 
@@ -87,19 +88,21 @@ describe('Activity page', () => {
         const rows = await $$('.log-row');
         if (rows.length === 0) return;
 
-        // Pick the status of the first row to filter by
+        // Pick the status of the first row to filter by.
+        // Badge text may be upper/lowercase; option labels in the select are Title Case.
         const firstBadge = await rows[0].$('.badge');
-        const targetStatus = (await firstBadge.getText()).trim();
+        const rawStatus = (await firstBadge.getText()).trim();
+        const titleStatus = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).toLowerCase();
 
         const statusSelect = await $$('.filters select')[1];
-        await statusSelect.selectByVisibleText(targetStatus);
+        await statusSelect.selectByVisibleText(titleStatus);
         await browser.pause(200);
 
         const filtered = await $$('.log-row');
         for (const row of filtered) {
             const badge = await row.$('.badge');
-            const text = (await badge.getText()).trim();
-            expect(text).toBe(targetStatus);
+            const text = (await badge.getText()).trim().toLowerCase();
+            expect(text).toBe(rawStatus.toLowerCase());
         }
 
         // Reset filter
