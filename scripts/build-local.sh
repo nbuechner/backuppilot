@@ -176,7 +176,10 @@ build_windows() {
   # Copy installer back to local dist/
   scp "${WIN_HOST}:${WIN_REPO//\\/\/}/target/release/bundle/nsis/*.exe" "$DIST/"
 
-  echo "Done: Windows installer copied to dist/"
+  # Also drop it on the Windows Desktop for easy access
+  ssh "$WIN_HOST" "copy ${WIN_REPO}\\target\\release\\bundle\\nsis\\*.exe C:\\Users\\user\\Desktop\\ >nul"
+
+  echo "Done: Windows installer copied to dist/ and Windows Desktop"
 }
 
 case "$TARGET" in
