@@ -481,6 +481,7 @@ fn run_key_create(path: &Path, _password: &str, hint: Option<&str>) -> Result<()
 }
 
 /// Runs `proxmox-backup-client key create` inside a pseudo-TTY (`script -qfc`).
+#[cfg(not(windows))]
 fn run_key_create_via_script(create_cmd: &str, password: &str) -> Result<std::process::Output> {
     let out = run_script_with_password_lines(create_cmd, &[password, password])?;
     if !out.status.success() {
