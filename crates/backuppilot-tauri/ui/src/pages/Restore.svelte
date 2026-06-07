@@ -197,6 +197,10 @@
     }
   }
 
+  function openInExplorer(path) {
+    invoke('open_in_explorer', { path });
+  }
+
   async function loadFuseCheck() {
     try {
       fuseCheck = await checkFuseAvailable();
@@ -237,7 +241,7 @@
         <span class="mono">{m.windows_path ?? m.mount_point}</span>
         <span class="muted">{m.profile_name} / {m.archive_name}</span>
         {#if m.windows_path}
-          <button class="btn-ghost-sm" onclick={() => invoke('open_in_explorer', { path: m.windows_path })>Open</button>
+          <button class="btn-ghost-sm" onclick={() => openInExplorer(m.windows_path)}>Open</button>
         {/if}
         <button class="btn-ghost-sm" onclick={() => doUnmount(m.id)}>Unmount</button>
       </div>
@@ -424,7 +428,7 @@
           ✓ Mounted at
           <span class="mono">{mountResult.mount?.windows_path ?? mountResult.mount?.mount_point ?? 'unknown path'}</span>
           {#if mountResult.mount?.windows_path}
-            <button class="btn-inline-ok" onclick={() => invoke('open_in_explorer', { path: mountResult.mount.windows_path })>Open in Explorer</button>
+            <button class="btn-inline-ok" onclick={() => openInExplorer(mountResult.mount.windows_path)}>Open in Explorer</button>
           {/if}
         </div>
       {:else if mountResult.needs_fuse3}
