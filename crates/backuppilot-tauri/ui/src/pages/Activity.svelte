@@ -23,9 +23,9 @@
         timeout,
       ]);
       error = '';
+      loading = false;
     } catch (e) {
       error = String(e);
-    } finally {
       loading = false;
     }
   }
