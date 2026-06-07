@@ -340,8 +340,9 @@ exit $LASTEXITCODE
     std::fs::write(&ps1_path, ps1.replace('\n', "\r\n"))?;
 
     // Minimal .cmd launcher (Windows can't execute .ps1 directly)
+    // -WindowStyle Hidden prevents a powershell console window from flashing up.
     let cmd = format!(
-        "@echo off\r\npowershell.exe -NoProfile -ExecutionPolicy Bypass -File \"{ps1}\" %*\r\nexit /b %ERRORLEVEL%\r\n",
+        "@echo off\r\npowershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{ps1}\" %*\r\nexit /b %ERRORLEVEL%\r\n",
         ps1 = ps1_path.display()
     );
     std::fs::write(&cmd_path, cmd)?;
