@@ -248,7 +248,7 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.72);
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -258,7 +258,7 @@
   }
 
   .dialog {
-    background: var(--card-bg);
+    background: var(--surface);
     border-radius: var(--radius);
     box-shadow: 0 20px 60px rgba(0,0,0,0.25);
     width: 100%;
