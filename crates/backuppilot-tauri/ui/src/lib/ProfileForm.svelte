@@ -1,5 +1,5 @@
 <script>
-  import { ipcCall } from './ipc.js';
+  import { ipcCall, verifyCredentials } from './ipc.js';
 
   let { onSaved, onCancel, profile = null } = $props();
 
@@ -38,8 +38,38 @@
   let scheduleTime    = $state(sched.time);
   let scheduleWeekday = $state(sched.weekday);
 
-  let saving = $state(false);
-  let error  = $state('');
+  let saving     = $state(false);
+  let error      = $state('');
+  let testing    = $state(false);
+  let testResult = $state(null); // null | { ok: boolean, message?: string }
+
+  // Clear stale test result when any PBS connection field changes.
+  $effect(() => {
+    void (pbsHost, pbsUser, pbsToken, pbsDatastore, pbsFingerprint, namespace);
+    testResult = null;
+  });
+
+  async function testConnection() {
+    testing = true;
+    testResult = null;
+    try {
+      const result = await verifyCredentials({
+        repository: JSON.stringify({
+          user: pbsUser.trim(),
+          host: pbsHost.trim(),
+          token: pbsToken.trim(),
+          datastore: pbsDatastore.trim(),
+        }),
+        namespace: namespace.trim() || null,
+        server_fingerprint: pbsFingerprint.trim() || null,
+      });
+      testResult = result;
+    } catch (e) {
+      testResult = { ok: false, message: String(e) };
+    } finally {
+      testing = false;
+    }
+  }
 
   function onKeydown(e) {
     if (e.key === 'Escape') onCancel();
@@ -162,6 +192,19 @@
         <div class="field">
           <label for="pf-fp">Fingerprint</label>
           <input id="pf-fp" type="text" placeholder="AA:BB:CC:… (optional)" bind:value={pbsFingerprint} />
+        </div>
+        <div class="field">
+          <span></span>
+          <div class="test-row">
+            <button class="btn-ghost" disabled={testing} onclick={testConnection}>
+              {testing ? 'Testing…' : 'Test Connection'}
+            </button>
+            {#if testResult}
+              <span class="test-badge {testResult.ok ? 'test-ok' : 'test-fail'}">
+                {testResult.ok ? '✓ Connected' : '✗ ' + (testResult.message ?? 'Failed')}
+              </span>
+            {/if}
+          </div>
         </div>
       </section>
 
@@ -328,6 +371,18 @@
     background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px;
   }
   .mono { font-family: monospace; }
+
+  .test-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .test-badge {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .test-ok   { color: var(--green); }
+  .test-fail { color: var(--red); }
 
   .error-box {
     margin: 0 24px 16px;
