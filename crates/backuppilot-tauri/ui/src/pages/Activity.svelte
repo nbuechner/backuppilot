@@ -103,7 +103,7 @@
   <div class="empty">No activity entries match the current filters.</div>
 {:else}
   <div class="log card">
-    {#each filtered as e (e.run.id)}
+    {#each filtered as e ((e.is_system ? 's' : 'b') + e.run.id)}
       <button class="log-row {statusClass(e.run.status)}" onclick={() => selected = selected?.run.id === e.run.id ? null : e}>
         <span class="log-time">{formatDate(e.run.started_at)}</span>
         <span class="log-profile">{e.profile_name ?? '—'}</span>
