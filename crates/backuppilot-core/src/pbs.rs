@@ -142,6 +142,13 @@ impl PbsClient {
         // The cache is pre-populated by init_pbs_client_path() at daemon startup.
         let binary = crate::paths::pbs_client_path().to_path_buf();
 
+        // On Windows the cached path is the WSL wrapper script.  If it was deleted
+        // (e.g. by wipe_all_local_data), regenerate it before probing.
+        #[cfg(windows)]
+        if !binary.exists() {
+            let _ = crate::paths::ensure_wsl_pbs_wrapper();
+        }
+
         if probe_pbs_binary(&binary).await {
             return true;
         }
