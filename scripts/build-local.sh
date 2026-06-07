@@ -59,8 +59,9 @@ lxd_run() {
   # Wait until the container is fully booted
   lxc exec "$cname" -- cloud-init status --wait 2>/dev/null || sleep 5
 
-  # Source: read-only; world-readable so no UID shift needed
-  lxc config device add "$cname" src  disk source="$REPO" path=/src readonly=true
+  # Source: shift=true so container root maps to host repo owner (needed by tauri-build
+  # which writes generated schema files back into the source tree)
+  lxc config device add "$cname" src  disk source="$REPO" path=/src shift=true
   # Output dir: shift=true maps container root UID to host dir owner
   lxc config device add "$cname" dist disk source="$DIST"                      path=/dist         shift=true
   # Persistent build caches (cargo registry + compiled artifacts)
@@ -111,7 +112,7 @@ fi
 cd /src
 cd crates/backuppilot-tauri/ui && npm ci --prefer-offline && npm run build && cd /src
 
-cargo build -p backuppilot-daemon -p backuppilot-cli -p backuppilot-tauri --release
+cargo build --locked -p backuppilot-daemon -p backuppilot-cli -p backuppilot-tauri --release
 
 VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/')
 PKG="/build/backuppilot_${VERSION}_ubuntu2404_amd64"
@@ -146,7 +147,11 @@ EOF
   if [[ "$BUILDER" == "lxd" ]]; then
     mkdir -p "$LXD_CACHE/node-2404"
     # Capture cname for the extra_devs eval (lxd_run sets cname before calling eval)
-    EXTRA='lxc config device add "$cname" node disk source="'"$LXD_CACHE"'/node-2404" path=/src/crates/backuppilot-tauri/ui/node_modules shift=true'
+    EXTRA='
+      lxc config device add "$cname" node   disk source="'"$LXD_CACHE"'/node-2404"   path=/src/crates/backuppilot-tauri/ui/node_modules shift=true
+      lxc config device add "$cname" uidist disk source="'"$LXD_CACHE"'/uidist-2404" path=/src/crates/backuppilot-tauri/ui/dist          shift=true
+    '
+    mkdir -p "$LXD_CACHE/uidist-2404"
     lxd_run "2404" "ubuntu:24.04" "$SCRIPT" "$EXTRA"
   else
     docker run --rm \
@@ -182,7 +187,7 @@ export PATH="/root/.cargo/bin:$PATH"
 rustup default stable 2>/dev/null || rustup toolchain install stable --no-self-update
 
 cd /src
-cargo build -p backuppilot-daemon -p backuppilot-gui -p backuppilot-cli --release
+cargo build --locked -p backuppilot-daemon -p backuppilot-gui -p backuppilot-cli --release
 
 VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/')
 PKG="/build/backuppilot_${VERSION}_ubuntu2604_amd64"
@@ -261,9 +266,25 @@ cd /src
 cd crates/backuppilot-tauri/ui && npm ci --prefer-offline && npm run build && cd /src
 
 TARGET=x86_64-pc-windows-gnu
+
+# Build daemon and CLI first (tauri-build checks for the daemon resource at build time)
 cargo build \
+  --locked \
   -p backuppilot-daemon \
   -p backuppilot-cli \
+  --target $TARGET \
+  --release
+
+# tauri.windows.conf.json expects the daemon at ../../target/release/ relative to the crate,
+# i.e. /src/target/release/backuppilot-daemon.exe. Copy the cross-compiled exe there so
+# tauri-build's resource existence check passes. (daemon.rs finds the daemon via same-dir
+# lookup at runtime, so the bundle path also works when installed.)
+mkdir -p /src/target/release
+cp "/build/target/${TARGET}/release/backuppilot-daemon.exe" \
+   /src/target/release/backuppilot-daemon.exe
+
+cargo build \
+  --locked \
   -p backuppilot-tauri \
   --target $TARGET \
   --release
@@ -275,6 +296,7 @@ BACKUPPILOT_DAEMON_EXE="$T/backuppilot-daemon.exe" \
 BACKUPPILOT_GUI_EXE="$T/backuppilot-tauri.exe" \
 BACKUPPILOT_CLI_EXE="$T/backuppilot-cli.exe" \
   cargo build \
+    --locked \
     -p backuppilot-installer \
     --target $TARGET \
     --release
@@ -289,9 +311,11 @@ EOF
     mkdir -p \
       "$LXD_CACHE/cargo-win" \
       "$LXD_CACHE/target-win" \
-      "$LXD_CACHE/node-win"
+      "$LXD_CACHE/node-win" \
+      "$LXD_CACHE/uidist-win"
     EXTRA='
-      lxc config device add "$cname" node disk source="'"$LXD_CACHE"'/node-win" path=/src/crates/backuppilot-tauri/ui/node_modules shift=true
+      lxc config device add "$cname" node   disk source="'"$LXD_CACHE"'/node-win"   path=/src/crates/backuppilot-tauri/ui/node_modules shift=true
+      lxc config device add "$cname" uidist disk source="'"$LXD_CACHE"'/uidist-win" path=/src/crates/backuppilot-tauri/ui/dist          shift=true
     '
     lxd_run "win" "ubuntu:24.04" "$SCRIPT" "$EXTRA"
   else
