@@ -684,6 +684,31 @@ async fn run_pbs_with_timeout(
     let key_id = encryption_key_id.or(profile.encryption_key_id);
     apply_encryption_to_command(&mut cmd, key_id, encryption_mode)?;
 
+    // On Windows, tokio::process::Command::output() creates overlapped async pipes for stdout/stderr
+    // capture, which fails with os error 50 (ERROR_NOT_SUPPORTED) in certain session contexts
+    // (e.g. RDP sessions, service-launched processes). Use blocking I/O via spawn_blocking instead.
+    #[cfg(windows)]
+    {
+        let std_ref = cmd.as_std();
+        let mut std_cmd = std::process::Command::new(std_ref.get_program());
+        std_cmd.args(std_ref.get_args());
+        for (k, v) in std_ref.get_envs() {
+            match v {
+                Some(val) => { std_cmd.env(k, val); }
+                None => { std_cmd.env_remove(k); }
+            }
+        }
+        return timeout(limit, tokio::task::spawn_blocking(move || std_cmd.output()))
+            .await
+            .map_err(|_| {
+                let mins = limit.as_secs() / 60;
+                CoreError::PbsCommand(format!("pbs command timed out after {mins} minutes"))
+            })?
+            .map_err(|e| CoreError::PbsCommand(format!("process thread panicked: {e}")))?
+            .map_err(CoreError::Io);
+    }
+
+    #[allow(unreachable_code)]
     timeout(limit, cmd.output())
         .await
         .map_err(|_| {

@@ -372,6 +372,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "backuppilot-probe"
+version = "1.0.0"
+dependencies = [
+ "backuppilot-ipc",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "backuppilot-tauri"
 version = "1.0.0"
 dependencies = [

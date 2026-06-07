@@ -1,0 +1,20 @@
+{
+  "name": "backuppilot-ui-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "wdio run wdio.conf.ts",
+    "test:profiles": "wdio run wdio.conf.ts --spec specs/profiles.spec.ts",
+    "test:restore": "wdio run wdio.conf.ts --spec specs/restore.spec.ts"
+  },
+  "devDependencies": {
+    "@wdio/cli": "^9.0.0",
+    "@wdio/local-runner": "^9.0.0",
+    "@wdio/mocha-framework": "^9.0.0",
+    "@wdio/spec-reporter": "^9.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0",
+    "webdriverio": "^9.0.0"
+  }
+}
