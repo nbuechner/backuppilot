@@ -10,10 +10,12 @@ mod install {
     use std::io::Write;
     use std::path::{Path, PathBuf};
     use std::process::Command;
-    use winreg::enums::{HKEY_CURRENT_USER, KEY_SET_VALUE};
+    use winreg::enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, KEY_READ, KEY_SET_VALUE};
     use winreg::RegKey;
 
     const APP_NAME: &str = "BackupPilot";
+    // GUID for the WebView2 Evergreen runtime
+    const WEBVIEW2_GUID: &str = "{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}";
     const UNINSTALL_KEY: &str =
         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\BackupPilot";
 
@@ -154,6 +156,48 @@ mod install {
         }
     }
 
+    fn webview2_installed() -> bool {
+        let subkey = format!(
+            r"SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{}",
+            WEBVIEW2_GUID
+        );
+        // Check machine-wide install (HKLM) then per-user install (HKCU)
+        let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+        if hklm.open_subkey_with_flags(&subkey, KEY_READ).is_ok() {
+            return true;
+        }
+        let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+        let subkey_user = format!(
+            r"Software\Microsoft\EdgeUpdate\Clients\{}",
+            WEBVIEW2_GUID
+        );
+        hkcu.open_subkey_with_flags(&subkey_user, KEY_READ).is_ok()
+    }
+
+    fn install_webview2() -> bool {
+        let tmp = std::env::var("TEMP").unwrap_or_else(|_| "C:\\Windows\\Temp".into());
+        let bootstrapper = format!(r"{}\MicrosoftEdgeWebview2Setup.exe", tmp);
+
+        // Download the Evergreen Bootstrapper (~1.7 MB) using curl.exe (ships with Win10+)
+        let dl = Command::new("curl.exe")
+            .args([
+                "-L", "--silent", "--show-error",
+                "-o", &bootstrapper,
+                "https://go.microsoft.com/fwlink/partners/139788",
+            ])
+            .status();
+
+        if dl.map(|s| s.success()).unwrap_or(false) {
+            let install = Command::new(&bootstrapper)
+                .args(["/silent", "/install"])
+                .status();
+            let _ = std::fs::remove_file(&bootstrapper);
+            install.map(|s| s.success()).unwrap_or(false)
+        } else {
+            false
+        }
+    }
+
     pub fn run_install() {
         let dir = install_dir();
 
@@ -190,6 +234,20 @@ mod install {
         set_autostart(&daemon_exe);
         create_shortcut(&gui_exe);
         register_uninstall(&installer_dst);
+
+        // Ensure WebView2 runtime is present (required by the Tauri GUI)
+        if !webview2_installed() {
+            msgbox(
+                "BackupPilot Setup",
+                "Microsoft Edge WebView2 Runtime is required.\n\nIt will be downloaded and installed now (~1.7 MB download).",
+            );
+            if !install_webview2() {
+                msgbox(
+                    "BackupPilot Setup",
+                    "WebView2 installation failed or was cancelled.\n\nPlease install it manually from:\nhttps://developer.microsoft.com/microsoft-edge/webview2/\n\nBackupPilot files have been installed but the GUI may not start.",
+                );
+            }
+        }
 
         let _ = Command::new(&daemon_exe).spawn();
         let _ = Command::new(&gui_exe).spawn();
