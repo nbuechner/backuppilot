@@ -33,7 +33,10 @@ describe('Settings page', () => {
 
     it('shows all expected sections', async () => {
         const headers = await $$('.section-header');
-        const texts = await Promise.all(headers.map(h => h.getText()));
+        const texts: string[] = [];
+        for (const h of headers) {
+            texts.push(await h.getText());
+        }
         const joined = texts.join(' ');
         for (const section of ['Notifications', 'Appearance', 'Health Check', 'Backup Conditions', 'Log Retention', 'Updates']) {
             expect(joined).toContain(section);
@@ -79,7 +82,10 @@ describe('Settings page', () => {
     it('color scheme select has valid options', async () => {
         await $('#color-scheme').waitForExist({ timeout: 3_000 });
         const options = await $$('#color-scheme option');
-        const values = await Promise.all(options.map(o => o.getValue()));
+        const values: string[] = [];
+        for (const o of options) {
+            values.push(await o.getValue());
+        }
         expect(values).toContain('system');
         expect(values).toContain('light');
         expect(values).toContain('dark');
