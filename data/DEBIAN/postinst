@@ -51,18 +51,22 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
         bookworm)
             echo "  Install it with:"
             echo ""
+            echo "    sudo mkdir -p /etc/apt/keyrings"
             echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg \\"
-            echo "      | sudo tee /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg >/dev/null"
-            echo "    echo 'deb http://download.proxmox.com/debian/pbs-client bookworm main' \\"
+            echo "      | sudo tee /etc/apt/keyrings/proxmox-release-bookworm.gpg >/dev/null"
+            echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-bookworm.gpg]" \
+                 "http://download.proxmox.com/debian/pbs-client bookworm main' \\"
             echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
             echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
             ;;
         trixie)
             echo "  Install it with:"
             echo ""
+            echo "    sudo mkdir -p /etc/apt/keyrings"
             echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg \\"
-            echo "      | sudo tee /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg >/dev/null"
-            echo "    echo 'deb http://download.proxmox.com/debian/pbs-client trixie main' \\"
+            echo "      | sudo tee /etc/apt/keyrings/proxmox-release-trixie.gpg >/dev/null"
+            echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-trixie.gpg]" \
+                 "http://download.proxmox.com/debian/pbs-client trixie main' \\"
             echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
             echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
             ;;
