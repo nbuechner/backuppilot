@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
-# Build BackupPilot Linux .deb packages locally using Docker.
+# Build BackupPilot release packages locally.
+#   Linux .deb  — built inside Docker containers (no host pollution)
+#   Windows NSIS — built on the Windows host via SSH, installer copied back
+#
 # Cargo and npm caches are kept in named Docker volumes so rebuilds are fast.
-# Usage: ./scripts/build-local.sh [ubuntu2404|ubuntu2604|all]
+#
+# Usage: ./scripts/build-local.sh [ubuntu2404|ubuntu2604|windows|all]
 set -euo pipefail
 
 TARGET="${1:-all}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 DIST="$REPO/dist"
+WIN_HOST="${WIN_HOST:-user@10.99.158.244}"
+WIN_REPO='C:\Users\user\backuppilot'
+
 mkdir -p "$DIST"
 
 VERSION=$(grep '^version' "$REPO/Cargo.toml" | head -1 | sed 's/.*= *"\(.*\)"/\1/')
@@ -17,7 +24,6 @@ build_2404() {
   echo ""
   echo "=== ubuntu-24.04 (Tauri / WebKitGTK) ==="
 
-  # Inner script written to a variable to avoid quoting nightmares
   read -r -d '' SCRIPT << 'EOF' || true
 set -e
 export DEBIAN_FRONTEND=noninteractive
@@ -27,25 +33,19 @@ apt-get install -y -q --no-install-recommends \
   libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev \
   librsvg2-dev libdbus-1-dev pkg-config libssl-dev
 
-# Rust (cached in volume after first run)
 if [ ! -f /root/.cargo/bin/rustup ]; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     | sh -s -- -y --profile minimal --no-modify-path
 fi
 export PATH="/root/.cargo/bin:$PATH"
 
-# Node 22 (cached in volume after first run)
 if ! command -v node &>/dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   apt-get install -y nodejs
 fi
 
 cd /src
-
-cd crates/backuppilot-tauri/ui
-npm ci --prefer-offline
-npm run build
-cd /src
+cd crates/backuppilot-tauri/ui && npm ci --prefer-offline && npm run build && cd /src
 
 cargo build -p backuppilot-daemon -p backuppilot-cli -p backuppilot-tauri --release
 
@@ -152,13 +152,41 @@ EOF
     bash -c "$SCRIPT"
 }
 
+# ── Windows: NSIS installer via SSH ──────────────────────────────────────────
+build_windows() {
+  echo ""
+  echo "=== Windows NSIS installer (via SSH to $WIN_HOST) ==="
+
+  # Kill any running instances so the OS releases the locked executables
+  ssh "$WIN_HOST" "taskkill /F /IM backuppilot-daemon.exe /IM backuppilot-tauri.exe 2>nul & exit 0" || true
+
+  # Sync latest code
+  ssh "$WIN_HOST" "cd /d ${WIN_REPO} && git pull"
+
+  # Build frontend
+  ssh "$WIN_HOST" "cd /d ${WIN_REPO}\\crates\\backuppilot-tauri\\ui && npm ci --prefer-offline && npm run build"
+
+  # Build daemon (must exist before Tauri bundles resources)
+  ssh "$WIN_HOST" "cd /d ${WIN_REPO} && cargo build -p backuppilot-daemon --release"
+
+  # Build Tauri NSIS installer
+  # Uses npx so no global install is required; @tauri-apps/cli is cached by npm after first run
+  ssh "$WIN_HOST" "cd /d ${WIN_REPO}\\crates\\backuppilot-tauri && npx --yes @tauri-apps/cli@v2 build --bundles nsis"
+
+  # Copy installer back to local dist/
+  scp "${WIN_HOST}:${WIN_REPO//\\/\/}/target/release/bundle/nsis/*.exe" "$DIST/"
+
+  echo "Done: Windows installer copied to dist/"
+}
+
 case "$TARGET" in
   ubuntu2404) build_2404 ;;
   ubuntu2604) build_2604 ;;
-  all) build_2404; build_2604 ;;
-  *) echo "Usage: $0 [ubuntu2404|ubuntu2604|all]"; exit 1 ;;
+  windows)    build_windows ;;
+  all)        build_2404; build_2604; build_windows ;;
+  *) echo "Usage: $0 [ubuntu2404|ubuntu2604|windows|all]"; exit 1 ;;
 esac
 
 echo ""
 echo "Packages in dist/:"
-ls -lh "$DIST"/*.deb 2>/dev/null || true
+ls -lh "$DIST"/ 2>/dev/null || true
