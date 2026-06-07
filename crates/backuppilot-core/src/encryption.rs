@@ -8,6 +8,7 @@ use tokio::process::Command;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+#[cfg(not(windows))]
 use tracing::warn;
 
 use crate::error::{CoreError, Result};
