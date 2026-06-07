@@ -105,6 +105,14 @@ describe('Encryption Keys page', () => {
         await $('#key-name').setValue(testName);
         await $('button*=Create Key').click();
 
+        // Capture any error shown by the UI to surface it in the test failure message
+        await browser.pause(2_000);
+        const errBox = await $('.error-box');
+        if (await errBox.isExisting()) {
+            const msg = await errBox.getText();
+            throw new Error(`Create key failed with UI error: ${msg}`);
+        }
+
         // Form closes and new row appears
         await form.waitForDisplayed({ timeout: 10_000, reverse: true });
         await browser.waitUntil(
