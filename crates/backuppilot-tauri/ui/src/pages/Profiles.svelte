@@ -1,15 +1,14 @@
 <script>
   import { listProfiles, listStatuses, runBackup, cancelBackup, deleteProfile, getProfile } from '../lib/ipc.js';
-  import ProfileForm from '../lib/ProfileForm.svelte';
   import { onDestroy } from 'svelte';
 
-  let profiles    = $state([]);
-  let statuses    = $state([]);
-  let loading     = $state(true);
-  let error       = $state('');
-  let busy        = $state({});
-  let showForm    = $state(false);
-  let editProfile = $state(null);  // profile object being edited
+  let { onOpenForm } = $props();
+
+  let profiles = $state([]);
+  let statuses = $state([]);
+  let loading  = $state(true);
+  let error    = $state('');
+  let busy     = $state({});
 
   async function load() {
     try {
@@ -72,22 +71,9 @@
 
   async function doEdit(id) {
     try {
-      editProfile = await getProfile(id);
-      showForm = true;
+      onOpenForm(await getProfile(id));
     } catch (e) {
       error = String(e);
-    }
-  }
-
-  function openAddForm() {
-    editProfile = null;
-    showForm = true;
-  }
-
-  function onKeydown(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'n' && !showForm) {
-      e.preventDefault();
-      openAddForm();
     }
   }
 
@@ -96,19 +82,9 @@
   onDestroy(() => clearInterval(interval));
 </script>
 
-<svelte:window onkeydown={onKeydown} />
-
-{#if showForm}
-  <ProfileForm
-    profile={editProfile}
-    onSaved={() => { showForm = false; editProfile = null; load(); }}
-    onCancel={() => { showForm = false; editProfile = null; }}
-  />
-{/if}
-
 <div class="page-header">
   <h1 class="page-title">Backup Profiles</h1>
-  <button class="btn-primary" onclick={openAddForm}>+ Add Profile</button>
+  <button class="btn-primary" onclick={() => onOpenForm(null)}>+ Add Profile</button>
 </div>
 
 {#if loading}

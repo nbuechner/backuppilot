@@ -10,10 +10,20 @@ export const config: Options.Testrunner = {
     hostname: 'localhost',
     port: 4444,
     path: '/',
-    specs: ['./specs/**/*.spec.ts'],
+    // Nested array forces all specs into one worker → sequential execution.
+    // Parallel sessions each launch a Tauri app and saturate the 8-instance named
+    // pipe pool, causing Activity's IPC load() to hang and the spinner never to clear.
+    specs: [[
+        './specs/activity.spec.ts',
+        './specs/cli.spec.ts',
+        './specs/encryption-keys.spec.ts',
+        './specs/profiles-e2e.spec.ts',
+        './specs/profiles.spec.ts',
+        './specs/restore-e2e.spec.ts',
+        './specs/restore.spec.ts',
+        './specs/settings.spec.ts',
+    ]],
     maxInstances: 1,
-    // Run specs sequentially — two parallel sessions would both launch the Tauri app
-    // via tauri-driver, conflicting on the named pipe and WebView2 instance.
     specFileRetries: 0,
     capabilities: [{
         browserName: 'chrome',

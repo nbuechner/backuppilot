@@ -4,8 +4,32 @@
   import Restore         from './pages/Restore.svelte';
   import Settings        from './pages/Settings.svelte';
   import EncryptionKeys  from './pages/EncryptionKeys.svelte';
+  import ProfileForm     from './lib/ProfileForm.svelte';
 
   let page = $state('profiles');
+
+  // Profile form state lives here so ProfileForm's position:fixed overlay
+  // renders as a sibling of .layout, not inside .content (overflow-y:auto),
+  // which would clip it in WebView2.
+  let showProfileForm  = $state(false);
+  let editFormProfile  = $state(null);
+
+  function openProfileForm(profile) {
+    editFormProfile = profile;
+    showProfileForm = true;
+  }
+
+  function closeProfileForm() {
+    showProfileForm = false;
+    editFormProfile = null;
+  }
+
+  function onKeydown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n' && page === 'profiles' && !showProfileForm) {
+      e.preventDefault();
+      openProfileForm(null);
+    }
+  }
 
   const nav = [
     { id: 'profiles', label: 'Profiles',        icon: '🗂' },
@@ -15,6 +39,8 @@
     { id: 'settings', label: 'Settings',         icon: '⚙' },
   ];
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <div class="layout">
   <nav class="sidebar">
@@ -35,7 +61,7 @@
 
   <main class="content">
     {#if page === 'profiles'}
-      <Profiles />
+      <Profiles onOpenForm={openProfileForm} />
     {:else if page === 'activity'}
       <Activity />
     {:else if page === 'restore'}
@@ -47,6 +73,14 @@
     {/if}
   </main>
 </div>
+
+{#if showProfileForm}
+  <ProfileForm
+    profile={editFormProfile}
+    onSaved={closeProfileForm}
+    onCancel={closeProfileForm}
+  />
+{/if}
 
 <style>
   .layout {
