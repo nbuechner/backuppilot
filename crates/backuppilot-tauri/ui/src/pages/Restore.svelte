@@ -215,72 +215,77 @@
     {/if}
   </div>
 
-</div>
-
-{#if selectedSnapshot && catalog}
   <!-- Step 3: Archive & file browser -->
-  <div class="card browser-panel">
+  <div class="panel card browser-panel">
     <h2 class="panel-title">3. Browse &amp; Select Files</h2>
 
-    {#if catalog.archives?.length > 1}
-      <div class="archive-tabs">
-        {#each catalog.archives as a}
-          <button
-            class="tab"
-            class:tab-active={selectedArchive === a}
-            onclick={() => selectArchive(a)}
-          >{a}</button>
-        {/each}
-      </div>
-    {/if}
-
-    <!-- Breadcrumbs -->
-    <div class="breadcrumbs">
-      {#each breadcrumbs() as crumb, i}
-        {#if i > 0}<span class="crumb-sep">/</span>{/if}
-        <button class="crumb" onclick={() => navigateDir(crumb.path)}>{crumb.label}</button>
-      {/each}
-    </div>
-
-    {#if loadingCatalog}
+    {#if !selectedSnapshot}
+      <p class="muted">Select a snapshot first.</p>
+    {:else if loadingCatalog && !catalog}
       <div class="center"><span class="spinner"></span></div>
-    {:else if catalog.entries?.length === 0}
-      <p class="muted">Empty directory.</p>
-    {:else}
-      <div class="file-list">
-        {#if currentPath !== '/'}
-          <button class="file-row" onclick={() => {
-            const parts = currentPath.split('/').filter(Boolean);
-            parts.pop();
-            navigateDir(parts.length ? '/' + parts.join('/') : '/');
-          }}>
-            <span class="file-icon">📁</span>
-            <span>..</span>
-          </button>
-        {/if}
-        {#each catalog.entries as entry}
-          <div class="file-row">
-            {#if !entry.is_dir}
-              <input type="checkbox"
-                checked={selectedPaths.has(entry.path)}
-                onchange={() => togglePath(entry.path)} />
-            {:else}
-              <span style="width:16px"></span>
-            {/if}
+    {:else if catalog}
+      {#if catalog.archives?.length > 1}
+        <div class="archive-tabs">
+          {#each catalog.archives as a}
             <button
-              class="file-name"
-              onclick={() => entry.is_dir ? navigateDir(entry.path) : togglePath(entry.path)}
-            >
-              <span class="file-icon">{entry.is_dir ? '📁' : '📄'}</span>
-              {entry.name}
-            </button>
-          </div>
+              class="tab"
+              class:tab-active={selectedArchive === a}
+              onclick={() => selectArchive(a)}
+            >{a}</button>
+          {/each}
+        </div>
+      {/if}
+
+      <div class="breadcrumbs">
+        {#each breadcrumbs() as crumb, i}
+          {#if i > 0}<span class="crumb-sep">/</span>{/if}
+          <button class="crumb" onclick={() => navigateDir(crumb.path)}>{crumb.label}</button>
         {/each}
       </div>
+
+      {#if loadingCatalog}
+        <div class="center"><span class="spinner"></span></div>
+      {:else if catalog.entries?.length === 0}
+        <p class="muted">Empty directory.</p>
+      {:else}
+        <div class="file-list">
+          {#if currentPath !== '/'}
+            <button class="file-row" onclick={() => {
+              const parts = currentPath.split('/').filter(Boolean);
+              parts.pop();
+              navigateDir(parts.length ? '/' + parts.join('/') : '/');
+            }}>
+              <span class="file-icon">📁</span>
+              <span>..</span>
+            </button>
+          {/if}
+          {#each catalog.entries as entry}
+            <div class="file-row">
+              {#if !entry.is_dir}
+                <input type="checkbox"
+                  checked={selectedPaths.has(entry.path)}
+                  onchange={() => togglePath(entry.path)} />
+              {:else}
+                <span style="width:16px"></span>
+              {/if}
+              <button
+                class="file-name"
+                onclick={() => entry.is_dir ? navigateDir(entry.path) : togglePath(entry.path)}
+              >
+                <span class="file-icon">{entry.is_dir ? '📁' : '📄'}</span>
+                {entry.name}
+              </button>
+            </div>
+          {/each}
+        </div>
+      {/if}
     {/if}
   </div>
 
-  <!-- Step 4: Restore options -->
+</div>
+
+<!-- Step 4: Restore options — always below the 3-column grid -->
+{#if selectedSnapshot}
   <div class="card restore-options">
     <h2 class="panel-title">4. Restore</h2>
 
@@ -335,12 +340,17 @@
 
   .restore-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 180px 220px 1fr;
     gap: 16px;
     margin-bottom: 16px;
+    align-items: start;
   }
 
-  .panel { padding: 16px; }
+  .panel {
+    padding: 16px;
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+  }
   .panel-title {
     font-size: 12px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 12px;
@@ -369,7 +379,7 @@
   .muted { color: var(--text-muted); font-size: 13px; }
   .mono { font-family: monospace; font-size: 12px; }
 
-  .browser-panel { padding: 16px; margin-bottom: 16px; }
+  .browser-panel { padding: 16px; }
 
   .archive-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
   .tab {
