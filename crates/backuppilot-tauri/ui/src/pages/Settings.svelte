@@ -12,6 +12,7 @@
   let updateState = $state(null);
   let checkingUpdate = $state(false);
   let confirmReset = $state(false);
+  let resetDone    = $state(false);
 
   async function load() {
     try {
@@ -54,7 +55,7 @@
     try {
       await resetAllData();
       confirmReset = false;
-      alert('All data has been reset. Please restart the application.');
+      resetDone = true;
     } catch (e) {
       error = String(e);
     }
@@ -236,6 +237,12 @@
         <button class="btn-ghost" onclick={() => confirmReset = false}>Cancel</button>
       </div>
     {/if}
+    {#if resetDone}
+      <div class="reset-done-banner">
+        All data has been reset. Please restart the application.
+        <button class="btn-ghost" onclick={() => resetDone = false}>Dismiss</button>
+      </div>
+    {/if}
   </div>
 
 {/if}
@@ -316,6 +323,12 @@
   .danger-zone { border: 1px solid #fecaca; }
   .confirm-text { font-size: 13px; color: #dc2626; margin-bottom: 12px; }
   .confirm-actions { display: flex; gap: 8px; }
+  .reset-done-banner {
+    margin-top: 12px; padding: 10px 14px;
+    background: #fef9c3; color: #854d0e;
+    border: 1px solid #fde68a; border-radius: var(--radius-sm);
+    font-size: 13px; display: flex; align-items: center; gap: 10px;
+  }
 
   .btn-danger {
     background: #dc2626; color: #fff; border: none;

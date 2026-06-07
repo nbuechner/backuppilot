@@ -30,6 +30,12 @@ pub fn wipe_all_local_data() -> std::io::Result<()> {
     }
 
     ensure_data_dirs()?;
+    // Regenerate the WSL wrapper scripts — they live in data_dir() which was
+    // just deleted, and PbsClient::is_available() would fail without them.
+    #[cfg(windows)]
+    {
+        let _ = crate::paths::ensure_wsl_pbs_wrapper();
+    }
     Ok(())
 }
 

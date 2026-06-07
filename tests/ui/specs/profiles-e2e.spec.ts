@@ -48,15 +48,9 @@ describe('Profile lifecycle', () => {
         await confirmBtn.waitForDisplayed({ timeout: 5_000 });
         await confirmBtn.click();
 
-        // App shows a browser alert: "All data has been reset. Please restart..."
-        await browser.waitUntil(
-            async () => {
-                try { await browser.getAlertText(); return true; }
-                catch { return false; }
-            },
-            { timeout: 10_000, timeoutMsg: 'Reset confirmation alert did not appear' }
-        );
-        await browser.acceptAlert();
+        // App shows an in-page banner after reset (no native alert)
+        const banner = await $('.reset-done-banner');
+        await banner.waitForDisplayed({ timeout: 10_000 });
     });
 
     it('Profiles tab is empty after reset', async () => {
@@ -144,28 +138,28 @@ describe('Profile lifecycle', () => {
             { timeout: 120_000, timeoutMsg: 'No activity row appeared for the backup' }
         );
 
-        // Wait for the run to finish (SUCCESS or FAILED — not RUNNING)
+        // Wait for the run to finish (any terminal state — not RUNNING)
         await browser.waitUntil(
             async () => {
                 for (const row of await $$('.log-row')) {
                     const text = (await row.getText()).toLowerCase();
                     if (!text.includes(PROFILE.name.toLowerCase())) continue;
-                    return text.includes('success') || text.includes('failed');
+                    return text.includes('success') || text.includes('failed') || text.includes('skipped');
                 }
                 return false;
             },
             { timeout: 180_000, timeoutMsg: 'Backup run did not complete within 3 minutes' }
         );
 
-        // Verify it succeeded
-        let foundSuccess = false;
+        // Verify it succeeded (not failed or skipped)
+        let status = '';
         for (const row of await $$('.log-row')) {
             const text = (await row.getText()).toLowerCase();
-            if (text.includes(PROFILE.name.toLowerCase()) && text.includes('success')) {
-                foundSuccess = true;
-                break;
-            }
+            if (!text.includes(PROFILE.name.toLowerCase())) continue;
+            if (text.includes('success')) { status = 'success'; break; }
+            if (text.includes('failed'))  { status = 'failed';  break; }
+            if (text.includes('skipped')) { status = 'skipped'; break; }
         }
-        expect(foundSuccess).toBe(true);
+        expect(status).toBe('success');
     });
 });
