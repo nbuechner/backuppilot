@@ -19,17 +19,23 @@ describe('Encryption Keys page', () => {
         );
         await browser.pause(300);
 
-        // Clean up any stale UI-Test-Key-* entries left by previous runs
-        for (const row of await $$('.key-row')) {
+        // Clean up any stale UI-Test-Key-* entries left by previous runs.
+        // Re-query rows each iteration: delete reloads the list and old references go stale.
+        let staleRows = await $$('.key-row');
+        for (const row of staleRows) {
             const nameEl = await row.$('.key-name');
             if (!(await nameEl.getText()).startsWith('UI-Test-Key-')) continue;
             const deleteBtn = await row.$('.btn-danger-sm');
-            if (await deleteBtn.isExisting()) {
-                await deleteBtn.click();
-                const confirmBtn = await $('button*=Delete Key');
-                if (await confirmBtn.isExisting()) await confirmBtn.click();
-                await browser.pause(300);
-            }
+            if (!(await deleteBtn.isExisting())) continue;
+            await deleteBtn.click();
+            const confirmBtn = await $('button*=Delete Key');
+            if (await confirmBtn.isExisting()) await confirmBtn.click();
+            // Wait for the dialog to close and the list to reload before continuing
+            await browser.waitUntil(
+                async () => !(await $('.dialog').isExisting()),
+                { timeout: 10_000, timeoutMsg: 'Delete dialog did not close' }
+            );
+            await browser.pause(300);
         }
     });
 
