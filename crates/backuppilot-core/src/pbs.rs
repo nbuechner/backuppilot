@@ -37,20 +37,28 @@ async fn probe_pbs_binary(path: &Path) -> bool {
 
 /// Builds a `Command` for the given PBS client binary.
 /// On Windows, `.cmd`/`.bat` wrapper files are launched via `cmd /c` since
-/// `CreateProcess` cannot execute them directly.
+/// `CreateProcess` cannot execute them directly. CREATE_NO_WINDOW suppresses
+/// the console popup that would otherwise appear for each PBS operation.
 pub(crate) fn spawn_pbs_command(binary: &Path) -> Command {
     #[cfg(windows)]
     {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
         let ext = binary
             .extension()
             .and_then(|e| e.to_str())
             .unwrap_or("");
-        if ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat") {
-            let mut cmd = Command::new("cmd");
-            cmd.args([std::ffi::OsStr::new("/c"), binary.as_os_str()]);
-            return cmd;
-        }
+        let mut cmd = if ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat") {
+            let mut c = Command::new("cmd");
+            c.args([std::ffi::OsStr::new("/c"), binary.as_os_str()]);
+            c
+        } else {
+            Command::new(binary)
+        };
+        cmd.creation_flags(CREATE_NO_WINDOW);
+        return cmd;
     }
+    #[allow(unreachable_code)]
     Command::new(binary)
 }
 

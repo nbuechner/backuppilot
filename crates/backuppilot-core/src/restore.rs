@@ -689,9 +689,12 @@ async fn run_pbs_with_timeout(
     // (e.g. RDP sessions, service-launched processes). Use blocking I/O via spawn_blocking instead.
     #[cfg(windows)]
     {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
         let std_ref = cmd.as_std();
         let mut std_cmd = std::process::Command::new(std_ref.get_program());
         std_cmd.args(std_ref.get_args());
+        std_cmd.creation_flags(CREATE_NO_WINDOW);
         for (k, v) in std_ref.get_envs() {
             match v {
                 Some(val) => { std_cmd.env(k, val); }
