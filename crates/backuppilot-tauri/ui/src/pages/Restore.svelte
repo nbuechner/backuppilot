@@ -457,8 +457,8 @@
   }
   .close-btn { background: none; border: none; color: #721c24; font-size: 18px; cursor: pointer; }
 
-  .mount-banner { padding: 12px 16px; margin-bottom: 16px; background: #fffbf0; border: 1px solid #fde68a; }
-  .mount-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; font-size: 13px; }
+  .mount-banner { padding: 12px 16px; margin-bottom: 16px; background: var(--bg); border: 1px solid #ca8a04; color: var(--text); }
+  .mount-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; font-size: 13px; color: var(--text); }
 
   .restore-layout {
     display: grid;
