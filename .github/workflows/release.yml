@@ -52,10 +52,18 @@ jobs:
           path: target/release/bundle/nsis/*.exe
           if-no-files-found: error
 
-  # ── Linux: .deb package ──────────────────────────────────────────────────────
+  # ── Linux: .deb package (matrix: 24.04 + 26.04) ─────────────────────────────
   build-linux:
-    name: Linux package (.deb)
-    runs-on: ubuntu-25.04
+    name: Linux package (.deb) — ${{ matrix.ubuntu }}
+    runs-on: ${{ matrix.ubuntu }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ubuntu: ubuntu-24.04
+            codename: noble
+          - ubuntu: ubuntu-26.04
+            codename: oracular
     steps:
       - uses: actions/checkout@v4
 
@@ -67,9 +75,14 @@ jobs:
         with:
           workspaces: ". -> target"
 
+      - name: Add GNOME staging PPA for GTK 4.16 (24.04 only)
+        if: matrix.ubuntu == 'ubuntu-24.04'
+        run: |
+          sudo add-apt-repository -y ppa:gnome-team/gnome-staging
+          sudo apt-get update
+
       - name: Install system dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install -y \
             libgtk-4-dev \
             libadwaita-1-dev \
@@ -84,7 +97,7 @@ jobs:
         run: |
           set -e
           VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/')
-          PKG="backuppilot_${VERSION}_amd64"
+          PKG="backuppilot_${VERSION}_${{ matrix.codename }}_amd64"
 
           mkdir -p "$PKG/DEBIAN"
           mkdir -p "$PKG/usr/bin"
@@ -116,7 +129,7 @@ jobs:
       - name: Upload .deb package
         uses: actions/upload-artifact@v4
         with:
-          name: backuppilot-linux-deb
+          name: backuppilot-linux-deb-${{ matrix.codename }}
           path: "*.deb"
           if-no-files-found: error
 
@@ -135,10 +148,16 @@ jobs:
           name: backuppilot-windows-installer
           path: dist/
 
-      - name: Download Linux .deb
+      - name: Download Linux .deb (noble)
         uses: actions/download-artifact@v4
         with:
-          name: backuppilot-linux-deb
+          name: backuppilot-linux-deb-noble
+          path: dist/
+
+      - name: Download Linux .deb (oracular)
+        uses: actions/download-artifact@v4
+        with:
+          name: backuppilot-linux-deb-oracular
           path: dist/
 
       - name: Create release and upload assets
