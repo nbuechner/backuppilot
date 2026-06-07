@@ -2,13 +2,18 @@
   import { listProfiles, listStatuses, runBackup, cancelBackup, deleteProfile, getProfile } from '../lib/ipc.js';
   import { onDestroy } from 'svelte';
 
-  let { onOpenForm } = $props();
+  let { onOpenForm, reloadKey = 0 } = $props();
 
   let profiles = $state([]);
   let statuses = $state([]);
   let loading  = $state(true);
   let error    = $state('');
   let busy     = $state({});
+
+  // Trigger an immediate reload when the profile form saves (App.svelte increments reloadKey).
+  $effect(() => {
+    if (reloadKey > 0) load();
+  });
 
   async function load() {
     try {

@@ -29,15 +29,15 @@ describe('Activity page', () => {
         await activityTab.waitForClickable({ timeout: 10_000 });
         await activityTab.click();
 
-        // The Activity page sets loading=true on mount and has setInterval(load,15000).
-        // If the first load() hangs (IPC delay on cold start), the interval's second
-        // call fires at T+15s and clears the spinner. Use 30s to survive this race.
+        // Activity.svelte calls listRecentActivity + listProfiles via Promise.all on mount.
+        // On cold daemon start the first IPC round-trip can take 15–60s; the setInterval
+        // at T+15s provides a second attempt. Use 90s to cover both.
         await browser.waitUntil(
             async () => {
                 if (await $('.error-box').isExisting()) return true; // IPC error shown, loading=false
                 return !(await $('.spinner').isExisting());
             },
-            { timeout: 30_000, timeoutMsg: 'Activity page spinner did not clear' }
+            { timeout: 90_000, timeoutMsg: 'Activity page spinner did not clear' }
         );
         await browser.pause(300);
     });

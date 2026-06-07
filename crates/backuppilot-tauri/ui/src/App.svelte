@@ -13,6 +13,8 @@
   // which would clip it in WebView2.
   let showProfileForm  = $state(false);
   let editFormProfile  = $state(null);
+  // Incrementing this after a save tells Profiles to reload its list immediately.
+  let profileReloadKey = $state(0);
 
   function openProfileForm(profile) {
     editFormProfile = profile;
@@ -22,6 +24,7 @@
   function closeProfileForm() {
     showProfileForm = false;
     editFormProfile = null;
+    profileReloadKey++;
   }
 
   function onKeydown(e) {
@@ -61,7 +64,7 @@
 
   <main class="content">
     {#if page === 'profiles'}
-      <Profiles onOpenForm={openProfileForm} />
+      <Profiles onOpenForm={openProfileForm} reloadKey={profileReloadKey} />
     {:else if page === 'activity'}
       <Activity />
     {:else if page === 'restore'}
