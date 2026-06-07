@@ -3,7 +3,7 @@
            listActiveMounts, mountSnapshot, unmountSnapshot,
            checkFuseAvailable, installFuse3 } from '../lib/ipc.js';
   import { open as openDialog } from '@tauri-apps/plugin-dialog';
-  import { open as openShell } from '@tauri-apps/plugin-shell';
+  import { invoke } from '@tauri-apps/api/core';
   import { onDestroy } from 'svelte';
 
   async function pickTargetDir() {
@@ -237,7 +237,7 @@
         <span class="mono">{m.windows_path ?? m.mount_point}</span>
         <span class="muted">{m.profile_name} / {m.archive_name}</span>
         {#if m.windows_path}
-          <button class="btn-ghost-sm" onclick={() => openShell(m.windows_path)}>Open</button>
+          <button class="btn-ghost-sm" onclick={() => invoke('open_in_explorer', { path: m.windows_path })>Open</button>
         {/if}
         <button class="btn-ghost-sm" onclick={() => doUnmount(m.id)}>Unmount</button>
       </div>
@@ -424,7 +424,7 @@
           ✓ Mounted at
           <span class="mono">{mountResult.mount?.windows_path ?? mountResult.mount?.mount_point ?? 'unknown path'}</span>
           {#if mountResult.mount?.windows_path}
-            <button class="btn-inline-ok" onclick={() => openShell(mountResult.mount.windows_path)}>Open in Explorer</button>
+            <button class="btn-inline-ok" onclick={() => invoke('open_in_explorer', { path: mountResult.mount.windows_path })>Open in Explorer</button>
           {/if}
         </div>
       {:else if mountResult.needs_fuse3}

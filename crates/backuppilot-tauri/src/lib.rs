@@ -12,7 +12,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![commands::ipc_call])
+        .invoke_handler(tauri::generate_handler![commands::ipc_call, commands::open_in_explorer])
         .setup(|app| {
             tray::setup_tray(app)?;
             // Show window after setup (was created hidden so tray icon appears first)

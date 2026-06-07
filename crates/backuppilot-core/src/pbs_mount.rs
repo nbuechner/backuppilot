@@ -122,8 +122,11 @@ pub fn mount_point_for(profile_id: i64, snapshot: &str, archive_name: &str) -> P
 
 #[cfg(windows)]
 fn wsl_run_status(args: &[&str]) -> bool {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
     std::process::Command::new("wsl")
         .args(args)
+        .creation_flags(CREATE_NO_WINDOW)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -136,10 +139,13 @@ fn wsl_run_status(args: &[&str]) -> bool {
 /// Cached after the first successful call.
 #[cfg(windows)]
 pub fn wsl_distro_name() -> Option<&'static str> {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
     static CACHE: OnceLock<Option<String>> = OnceLock::new();
     CACHE.get_or_init(|| {
         let out = std::process::Command::new("wsl")
             .args(["-e", "sh", "-c", "printf '%s' \"$WSL_DISTRO_NAME\""])
+            .creation_flags(CREATE_NO_WINDOW)
             .output()
             .ok()?;
         let name = String::from_utf8(out.stdout).ok()?.trim().to_string();
@@ -421,6 +427,7 @@ pub async fn spawn_mount_process(
         let mp = mount_point.to_string_lossy();
         let status = tokio::process::Command::new("wsl")
             .args(["--", "mkdir", "-p", mp.as_ref()])
+            .creation_flags(0x0800_0000)
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::null())

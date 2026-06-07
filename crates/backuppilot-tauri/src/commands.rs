@@ -12,3 +12,13 @@ pub async fn ipc_call(
         .map_err(|e| e.to_string())?;
     serde_json::from_str(&raw).map_err(|e| e.to_string())
 }
+
+/// Open a local path in the system file manager (Explorer on Windows).
+/// Used for UNC paths (\\wsl.localhost\...) that openShell cannot handle.
+#[tauri::command]
+pub fn open_in_explorer(path: String) {
+    #[cfg(windows)]
+    { let _ = std::process::Command::new("explorer").arg(&path).spawn(); }
+    #[cfg(not(windows))]
+    { let _ = std::process::Command::new("xdg-open").arg(&path).spawn(); }
+}
