@@ -178,4 +178,123 @@ describe('Restore lifecycle', () => {
 
         expect(await (await $('.result-ok')).getText()).toContain('successfully');
     });
+
+    // ── 5. Selective file restore ─────────────────────────────────────────────
+
+    it('restores a single selected file (selective restore)', async () => {
+        await navigateTo('Profiles');
+        await navigateTo('Restore');
+
+        await browser.waitUntil(
+            async () => (await $$('.list-item')).length > 0,
+            { timeout: 15_000, timeoutMsg: 'Profile list did not reload for selective restore' }
+        );
+        for (const item of await $$('.list-item')) {
+            if ((await item.getText()).includes(PROFILE_NAME)) {
+                await item.click();
+                break;
+            }
+        }
+
+        await browser.waitUntil(
+            async () => (await $$('.snapshot-item')).length > 0,
+            { timeout: 60_000, timeoutMsg: 'Snapshots did not reload for selective restore' }
+        );
+        await (await $('.snapshot-item')).click();
+
+        await browser.waitUntil(
+            async () => (await $$('.file-row')).length > 0,
+            { timeout: 90_000, timeoutMsg: 'Catalog did not load for selective restore' }
+        );
+
+        // Click the checkbox of the first file entry (files have checkboxes; dirs do not)
+        const fileCheckbox = await $('.file-row input[type="checkbox"]');
+        await fileCheckbox.waitForExist({ timeout: 5_000 });
+        await fileCheckbox.click();
+
+        const targetInput = await $('#target-dir');
+        await targetInput.waitForDisplayed({ timeout: 5_000 });
+        await targetInput.setValue(RESTORE_TARGET + '-selective');
+
+        const overwriteCheckbox = await $('.restore-options .toggle-row input[type="checkbox"]');
+        if (!(await overwriteCheckbox.isSelected())) await overwriteCheckbox.click();
+
+        const restoreBtn = await $('button*=Start Restore');
+        await restoreBtn.waitForClickable({ timeout: 5_000 });
+        await restoreBtn.click();
+
+        await browser.waitUntil(
+            async () => {
+                const ok = await $('.result-ok');
+                if (await ok.isExisting()) return true;
+                const err = await $('.result-error');
+                if (await err.isExisting()) {
+                    throw new Error(`Selective restore failed: ${await err.getText()}`);
+                }
+                return false;
+            },
+            { timeout: 120_000, timeoutMsg: 'Selective restore did not complete within 2 minutes' }
+        );
+
+        expect(await (await $('.result-ok')).getText()).toContain('successfully');
+    });
+
+    // ── 6. Conflict detection ─────────────────────────────────────────────────
+
+    it('reports conflicts when restoring without overwrite into a populated dir', async () => {
+        await navigateTo('Profiles');
+        await navigateTo('Restore');
+
+        await browser.waitUntil(
+            async () => (await $$('.list-item')).length > 0,
+            { timeout: 15_000, timeoutMsg: 'Profile list did not reload for conflict test' }
+        );
+        for (const item of await $$('.list-item')) {
+            if ((await item.getText()).includes(PROFILE_NAME)) {
+                await item.click();
+                break;
+            }
+        }
+
+        await browser.waitUntil(
+            async () => (await $$('.snapshot-item')).length > 0,
+            { timeout: 60_000, timeoutMsg: 'Snapshots did not reload for conflict test' }
+        );
+        await (await $('.snapshot-item')).click();
+
+        await browser.waitUntil(
+            async () => (await $$('.file-row')).length > 0,
+            { timeout: 90_000, timeoutMsg: 'Catalog did not load for conflict test' }
+        );
+
+        // Target directory from test 4 — already populated, no overwrite
+        const targetInput = await $('#target-dir');
+        await targetInput.waitForDisplayed({ timeout: 5_000 });
+        await targetInput.setValue(RESTORE_TARGET);
+
+        // Ensure overwrite is disabled
+        const overwriteCheckbox = await $('.restore-options .toggle-row input[type="checkbox"]');
+        if (await overwriteCheckbox.isSelected()) await overwriteCheckbox.click();
+
+        const restoreBtn = await $('button*=Start Restore');
+        await restoreBtn.waitForClickable({ timeout: 5_000 });
+        await restoreBtn.click();
+
+        // Expect a failure result with at least one conflict entry
+        await browser.waitUntil(
+            async () => {
+                const err = await $('.result-error');
+                if (await err.isExisting()) return true;
+                const ok = await $('.result-ok');
+                if (await ok.isExisting()) {
+                    throw new Error('Expected conflict error but restore succeeded — overwrite may be on');
+                }
+                return false;
+            },
+            { timeout: 120_000, timeoutMsg: 'Conflict detection: no result appeared within 2 minutes' }
+        );
+
+        const conflictEntries = await $$('.result-error li.mono');
+        expect(conflictEntries.length).toBeGreaterThan(0);
+    });
 });
