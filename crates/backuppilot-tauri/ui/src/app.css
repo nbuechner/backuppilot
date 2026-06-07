@@ -29,6 +29,16 @@
 
 body { background: var(--bg); }
 
+[data-theme="dark"] {
+  --bg: #1a1b1e;
+  --surface: #25262b;
+  --border: #373a40;
+  --text: #c1c2c5;
+  --text-muted: #909296;
+  --sidebar-bg: #141517;
+  --sidebar-hover: #1c1d21;
+}
+
 button {
   cursor: pointer;
   border: none;

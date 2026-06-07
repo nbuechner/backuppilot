@@ -1,7 +1,7 @@
 <script>
   import { ipcCall, verifyCredentials } from './ipc.js';
 
-  let { onSaved, onCancel, profile = null } = $props();
+  let { onSaved, onCancel, profile = null, advancedMode = false } = $props();
 
   const isEdit = profile != null;
 
@@ -239,7 +239,8 @@
         {/if}
       </section>
 
-      <!-- Schedule -->
+      <!-- Schedule — advanced mode only -->
+      {#if advancedMode}
       <section>
         <h3 class="section-title">Schedule</h3>
         <div class="field">
@@ -271,6 +272,7 @@
           </div>
         {/if}
       </section>
+      {/if}
 
     </div>
 

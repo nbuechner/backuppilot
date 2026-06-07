@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(scp -o StrictHostKeyChecking=no user@10.99.158.244:\"C:/Users/user/ss.png\" /tmp/ss10.png)",
+      "Bash(ssh -o StrictHostKeyChecking=no user@10.99.158.244 \"cmd /c findstr /c:\\\\\"Add Profile\\\\\" C:\\\\Users\\\\user\\\\backuppilot\\\\crates\\\\backuppilot-tauri\\\\ui\\\\src\\\\pages\\\\Profiles.svelte 2>&1\")",
+      "Bash(ssh -o StrictHostKeyChecking=no user@10.99.158.244 \"cmd /c type C:\\\\Users\\\\user\\\\backuppilot\\\\crates\\\\backuppilot-tauri\\\\ui\\\\dist\\\\index.html 2>&1\")",
+      "Bash(ssh -o StrictHostKeyChecking=no user@10.99.158.244 \"cmd /c tasklist /fi \\\\\"imagename eq backuppilot*\\\\\" 2>&1\")",
+      "Bash(ssh -o StrictHostKeyChecking=no user@10.99.158.244 \"cmd /c taskkill /f /im backuppilot-tauri.exe 2>&1 && tasklist /fi \\\\\"imagename eq backuppilot-tauri.exe\\\\\" 2>&1\")",
+      "Bash(ssh -o StrictHostKeyChecking=no user@10.99.158.244 \"cmd /c schtasks /run /tn \\\\\"BP-Launch\\\\\" 2>&1\")",
+      "Bash(scp -o StrictHostKeyChecking=no user@10.99.158.244:\"C:/Users/user/ss.png\" /tmp/ss11.png)",
+      "Read(//home/ravage/git/proxmoxbackupclient_go/directorybackup/**)",
+      "Read(//home/ravage/git/proxmoxbackupclient_go/machinebackup/**)",
+      "Read(//home/ravage/git/proxmoxbackupclient_go/pbscommon/**)"
+    ],
+    "additionalDirectories": [
+      "/home/ravage/.claude"
+    ]
+  }
+}

@@ -1,12 +1,24 @@
 <script>
+  import { onMount } from 'svelte';
   import Profiles        from './pages/Profiles.svelte';
   import Activity        from './pages/Activity.svelte';
   import Restore         from './pages/Restore.svelte';
   import Settings        from './pages/Settings.svelte';
   import EncryptionKeys  from './pages/EncryptionKeys.svelte';
   import ProfileForm     from './lib/ProfileForm.svelte';
+  import { getSettings } from './lib/ipc.js';
+  import { applyColorScheme } from './lib/theme.js';
 
   let page = $state('profiles');
+  let advancedMode = $state(false);
+
+  onMount(async () => {
+    try {
+      const s = await getSettings();
+      applyColorScheme(s.appearance.color_scheme);
+      advancedMode = s.appearance.advanced_mode ?? false;
+    } catch { /* daemon not ready yet; defaults stay */ }
+  });
 
   // Profile form state lives here so ProfileForm's position:fixed overlay
   // renders as a sibling of .layout, not inside .content (overflow-y:auto),
@@ -80,6 +92,7 @@
 {#if showProfileForm}
   <ProfileForm
     profile={editFormProfile}
+    {advancedMode}
     onSaved={closeProfileForm}
     onCancel={closeProfileForm}
   />

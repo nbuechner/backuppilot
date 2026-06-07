@@ -14,10 +14,13 @@
   let filterSearch  = $state('');
 
   async function load() {
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Activity load timed out — daemon may be unresponsive')), 20_000)
+    );
     try {
-      [entries, profiles] = await Promise.all([
-        listRecentActivity(200),
-        listProfiles(),
+      [entries, profiles] = await Promise.race([
+        Promise.all([listRecentActivity(200), listProfiles()]),
+        timeout,
       ]);
       error = '';
     } catch (e) {

@@ -1,5 +1,6 @@
 <script>
   import { getSettings, saveSettings, resetAllData, getUpdateState, checkForUpdates } from '../lib/ipc.js';
+  import { applyColorScheme } from '../lib/theme.js';
   import { onDestroy } from 'svelte';
 
   let settings = $state(null);
@@ -17,6 +18,7 @@
   async function load() {
     try {
       [settings, updateState] = await Promise.all([getSettings(), getUpdateState()]);
+      applyColorScheme(settings.appearance.color_scheme);
       error = '';
     } catch (e) {
       error = String(e);
@@ -29,6 +31,7 @@
     saving = true;
     try {
       await saveSettings(settings);
+      applyColorScheme(settings.appearance.color_scheme);
       saved = true;
       if (savedTimer) clearTimeout(savedTimer);
       savedTimer = setTimeout(() => { saved = false; }, 2000);
@@ -192,7 +195,8 @@
     <p class="section-desc">Set to 0 to keep all logs indefinitely. Minimum 7, maximum 3650.</p>
   </div>
 
-  <!-- Updates -->
+  <!-- Updates — advanced mode only -->
+  {#if settings.appearance.advanced_mode}
   <div class="card section">
     <h2 class="section-header">Updates</h2>
     <label class="toggle-row">
@@ -224,7 +228,7 @@
     </button>
   </div>
 
-  <!-- Reset -->
+  <!-- Danger Zone — advanced mode only -->
   <div class="card section danger-zone">
     <h2 class="section-header danger">Danger Zone</h2>
     {#if !confirmReset}
@@ -244,6 +248,7 @@
       </div>
     {/if}
   </div>
+  {/if}
 
 {/if}
 
