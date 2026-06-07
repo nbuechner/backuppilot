@@ -11,6 +11,7 @@
   let profiles    = $state([]);
   let snapshots   = $state([]);
   let catalog     = $state(null);   // ListCatalogResponse
+  let allArchives = $state([]);     // cumulative archive list — survives per-archive reloads
   let activeMounts = $state([]);
 
   let selectedProfile  = $state(null);
@@ -56,6 +57,7 @@
   async function selectSnapshot(s) {
     selectedSnapshot = s;
     catalog = null;
+    allArchives = [];
     selectedArchive = '';
     currentPath = '/';
     await loadCatalog('/');
@@ -76,6 +78,10 @@
       currentPath = path;
       if (!selectedArchive && catalog.suggested_archive) {
         selectedArchive = catalog.suggested_archive;
+      }
+      // Keep the largest seen archive list — a per-archive reload may return fewer
+      if ((catalog.archives?.length ?? 0) > allArchives.length) {
+        allArchives = catalog.archives;
       }
     } catch (e) {
       error = String(e);
@@ -230,9 +236,9 @@
     {:else if loadingCatalog && !catalog}
       <div class="center"><span class="spinner"></span></div>
     {:else if catalog}
-      {#if catalog.archives?.length > 1}
+      {#if allArchives.length > 1}
         <div class="archive-tabs">
-          {#each catalog.archives as a}
+          {#each allArchives as a}
             <button
               class="tab"
               class:tab-active={selectedArchive === a}

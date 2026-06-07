@@ -381,7 +381,7 @@ impl PbsRestore {
         encryption_key_id: Option<i64>,
     ) -> Result<Vec<String>> {
         let lines =
-            load_catalog_lines(profile, snapshot, archive_name, false, encryption_key_id).await?;
+            load_catalog_lines(profile, snapshot, false, encryption_key_id).await?;
         let mut conflicts = Vec::new();
         let rel_paths = restore_relative_paths(&lines, archive_name, patterns);
         for rel in rel_paths {
@@ -449,7 +449,6 @@ impl PbsRestore {
         let lines = load_catalog_lines(
             profile,
             &request.snapshot,
-            &request.archive_name,
             request.force_refresh,
             key_id,
         )
@@ -465,10 +464,17 @@ impl PbsRestore {
             .or_else(|| archives.first().cloned())
             .unwrap_or_else(|| request.archive_name.clone());
 
-        let entries = catalog::list_children(&lines, &parent, &suggested_archive);
+        // Use the explicitly requested archive for browsing; fall back to suggested.
+        let active_archive = if request.archive_name.is_empty() {
+            suggested_archive.clone()
+        } else {
+            request.archive_name.clone()
+        };
+
+        let entries = catalog::list_children(&lines, &parent, &active_archive);
         if entries.is_empty() && parent.is_empty() && lines.is_empty() {
             return Err(CoreError::PbsCommand(
-                "backup catalog is empty or could not be read — try “Reload file list” or restore via CLI"
+                "backup catalog is empty or could not be read -- try Reload file list or restore via CLI"
                     .into(),
             ));
         }
@@ -532,14 +538,13 @@ fn catalog_cache() -> &'static Mutex<HashMap<String, Vec<CatalogLine>>> {
 fn catalog_cache_key(
     profile_id: i64,
     snapshot: &str,
-    archive: &str,
     encryption_key_id: Option<i64>,
 ) -> String {
-    format!("{profile_id}:{snapshot}:{archive}:key={encryption_key_id:?}")
+    format!("{profile_id}:{snapshot}:key={encryption_key_id:?}")
 }
 
-pub fn clear_catalog_cache(profile_id: i64, snapshot: &str, archive_name: &str) {
-    let key = catalog_cache_key(profile_id, snapshot, archive_name, None);
+pub fn clear_catalog_cache(profile_id: i64, snapshot: &str) {
+    let key = catalog_cache_key(profile_id, snapshot, None);
     if let Ok(mut cache) = catalog_cache().lock() {
         cache.remove(&key);
     }
@@ -554,11 +559,10 @@ pub fn clear_all_catalog_cache() {
 async fn load_catalog_lines(
     profile: &BackupProfile,
     snapshot: &str,
-    archive_name: &str,
     force_refresh: bool,
     encryption_key_id: Option<i64>,
 ) -> Result<Vec<CatalogLine>> {
-    let key = catalog_cache_key(profile.id, snapshot, archive_name, encryption_key_id);
+    let key = catalog_cache_key(profile.id, snapshot, encryption_key_id);
     if !force_refresh {
         if let Some(lines) = catalog_cache().lock().ok().and_then(|c| c.get(&key).cloned()) {
             return Ok(lines);
@@ -594,7 +598,6 @@ async fn load_catalog_lines(
 
     debug!(
         snapshot,
-        archive = archive_name,
         stdout_len = output.stdout.len(),
         stderr_len = output.stderr.len(),
         "catalog dump finished"
@@ -606,10 +609,12 @@ async fn load_catalog_lines(
         ));
     }
 
-    let mut lines = catalog::parse_catalog_dump(&combined, archive_name);
+    // Parse without a fallback archive so explicit .didx/ paths determine archive names;
+    // lines without .didx/ fall back to "root.pxar" (the default in parse_catalog_dump).
+    let mut lines = catalog::parse_catalog_dump(&combined, "");
 
     if lines.is_empty() {
-        lines = catalog::parse_catalog_dump(&combined, "");
+        lines = catalog::parse_catalog_dump(&combined, "root.pxar");
     }
 
     if lines.is_empty() {
