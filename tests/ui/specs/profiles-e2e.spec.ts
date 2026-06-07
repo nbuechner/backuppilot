@@ -113,13 +113,14 @@ describe('Profile lifecycle', () => {
         await backupBtn.waitForClickable({ timeout: 5_000 });
         await backupBtn.click();
 
-        // Button should briefly show "Starting…" then revert — wait for revert
+        // Button should briefly show "Starting…" then revert — wait for revert.
+        // Preflight includes a cold-WSL probe that can take up to ~30s on first run.
         await browser.waitUntil(
             async () => {
                 const text = await backupBtn.getText();
                 return text.includes('Backup Now');
             },
-            { timeout: 15_000, timeoutMsg: 'Backup Now button did not revert after triggering' }
+            { timeout: 60_000, timeoutMsg: 'Backup Now button did not revert after triggering' }
         );
     });
 

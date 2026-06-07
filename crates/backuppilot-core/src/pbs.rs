@@ -142,31 +142,28 @@ impl PbsClient {
         // The cache is pre-populated by init_pbs_client_path() at daemon startup.
         let binary = crate::paths::pbs_client_path().to_path_buf();
 
-        // On Windows the cached path is the WSL wrapper script.  Always regenerate
-        // it before probing — it may have been deleted by wipe_all_local_data().
-        // The write is idempotent and cheap (two small text files).
+        // On Windows the cached path is the WSL wrapper script.  If it was deleted
+        // (e.g. after wipe_all_local_data) or if init_pbs_client_path timed out on
+        // a cold WSL start (leaving the cache unset → bare "proxmox-backup-client"),
+        // regenerate the wrapper so probe_pbs_binary can locate it.
         #[cfg(windows)]
         {
-            let probe_path = match crate::paths::ensure_wsl_pbs_wrapper() {
-                Ok(p) => {
-                    debug!("WSL wrapper ready at {:?}", p);
-                    p
+            let probe_path = if !binary.is_file() {
+                // Wrapper missing — regenerate it (idempotent, fast write).
+                match crate::paths::ensure_wsl_pbs_wrapper() {
+                    Ok(p) => {
+                        debug!("WSL wrapper regenerated at {:?}", p);
+                        p
+                    }
+                    Err(e) => {
+                        error!("Failed to write WSL wrapper: {e}");
+                        binary.clone()
+                    }
                 }
-                Err(e) => {
-                    error!("Failed to write WSL wrapper: {e}");
-                    let _ = std::fs::write(
-                        r"C:\Users\user\pbs_diag.txt",
-                        format!("ensure_wsl_pbs_wrapper err: binary={binary:?} err={e}"),
-                    );
-                    binary.clone()
-                }
+            } else {
+                binary.clone()
             };
-            let probe_ok = probe_pbs_binary(&probe_path).await;
-            let _ = std::fs::write(
-                r"C:\Users\user\pbs_diag.txt",
-                format!("is_available: binary={binary:?} probe_path={probe_path:?} probe_ok={probe_ok}"),
-            );
-            if probe_ok {
+            if probe_pbs_binary(&probe_path).await {
                 return true;
             }
             if std::env::var_os("FLATPAK_ID").is_some() {
