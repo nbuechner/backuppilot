@@ -26,7 +26,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: crates/backuppilot-tauri/ui/package-lock.json
 
@@ -55,7 +55,7 @@ jobs:
   # ── Linux: .deb package ──────────────────────────────────────────────────────
   build-linux:
     name: Linux package (.deb)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-25.04
     steps:
       - uses: actions/checkout@v4
 
