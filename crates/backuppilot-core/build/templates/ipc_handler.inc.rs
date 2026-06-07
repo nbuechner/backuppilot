@@ -239,6 +239,11 @@ pub async fn dispatch(
             ser(&v)
         }
 
+        "check_windows_setup" => {
+            let v = service.check_windows_setup();
+            ser(&v)
+        }
+
         "install_fuse3" => {
             let v = service.install_fuse3().await.map_err(|e| e.to_string())?;
             ser(&v)

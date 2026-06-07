@@ -5,6 +5,7 @@
   import Restore         from './pages/Restore.svelte';
   import Settings        from './pages/Settings.svelte';
   import EncryptionKeys  from './pages/EncryptionKeys.svelte';
+  import Setup           from './pages/Setup.svelte';
   import ProfileForm     from './lib/ProfileForm.svelte';
   import { getSettings, listActiveMounts, unmountSnapshot } from './lib/ipc.js';
   import { applyColorScheme } from './lib/theme.js';
@@ -80,6 +81,7 @@
     { id: 'restore',  label: 'Restore',          icon: '⏮' },
     { id: 'keys',     label: 'Encryption Keys',  icon: '🔑' },
     { id: 'settings', label: 'Settings',         icon: '⚙' },
+    { id: 'setup',    label: 'Setup Guide',      icon: '🛠' },
   ];
 </script>
 
@@ -113,6 +115,8 @@
       <EncryptionKeys />
     {:else if page === 'settings'}
       <Settings />
+    {:else if page === 'setup'}
+      <Setup />
     {/if}
   </main>
 </div>

@@ -18,6 +18,7 @@ pub mod health_notify;
 pub mod network;
 pub mod retry;
 pub mod restore_paths;
+pub mod windows_setup;
 pub mod notify;
 pub mod preflight;
 pub mod secrets;
@@ -99,6 +100,7 @@ pub use health_notify::{
 };
 pub use retry::PREFLIGHT_RETRY_DELAY;
 pub use restore_paths::{archive_source_root, original_restore_target_dir};
+pub use windows_setup::{check_windows_setup, WslSetupStatus};
 pub use pbs::{
     backup_archive_name, backup_process_running, cancel_all_running_backups, cancel_running_backup,
     parse_snapshot_id_from_stderr,

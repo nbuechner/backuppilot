@@ -75,6 +75,10 @@ impl DaemonService {
         backuppilot_core::check_fuse()
     }
 
+    pub fn check_windows_setup(&self) -> backuppilot_core::WslSetupStatus {
+        backuppilot_core::check_windows_setup()
+    }
+
     pub async fn install_fuse3(&self) -> Result<backuppilot_core::InstallFuse3Result> {
         #[cfg(windows)]
         {

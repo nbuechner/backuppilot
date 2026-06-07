@@ -29,6 +29,7 @@ export const listSnapshots       = (profileId)  => ipcCall('list_snapshots',    
 export const listCatalog         = (req)        => ipcCall('list_catalog',            { request_json: JSON.stringify(req) });
 export const restoreArchive      = (req)        => ipcCall('restore_archive',         { request_json: JSON.stringify(req) });
 export const checkFuseAvailable  = ()           => ipcCall('check_fuse_available');
+export const checkWindowsSetup   = ()           => ipcCall('check_windows_setup');
 export const installFuse3        = ()           => ipcCall('install_fuse3');
 export const listActiveMounts    = ()           => ipcCall('list_active_mounts');
 export const mountSnapshot       = (req)        => ipcCall('mount_snapshot',          { request_json: JSON.stringify(req) });
