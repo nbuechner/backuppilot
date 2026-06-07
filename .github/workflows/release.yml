@@ -34,6 +34,10 @@ jobs:
         working-directory: crates/backuppilot-tauri/ui
         run: npm ci
 
+      - name: Build frontend
+        working-directory: crates/backuppilot-tauri/ui
+        run: npm run build
+
       - name: Build daemon (must exist before Tauri bundles resources)
         run: cargo build -p backuppilot-daemon --release
 
