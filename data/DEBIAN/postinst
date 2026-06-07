@@ -6,11 +6,15 @@ systemctl --user enable backuppilot-daemon.service 2>/dev/null || true
 systemctl --user start backuppilot-daemon.service 2>/dev/null || true
 
 if ! command -v proxmox-backup-client >/dev/null 2>&1; then
-    # Detect distro and map to the appropriate Proxmox PBS client repo.
-    # Proxmox ships two repos: bookworm (PVE 8) and trixie (PVE 9).
-    # For Ubuntu we use the version number so new releases are handled automatically:
-    #   Ubuntu <= 24.04 (noble)   -> bookworm packages
-    #   Ubuntu >= 24.10 (oracular and later) -> trixie packages
+    # Map distro to the appropriate Proxmox PBS client repo.
+    # Tested matrix (as of 2025-06):
+    #   Ubuntu 22.04 (jammy)    - NO working repo: too new for bullseye (no libssl1.1),
+    #                             too old for bookworm (libzstd 1.4.8 < 1.5.2 required)
+    #   Ubuntu 24.04 (noble)    - bookworm works
+    #   Ubuntu 24.10+ (oracular, plucky, ...) - trixie works
+    #   Ubuntu 26.04 (resolute) - trixie works (Proxmox updated packages for libfuse3-4)
+    #   Debian bookworm         - bookworm works
+    #   Debian trixie           - trixie works
     CODENAME=""
     ID=""
     VERSION_ID=""
@@ -21,19 +25,15 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
         VERSION_ID="${VERSION_ID:-}"
     fi
 
-    # Resolve Ubuntu version numbers to a Proxmox repo codename.
-    # Ubuntu 26.04+ ships libfuse3-4 but the Proxmox trixie packages still
-    # depend on libfuse3-3, so flag those as incompatible for now.
     PBS_REPO=""
-    PBS_FUSE_CONFLICT=""
+    PBS_NO_COMPAT=""
     if [ "$ID" = "ubuntu" ] && [ -n "$VERSION_ID" ]; then
-        # Compare as integers by stripping the dot (24.04 -> 2404, 26.04 -> 2604)
+        # Compare as integers: 22.04 -> 2204, 24.04 -> 2404, 26.04 -> 2604
         VER_INT=$(echo "$VERSION_ID" | awk -F. '{printf "%d%02d", $1, $2}')
-        if [ "$VER_INT" -le 2404 ]; then
+        if [ "$VER_INT" -le 2204 ]; then
+            PBS_NO_COMPAT="yes"
+        elif [ "$VER_INT" -le 2404 ]; then
             PBS_REPO="bookworm"
-        elif [ "$VER_INT" -ge 2604 ]; then
-            PBS_REPO="trixie"
-            PBS_FUSE_CONFLICT="yes"
         else
             PBS_REPO="trixie"
         fi
@@ -53,40 +53,26 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
     echo "  and restores."
     echo ""
 
-    case "$PBS_REPO" in
-        bookworm)
-            echo "  Install it with:"
-            echo ""
-            echo "    sudo mkdir -p /etc/apt/keyrings"
-            echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg \\"
-            echo "      | sudo tee /etc/apt/keyrings/proxmox-release-bookworm.gpg >/dev/null"
-            echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-bookworm.gpg]" \
-                 "http://download.proxmox.com/debian/pbs-client bookworm main' \\"
-            echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
-            echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
-            ;;
-        trixie)
-            if [ -n "$PBS_FUSE_CONFLICT" ]; then
-                echo "  NOTE: The Proxmox trixie packages depend on libfuse3-3, which is"
-                echo "  not available on Ubuntu $VERSION_ID (libfuse3-4 replaced it)."
-                echo "  Proxmox has not yet released updated packages for this Ubuntu version."
-                echo ""
-                echo "  You can still add the repo and force-install, accepting that the"
-                echo "  proxmox-backup-client mount subcommand will not work (BackupPilot's"
-                echo "  own FUSE mount is unaffected -- it links libfuse3 directly):"
+    if [ -n "$PBS_NO_COMPAT" ]; then
+        echo "  Ubuntu $VERSION_ID is not compatible with any current Proxmox package repo:"
+        echo "  bullseye packages require libssl1.1 (removed in 22.04),"
+        echo "  bookworm packages require libzstd >= 1.5.2 (22.04 ships 1.4.8)."
+        echo ""
+        echo "  Please upgrade to Ubuntu 24.04 LTS and re-install BackupPilot."
+    else
+        case "$PBS_REPO" in
+            bookworm)
+                echo "  Install it with:"
                 echo ""
                 echo "    sudo mkdir -p /etc/apt/keyrings"
-                echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg \\"
-                echo "      | sudo tee /etc/apt/keyrings/proxmox-release-trixie.gpg >/dev/null"
-                echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-trixie.gpg]" \
-                     "http://download.proxmox.com/debian/pbs-client trixie main' \\"
+                echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg \\"
+                echo "      | sudo tee /etc/apt/keyrings/proxmox-release-bookworm.gpg >/dev/null"
+                echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-bookworm.gpg]" \
+                     "http://download.proxmox.com/debian/pbs-client bookworm main' \\"
                 echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
-                echo "    sudo apt-get update"
-                echo "    sudo apt-get install -y --no-install-recommends proxmox-backup-client \\"
-                echo "      || sudo apt-get install -y --ignore-missing proxmox-backup-client"
-                echo ""
-                echo "  Or wait for Proxmox to publish updated packages for Ubuntu $VERSION_ID."
-            else
+                echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
+                ;;
+            trixie)
                 echo "  Install it with:"
                 echo ""
                 echo "    sudo mkdir -p /etc/apt/keyrings"
@@ -96,15 +82,15 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
                      "http://download.proxmox.com/debian/pbs-client trixie main' \\"
                 echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
                 echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
-            fi
-            ;;
-        *)
-            echo "  Your system (${CODENAME:-unknown}) may not have official Proxmox packages."
-            echo "  Please check the Proxmox download page for your distribution:"
-            echo ""
-            echo "    https://www.proxmox.com/en/downloads/proxmox-backup-client"
-            ;;
-    esac
+                ;;
+            *)
+                echo "  Your system (${CODENAME:-unknown}) may not have official Proxmox packages."
+                echo "  Please check the Proxmox download page for your distribution:"
+                echo ""
+                echo "    https://www.proxmox.com/en/downloads/proxmox-backup-client"
+                ;;
+        esac
+    fi
 
     echo ""
     echo "========================================================="
