@@ -14,7 +14,7 @@
   let filterSearch  = $state('');
 
   async function load() {
-    const timeout = new Promise<never>((_, reject) =>
+    const timeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Activity load timed out — daemon may be unresponsive')), 20_000)
     );
     try {
