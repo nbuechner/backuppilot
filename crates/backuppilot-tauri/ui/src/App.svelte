@@ -43,7 +43,7 @@
           }
         }
       } catch { /* fall through and close */ }
-      await appWindow.destroy();
+      await appWindow.destroy().catch(() => appWindow.close());
     });
   });
 
