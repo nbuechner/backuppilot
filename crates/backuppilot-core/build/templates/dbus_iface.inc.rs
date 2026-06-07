@@ -143,6 +143,28 @@ impl BackupPilotDaemon {
         serde_json::to_string(&snapshots).map_err(json_err)
     }
 
+    async fn delete_snapshot(
+        &self,
+        profile_id: i64,
+        snapshot_path: String,
+    ) -> zbus::fdo::Result<()> {
+        self.service
+            .delete_snapshot(profile_id, snapshot_path)
+            .await
+            .map_err(json_err)
+    }
+
+    async fn check_snapshot_permissions(
+        &self,
+        profile_id: i64,
+    ) -> zbus::fdo::Result<String> {
+        let perms = self.service
+            .check_snapshot_permissions(profile_id)
+            .await
+            .map_err(json_err)?;
+        serde_json::to_string(&perms).map_err(|e| zbus::fdo::Error::Failed(e.to_string()))
+    }
+
     async fn list_catalog(&self, request_json: String) -> zbus::fdo::Result<String> {
         let request: backuppilot_core::ListCatalogRequest =
             serde_json::from_str(&request_json).map_err(json_err)?;

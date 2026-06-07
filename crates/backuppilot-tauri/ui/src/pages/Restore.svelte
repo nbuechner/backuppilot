@@ -1,8 +1,10 @@
 <script>
   import { listProfiles, listSnapshots, listCatalog, restoreArchive,
            listActiveMounts, mountSnapshot, unmountSnapshot,
-           checkFuseAvailable, installFuse3 } from '../lib/ipc.js';
+           checkFuseAvailable, installFuse3,
+           deleteSnapshot, checkSnapshotPermissions } from '../lib/ipc.js';
   import { open as openDialog } from '@tauri-apps/plugin-dialog';
+  import { confirm } from '@tauri-apps/plugin-dialog';
   import { invoke } from '@tauri-apps/api/core';
   import { onDestroy } from 'svelte';
 
@@ -33,6 +35,8 @@
   let mounting         = $state(false);
   let mountResult      = $state(null);
   let installingFuse3  = $state(false);
+  let canDelete        = $state(false);
+  let canRestore       = $state(true);
   let fuseCheck        = $state(null); // FuseCheckResult
   let error            = $state('');
 
@@ -51,9 +55,17 @@
     selectedArchive = '';
     currentPath = '/';
     snapshots = [];
+    canDelete = false;
+    canRestore = true;
     loadingSnapshots = true;
     try {
-      snapshots = await listSnapshots(p.id);
+      const [snaps, perms] = await Promise.all([
+        listSnapshots(p.id),
+        checkSnapshotPermissions(p.id),
+      ]);
+      snapshots = snaps;
+      canDelete = perms?.can_delete ?? false;
+      canRestore = perms?.can_restore ?? true;
     } catch (e) {
       error = String(e);
     } finally {
@@ -145,6 +157,24 @@
       error = String(e);
     } finally {
       restoring = false;
+    }
+  }
+
+  async function doDeleteSnapshot() {
+    if (!selectedProfile || !selectedSnapshot) return;
+    if (selectedSnapshot.protected) return;
+    const label = snapshotLabel(selectedSnapshot);
+    const ok = await confirm(
+      `Delete snapshot "${label}"? This cannot be undone.`,
+      { title: 'Delete snapshot', kind: 'warning' }
+    );
+    if (!ok) return;
+    try {
+      await deleteSnapshot(selectedProfile.id, selectedSnapshot.path);
+      selectedSnapshot = null;
+      snapshots = await listSnapshots(selectedProfile.id);
+    } catch (e) {
+      error = String(e);
     }
   }
 
@@ -383,9 +413,24 @@
 
     <div class="action-row">
       <button class="btn-primary" onclick={doRestore}
-        disabled={restoring || !targetDir.trim()}>
+        disabled={restoring || !targetDir.trim() || !canRestore}
+        title={!canRestore ? 'No Datastore.Read permission on this profile' : undefined}>
         {restoring ? 'Restoring…' : 'Start Restore'}
       </button>
+
+      {#if selectedSnapshot?.protected}
+        <span class="muted" title="This snapshot is protected on the PBS server">Protected — cannot delete</span>
+      {:else if canDelete}
+        <button class="btn-ghost btn-danger" onclick={doDeleteSnapshot}
+          disabled={!selectedSnapshot}>
+          Delete snapshot
+        </button>
+      {:else}
+        <button class="btn-ghost" disabled
+          title="No Datastore.Prune permission on this profile">
+          Delete snapshot
+        </button>
+      {/if}
 
       <div class="mount-action">
         {#if fuseCheck === null}

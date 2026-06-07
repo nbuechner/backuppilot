@@ -1,10 +1,6 @@
 /// Native Rust HTTP client for the Proxmox Backup Server REST API.
 ///
-/// Replaces subprocess calls to `proxmox-backup-client` for operations that
-/// don't require chunk-level access (credential verification, snapshot listing,
-/// archive manifest). Backup upload and restore still use the CLI binary.
-///
-/// Works on all platforms — only `reqwest` + TLS, no Unix-specific code.
+/// Works on all platforms -- only `reqwest` + TLS, no Unix-specific code.
 mod snapshots;
 
 use std::time::Duration;
@@ -17,6 +13,21 @@ use crate::restore::PbsSnapshotInfo;
 
 pub use snapshots::PbsApiError;
 
+/// Effective datastore permissions for the configured API token.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct DatastorePermissions {
+    /// Token has Datastore.Prune or Datastore.Modify -- may delete snapshots.
+    pub can_delete: bool,
+    /// Token has Datastore.Read or Datastore.Modify -- may restore and browse catalogs.
+    pub can_restore: bool,
+}
+
+impl DatastorePermissions {
+    pub fn none() -> Self {
+        Self { can_delete: false, can_restore: false }
+    }
+}
+
 /// HTTP client bound to one PBS datastore + namespace.
 pub struct PbsApiClient {
     client: Client,
@@ -27,11 +38,6 @@ pub struct PbsApiClient {
 }
 
 impl PbsApiClient {
-    /// Builds a client from parsed repository credentials.
-    ///
-    /// When `server_fingerprint` is supplied the PBS server likely uses a
-    /// self-signed certificate, so TLS verification is bypassed in favour of
-    /// the out-of-band fingerprint the user has already accepted.
     pub fn new(
         parts: &PbsRepositoryParts,
         namespace: Option<&str>,
@@ -48,7 +54,6 @@ impl PbsApiClient {
         if secret.is_empty() {
             return Err("PBS API token secret is empty".to_string());
         }
-        // PBS API token auth header: "PBSAPIToken=user@realm!tokenname:secret"
         let auth_header = format!("PBSAPIToken={auth_id}:{secret}");
 
         let mut builder = ClientBuilder::new()
@@ -56,9 +61,6 @@ impl PbsApiClient {
             .connect_timeout(Duration::from_secs(10));
 
         if server_fingerprint.is_some() {
-            // PBS routinely uses self-signed certs; the fingerprint is the
-            // user's trust anchor (same behaviour as proxmox-backup-client
-            // --fingerprint). Bypassing TLS cert verification is intentional.
             builder = builder.danger_accept_invalid_certs(true);
         }
 
@@ -73,7 +75,6 @@ impl PbsApiClient {
         })
     }
 
-    /// Convenience constructor from a `BackupProfile`.
     pub fn from_profile(
         profile: &crate::profile::BackupProfile,
     ) -> Result<Self, String> {
@@ -92,6 +93,12 @@ impl PbsApiClient {
             .header("Authorization", &self.auth_header)
     }
 
+    pub(crate) fn delete(&self, path: &str) -> reqwest::RequestBuilder {
+        self.client
+            .delete(format!("{}{}", self.base_url, path))
+            .header("Authorization", &self.auth_header)
+    }
+
     pub(crate) fn datastore(&self) -> &str {
         &self.datastore
     }
@@ -100,17 +107,12 @@ impl PbsApiClient {
         self.namespace.as_deref()
     }
 
-    // ── Public operations ──────────────────────────────────────────────────
+    // -- Public operations ---------------------------------------------------
 
-    /// Verifies PBS credentials via the REST API (no subprocess required).
-    ///
-    /// Returns success even when the token has no `Datastore.Audit` permission
-    /// but is otherwise valid — mirroring the CLI's `list` behaviour.
     pub async fn verify_credentials(&self) -> CredentialVerifyResult {
         snapshots::api_verify_credentials(self).await
     }
 
-    /// Lists all `host` snapshots for the given `backup_id`.
     pub async fn list_snapshots(
         &self,
         backup_id: &str,
@@ -118,11 +120,18 @@ impl PbsApiClient {
         snapshots::api_list_snapshots(self, backup_id).await
     }
 
-    /// Lists `.pxar` archive names in a snapshot (`host/{id}/{timestamp}`).
     pub async fn list_snapshot_archives(
         &self,
         snapshot_path: &str,
     ) -> Result<Vec<String>, PbsApiError> {
         snapshots::api_list_snapshot_archives(self, snapshot_path).await
+    }
+
+    pub async fn delete_snapshot(&self, snapshot_path: &str) -> Result<(), PbsApiError> {
+        snapshots::api_delete_snapshot(self, snapshot_path).await
+    }
+
+    pub async fn check_datastore_permissions(&self) -> Result<DatastorePermissions, PbsApiError> {
+        snapshots::api_check_datastore_permissions(self).await
     }
 }

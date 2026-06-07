@@ -125,6 +125,22 @@ pub async fn list_snapshots(_: &DaemonClient, profile_id: i64) -> IpcResult<Vec<
     parse(&call("list_snapshots", json!({"profile_id": profile_id})).await?)
 }
 
+pub async fn delete_snapshot(
+    _: &DaemonClient,
+    profile_id: i64,
+    snapshot_path: &str,
+) -> IpcResult<()> {
+    call("delete_snapshot", json!({"profile_id": profile_id, "snapshot_path": snapshot_path})).await?;
+    Ok(())
+}
+
+pub async fn check_snapshot_permissions(
+    _: &DaemonClient,
+    profile_id: i64,
+) -> IpcResult<backuppilot_core::DatastorePermissions> {
+    parse(&call("check_snapshot_permissions", json!({"profile_id": profile_id})).await?)
+}
+
 pub async fn list_catalog(
     _: &DaemonClient,
     request: &ListCatalogRequest,

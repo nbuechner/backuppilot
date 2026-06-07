@@ -38,6 +38,10 @@ pub trait BackupPilotDaemon {
 
     fn list_snapshots(&self, profile_id: i64) -> zbus::Result<String>;
 
+    fn delete_snapshot(&self, profile_id: i64, snapshot_path: String) -> zbus::Result<()>;
+
+    fn check_snapshot_permissions(&self, profile_id: i64) -> zbus::Result<String>;
+
     fn list_catalog(&self, request_json: String) -> zbus::Result<String>;
 
     fn restore_archive(&self, request_json: String) -> zbus::Result<String>;

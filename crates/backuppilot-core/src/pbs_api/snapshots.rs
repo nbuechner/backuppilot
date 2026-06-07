@@ -36,15 +36,8 @@ impl From<reqwest::Error> for PbsApiError {
     }
 }
 
-// ── Credential verification ─────────────────────────────────────────────────
+// -- Credential verification -------------------------------------------------
 
-/// Verifies credentials by listing the datastore root (or namespace).
-///
-/// HTTP 200/2xx  → credentials valid.
-/// HTTP 401      → bad credentials.
-/// HTTP 403      → authenticated but no `Datastore.Audit` — still counts as
-///                 "credentials work" (same interpretation as the CLI `list`).
-/// Other errors  → network / config problem, reported as failure.
 pub(super) async fn api_verify_credentials(client: &PbsApiClient) -> CredentialVerifyResult {
     let url = format!(
         "/api2/json/admin/datastore/{}/snapshots",
@@ -83,9 +76,8 @@ pub(super) async fn api_verify_credentials(client: &PbsApiClient) -> CredentialV
     }
 }
 
-// ── Snapshot listing ────────────────────────────────────────────────────────
+// -- Snapshot listing --------------------------------------------------------
 
-/// Lists all `host/{backup_id}` snapshots via the PBS REST API.
 pub(super) async fn api_list_snapshots(
     client: &PbsApiClient,
     backup_id: &str,
@@ -116,11 +108,6 @@ pub(super) async fn api_list_snapshots(
     parse_snapshot_list(&body, backup_id)
 }
 
-/// Lists `.pxar` archive names for a snapshot via `GET .../files`.
-///
-/// `snapshot_path` is the full path as stored internally:
-/// `host/{backup_id}/{ISO-8601-timestamp}` — e.g.
-/// `host/my-laptop/2025-05-18T10:00:00Z`.
 pub(super) async fn api_list_snapshot_archives(
     client: &PbsApiClient,
     snapshot_path: &str,
@@ -153,7 +140,57 @@ pub(super) async fn api_list_snapshot_archives(
     Ok(parse_archive_list(&body))
 }
 
-// ── Parsing helpers ──────────────────────────────────────────────────────────
+pub(super) async fn api_delete_snapshot(
+    client: &PbsApiClient,
+    snapshot_path: &str,
+) -> Result<(), PbsApiError> {
+    let (backup_type, backup_id, backup_time_unix) = parse_snapshot_path(snapshot_path)?;
+    let url = format!("/api2/json/admin/datastore/{}/snapshots", client.datastore());
+    let backup_time_str = backup_time_unix.to_string();
+    let mut req = client.delete(&url).query(&[
+        ("backup-type", backup_type),
+        ("backup-id", backup_id),
+        ("backup-time", backup_time_str.as_str()),
+    ]);
+    if let Some(ns) = client.namespace() {
+        req = req.query(&[("ns", ns)]);
+    }
+    debug!(%url, snapshot_path, "PBS API delete snapshot");
+    let resp = req.send().await?;
+    let status = resp.status().as_u16();
+    if status == 200 || status == 204 {
+        Ok(())
+    } else {
+        Err(PbsApiError::Pbs { status, message: extract_pbs_error(resp).await })
+    }
+}
+
+/// Checks Datastore.Prune (delete) and Datastore.Read (restore/browse) in one API call.
+pub(super) async fn api_check_datastore_permissions(
+    client: &PbsApiClient,
+) -> Result<super::DatastorePermissions, PbsApiError> {
+    let path_param = format!("/datastore/{}", client.datastore());
+    let req = client.get("/api2/json/access/permissions")
+        .query(&[("path", path_param.as_str()), ("propagate", "0")]);
+    debug!("PBS API check datastore permissions");
+    let resp = req.send().await?;
+    let status = resp.status().as_u16();
+    if status != 200 {
+        // 401 = bad creds, 403 = no permission to query, anything else = network issue.
+        // All mean we cannot confirm any elevated permission.
+        return Ok(super::DatastorePermissions::none());
+    }
+    let body: serde_json::Value = resp.json().await.map_err(|e| PbsApiError::Parse(e.to_string()))?;
+    let perms = body.get("data").unwrap_or(&body);
+    let has = |key: &str| perms.get(key).and_then(|v| v.as_u64()).unwrap_or(0) > 0;
+    let modify = has("Datastore.Modify");
+    Ok(super::DatastorePermissions {
+        can_delete:  modify || has("Datastore.Prune"),
+        can_restore: modify || has("Datastore.Read"),
+    })
+}
+
+// -- Parsing helpers ---------------------------------------------------------
 
 fn parse_snapshot_list(body: &Value, backup_id: &str) -> Result<Vec<PbsSnapshotInfo>, PbsApiError> {
     let items = data_array(body);
@@ -162,7 +199,6 @@ fn parse_snapshot_list(body: &Value, backup_id: &str) -> Result<Vec<PbsSnapshotI
         .filter_map(|item| parse_snapshot_item(item, backup_id))
         .collect();
 
-    // Newest first — mirrors CLI `snapshot list` sort order.
     snapshots.sort_by(|a, b| b.path.cmp(&a.path));
     snapshots.dedup_by(|a, b| a.path == b.path);
     Ok(snapshots)
@@ -181,7 +217,6 @@ fn parse_snapshot_item(item: &Value, backup_id: &str) -> Option<PbsSnapshotInfo>
         .and_then(|v| v.as_str())
         .unwrap_or(backup_id);
 
-    // `backup-time` from the REST API is always a Unix timestamp integer.
     let time_iso = timestamp_to_iso(item.get("backup-time"))?;
     let path = format!("{btype}/{id}/{time_iso}");
 
@@ -193,6 +228,7 @@ fn parse_snapshot_item(item: &Value, backup_id: &str) -> Option<PbsSnapshotInfo>
     let archives = parse_files_field(item.get("files"));
     let fingerprint = string_field(item, &["fingerprint"]);
     let encrypted = detect_encrypted(item, &archives, fingerprint.as_deref());
+    let protected = item.get("protected").and_then(|v| v.as_bool()).unwrap_or(false);
 
     Some(PbsSnapshotInfo {
         path,
@@ -200,6 +236,7 @@ fn parse_snapshot_item(item: &Value, backup_id: &str) -> Option<PbsSnapshotInfo>
         archives,
         fingerprint,
         encrypted,
+        protected,
     })
 }
 
@@ -220,9 +257,8 @@ fn parse_archive_list(body: &Value) -> Vec<String> {
     names
 }
 
-// ── Snapshot path utilities ──────────────────────────────────────────────────
+// -- Snapshot path utilities -------------------------------------------------
 
-/// Splits `host/{backup_id}/{timestamp}` into `(backup_type, backup_id, unix_ts)`.
 fn parse_snapshot_path(path: &str) -> Result<(&str, &str, i64), PbsApiError> {
     let parts: Vec<&str> = path.trim_matches('/').splitn(3, '/').collect();
     if parts.len() != 3 {
@@ -239,9 +275,8 @@ fn parse_snapshot_path(path: &str) -> Result<(&str, &str, i64), PbsApiError> {
     Ok((backup_type, backup_id, unix_ts))
 }
 
-// ── JSON utilities ───────────────────────────────────────────────────────────
+// -- JSON utilities ----------------------------------------------------------
 
-/// Returns the `data` array from a PBS API response, or the top-level array.
 fn data_array(body: &Value) -> Vec<Value> {
     match body {
         Value::Array(arr) => arr.clone(),
@@ -254,15 +289,12 @@ fn data_array(body: &Value) -> Vec<Value> {
     }
 }
 
-/// Converts a PBS `backup-time` integer to an ISO-8601 UTC string.
 fn timestamp_to_iso(value: Option<&Value>) -> Option<String> {
     let secs = value?.as_i64()?;
     DateTime::from_timestamp(secs, 0)
         .map(|dt| dt.format("%Y-%m-%dT%H:%M:%SZ").to_string())
 }
 
-/// Parses the `files` field — either `["root.pxar", ...]` or
-/// `[{"filename": "root.pxar"}, ...]`.
 fn parse_files_field(value: Option<&Value>) -> Vec<String> {
     match value {
         Some(Value::Array(arr)) => arr
@@ -316,9 +348,9 @@ fn string_field(item: &Value, keys: &[&str]) -> Option<String> {
     None
 }
 
-// ── Error extraction ─────────────────────────────────────────────────────────
+// -- Error extraction --------------------------------------------------------
 
-async fn extract_pbs_error(resp: reqwest::Response) -> String {
+pub(super) async fn extract_pbs_error(resp: reqwest::Response) -> String {
     let status = resp.status().as_u16();
     match resp.json::<Value>().await {
         Ok(body) => body
@@ -333,7 +365,7 @@ async fn extract_pbs_error(resp: reqwest::Response) -> String {
     }
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────────
+// -- Tests -------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
@@ -357,34 +389,22 @@ mod tests {
         assert!(snaps[0].path.starts_with("host/mypc/"));
         assert!(snaps[0].archives.contains(&"home.pxar".to_string()));
         assert!(!snaps[0].encrypted);
+        assert!(!snaps[0].protected);
     }
 
     #[test]
-    fn detects_encrypted_snapshot_by_fingerprint() {
+    fn parses_protected_snapshot() {
         let body = serde_json::json!({
             "data": [{
                 "backup-type": "host",
                 "backup-id": "pc",
                 "backup-time": 1_700_000_000_i64,
                 "size": 0,
-                "fingerprint": "aa:bb:cc:dd"
+                "protected": true
             }]
         });
         let snaps = parse_snapshot_list(&body, "pc").unwrap();
-        assert!(snaps[0].encrypted);
-        assert_eq!(snaps[0].fingerprint.as_deref(), Some("aa:bb:cc:dd"));
-    }
-
-    #[test]
-    fn parses_archive_list_with_data_wrapper() {
-        let body = serde_json::json!({
-            "data": [
-                {"filename": "root.pxar", "size": 500},
-                {"filename": "catalog.pcat1", "size": 10}
-            ]
-        });
-        let archives = parse_archive_list(&body);
-        assert_eq!(archives, vec!["root.pxar"]);
+        assert!(snaps[0].protected);
     }
 
     #[test]

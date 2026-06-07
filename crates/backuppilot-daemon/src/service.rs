@@ -865,6 +865,25 @@ impl DaemonService {
         PbsRestore::list_snapshots(&profile).await
     }
 
+    pub async fn delete_snapshot(&self, profile_id: i64, snapshot_path: String) -> Result<()> {
+        let profile = self.profile_with_credentials(profile_id).await?;
+        let client = backuppilot_core::PbsApiClient::from_profile(&profile)
+            .map_err(|e| backuppilot_core::CoreError::PbsCommand(e))?;
+        client.delete_snapshot(&snapshot_path).await
+            .map_err(|e| backuppilot_core::CoreError::PbsCommand(e.to_string()))
+    }
+
+    pub async fn check_snapshot_permissions(
+        &self,
+        profile_id: i64,
+    ) -> Result<backuppilot_core::DatastorePermissions> {
+        let profile = self.profile_with_credentials(profile_id).await?;
+        let client = backuppilot_core::PbsApiClient::from_profile(&profile)
+            .map_err(|e| backuppilot_core::CoreError::PbsCommand(e))?;
+        Ok(client.check_datastore_permissions().await
+            .unwrap_or_else(|_| backuppilot_core::DatastorePermissions::none()))
+    }
+
     pub async fn list_catalog(&self, request: ListCatalogRequest) -> Result<ListCatalogResponse> {
         let profile = self.profile_with_credentials(request.profile_id).await?;
         PbsRestore::list_catalog(&request, &profile).await

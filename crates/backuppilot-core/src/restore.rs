@@ -42,6 +42,9 @@ pub struct PbsSnapshotInfo {
     /// Derived from [`Self::fingerprint`] and encryption markers in the file list.
     #[serde(default)]
     pub encrypted: bool,
+    /// Whether the snapshot is protected against deletion on the PBS server.
+    #[serde(default)]
+    pub protected: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -180,53 +183,32 @@ pub async fn enrich_encryption_keys_usage(
     keys: &mut [EncryptionKey],
     profiles: &[BackupProfile],
 ) {
-    // Only do the expensive PBS probe when at least one key has a fingerprint.
-    // kdf=none keys (Windows) have no fingerprint, so nothing to match.
-    let any_key_fp = keys.iter().any(|k| k.fingerprint.is_some());
-
     let mut snapshot_counts: HashMap<i64, HashMap<String, u32>> = HashMap::new();
 
-    if any_key_fp && !profiles.is_empty() {
-        // Query all profiles in parallel; bail out after 5 s so the key list
-        // never hangs if the PBS server is slow or unreachable.
-        const ENRICH_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
-
-        let mut set = tokio::task::JoinSet::new();
-        for profile in profiles {
-            let profile = profile.clone();
-            set.spawn(async move {
-                let snaps = PbsRestore::list_snapshots(&profile).await.unwrap_or_default();
-                (profile.name.clone(), snaps)
-            });
-        }
-
-        let key_fingerprints: Vec<(i64, String)> = keys
-            .iter()
-            .filter_map(|k| k.fingerprint.as_ref().map(|fp| (k.id, fp.clone())))
-            .collect();
-
-        let _ = timeout(ENRICH_TIMEOUT, async {
-            while let Some(Ok((profile_name, snaps))) = set.join_next().await {
-                for snap in snaps {
-                    if !snap.encrypted {
-                        continue;
-                    }
-                    let Some(ref snap_fp) = snap.fingerprint else {
-                        continue;
-                    };
-                    for (key_id, key_fp) in &key_fingerprints {
-                        if fingerprints_match(snap_fp, key_fp) {
-                            *snapshot_counts
-                                .entry(*key_id)
-                                .or_default()
-                                .entry(profile_name.clone())
-                                .or_insert(0) += 1;
-                        }
-                    }
+    for profile in profiles {
+        let Ok(snapshots) = PbsRestore::list_snapshots(profile).await else {
+            continue;
+        };
+        for snap in snapshots {
+            if !snap.encrypted {
+                continue;
+            }
+            let Some(ref snap_fp) = snap.fingerprint else {
+                continue;
+            };
+            for key in keys.iter() {
+                let Some(ref key_fp) = key.fingerprint else {
+                    continue;
+                };
+                if fingerprints_match(snap_fp, key_fp) {
+                    *snapshot_counts
+                        .entry(key.id)
+                        .or_default()
+                        .entry(profile.name.clone())
+                        .or_insert(0) += 1;
                 }
             }
-        })
-        .await;
+        }
     }
 
     for key in keys.iter_mut() {
@@ -294,16 +276,6 @@ pub fn resolve_encryption_key_id_for_snapshot(
 
 impl PbsRestore {
     pub async fn list_snapshots(profile: &BackupProfile) -> Result<Vec<PbsSnapshotInfo>> {
-        // REST API fallback: works on platforms without the CLI binary (e.g. Windows).
-        if !crate::pbs::PbsClient::is_available().await {
-            let api = crate::pbs_api::PbsApiClient::from_profile(profile)
-                .map_err(|e| CoreError::PbsCommand(e))?;
-            return api
-                .list_snapshots(&profile.backup_id)
-                .await
-                .map_err(|e| CoreError::PbsCommand(e.to_string()));
-        }
-
         let parts = repository_parts(profile)?;
         let group = snapshot_group(profile);
         let output = run_pbs_with_timeout(
@@ -381,7 +353,7 @@ impl PbsRestore {
         encryption_key_id: Option<i64>,
     ) -> Result<Vec<String>> {
         let lines =
-            load_catalog_lines(profile, snapshot, false, encryption_key_id).await?;
+            load_catalog_lines(profile, snapshot, archive_name, false, encryption_key_id).await?;
         let mut conflicts = Vec::new();
         let rel_paths = restore_relative_paths(&lines, archive_name, patterns);
         for rel in rel_paths {
@@ -449,6 +421,7 @@ impl PbsRestore {
         let lines = load_catalog_lines(
             profile,
             &request.snapshot,
+            &request.archive_name,
             request.force_refresh,
             key_id,
         )
@@ -464,17 +437,10 @@ impl PbsRestore {
             .or_else(|| archives.first().cloned())
             .unwrap_or_else(|| request.archive_name.clone());
 
-        // Use the explicitly requested archive for browsing; fall back to suggested.
-        let active_archive = if request.archive_name.is_empty() {
-            suggested_archive.clone()
-        } else {
-            request.archive_name.clone()
-        };
-
-        let entries = catalog::list_children(&lines, &parent, &active_archive);
+        let entries = catalog::list_children(&lines, &parent, &suggested_archive);
         if entries.is_empty() && parent.is_empty() && lines.is_empty() {
             return Err(CoreError::PbsCommand(
-                "backup catalog is empty or could not be read -- try Reload file list or restore via CLI"
+                "backup catalog is empty or could not be read — try “Reload file list” or restore via CLI"
                     .into(),
             ));
         }
@@ -492,16 +458,6 @@ impl PbsRestore {
         profile: &BackupProfile,
         snapshot: &str,
     ) -> Result<Vec<String>> {
-        // REST API fallback: works on platforms without the CLI binary (e.g. Windows).
-        if !crate::pbs::PbsClient::is_available().await {
-            let api = crate::pbs_api::PbsApiClient::from_profile(profile)
-                .map_err(|e| CoreError::PbsCommand(e))?;
-            return api
-                .list_snapshot_archives(snapshot)
-                .await
-                .map_err(|e| CoreError::PbsCommand(e.to_string()));
-        }
-
         let parts = repository_parts(profile)?;
         let output = run_pbs_with_timeout(
             profile,
@@ -538,13 +494,14 @@ fn catalog_cache() -> &'static Mutex<HashMap<String, Vec<CatalogLine>>> {
 fn catalog_cache_key(
     profile_id: i64,
     snapshot: &str,
+    archive: &str,
     encryption_key_id: Option<i64>,
 ) -> String {
-    format!("{profile_id}:{snapshot}:key={encryption_key_id:?}")
+    format!("{profile_id}:{snapshot}:{archive}:key={encryption_key_id:?}")
 }
 
-pub fn clear_catalog_cache(profile_id: i64, snapshot: &str) {
-    let key = catalog_cache_key(profile_id, snapshot, None);
+pub fn clear_catalog_cache(profile_id: i64, snapshot: &str, archive_name: &str) {
+    let key = catalog_cache_key(profile_id, snapshot, archive_name, None);
     if let Ok(mut cache) = catalog_cache().lock() {
         cache.remove(&key);
     }
@@ -559,10 +516,11 @@ pub fn clear_all_catalog_cache() {
 async fn load_catalog_lines(
     profile: &BackupProfile,
     snapshot: &str,
+    archive_name: &str,
     force_refresh: bool,
     encryption_key_id: Option<i64>,
 ) -> Result<Vec<CatalogLine>> {
-    let key = catalog_cache_key(profile.id, snapshot, encryption_key_id);
+    let key = catalog_cache_key(profile.id, snapshot, archive_name, encryption_key_id);
     if !force_refresh {
         if let Some(lines) = catalog_cache().lock().ok().and_then(|c| c.get(&key).cloned()) {
             return Ok(lines);
@@ -598,6 +556,7 @@ async fn load_catalog_lines(
 
     debug!(
         snapshot,
+        archive = archive_name,
         stdout_len = output.stdout.len(),
         stderr_len = output.stderr.len(),
         "catalog dump finished"
@@ -609,12 +568,10 @@ async fn load_catalog_lines(
         ));
     }
 
-    // Parse without a fallback archive so explicit .didx/ paths determine archive names;
-    // lines without .didx/ fall back to "root.pxar" (the default in parse_catalog_dump).
-    let mut lines = catalog::parse_catalog_dump(&combined, "");
+    let mut lines = catalog::parse_catalog_dump(&combined, archive_name);
 
     if lines.is_empty() {
-        lines = catalog::parse_catalog_dump(&combined, "root.pxar");
+        lines = catalog::parse_catalog_dump(&combined, "");
     }
 
     if lines.is_empty() {
@@ -698,7 +655,7 @@ async fn run_pbs_with_timeout(
 
     let _ = crate::pbs::PbsClient::write_profile_config(profile);
 
-    let mut cmd = crate::pbs::spawn_pbs_command(pbs_client_path());
+    let mut cmd = Command::new(pbs_client_path());
     apply_pbs_client_env(
         &mut cmd,
         parts,
@@ -710,34 +667,6 @@ async fn run_pbs_with_timeout(
     let key_id = encryption_key_id.or(profile.encryption_key_id);
     apply_encryption_to_command(&mut cmd, key_id, encryption_mode)?;
 
-    // On Windows, tokio::process::Command::output() creates overlapped async pipes for stdout/stderr
-    // capture, which fails with os error 50 (ERROR_NOT_SUPPORTED) in certain session contexts
-    // (e.g. RDP sessions, service-launched processes). Use blocking I/O via spawn_blocking instead.
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
-        let std_ref = cmd.as_std();
-        let mut std_cmd = std::process::Command::new(std_ref.get_program());
-        std_cmd.args(std_ref.get_args());
-        std_cmd.creation_flags(CREATE_NO_WINDOW);
-        for (k, v) in std_ref.get_envs() {
-            match v {
-                Some(val) => { std_cmd.env(k, val); }
-                None => { std_cmd.env_remove(k); }
-            }
-        }
-        return timeout(limit, tokio::task::spawn_blocking(move || std_cmd.output()))
-            .await
-            .map_err(|_| {
-                let mins = limit.as_secs() / 60;
-                CoreError::PbsCommand(format!("pbs command timed out after {mins} minutes"))
-            })?
-            .map_err(|e| CoreError::PbsCommand(format!("process thread panicked: {e}")))?
-            .map_err(CoreError::Io);
-    }
-
-    #[allow(unreachable_code)]
     timeout(limit, cmd.output())
         .await
         .map_err(|_| {
@@ -880,12 +809,14 @@ fn parse_snapshot_item(item: &Value, backup_id: &str) -> Option<PbsSnapshotInfo>
         let archives = parse_archives_field(item.get("files"));
         let fingerprint = json_fingerprint(item.get("fingerprint"));
         let encrypted = snapshot_is_encrypted(item, &archives, fingerprint.as_deref());
+        let protected = item.get("protected").and_then(|v| v.as_bool()).unwrap_or(false);
         return Some(PbsSnapshotInfo {
             path: path.to_string(),
             size_bytes,
             archives,
             fingerprint,
             encrypted,
+            protected,
         });
     }
 
@@ -908,6 +839,7 @@ fn parse_snapshot_item(item: &Value, backup_id: &str) -> Option<PbsSnapshotInfo>
     let archives = parse_archives_field(item.get("files"));
     let fingerprint = json_fingerprint(item.get("fingerprint"));
     let encrypted = snapshot_is_encrypted(item, &archives, fingerprint.as_deref());
+    let protected = item.get("protected").and_then(|v| v.as_bool()).unwrap_or(false);
 
     Some(PbsSnapshotInfo {
         path,
@@ -915,6 +847,7 @@ fn parse_snapshot_item(item: &Value, backup_id: &str) -> Option<PbsSnapshotInfo>
         archives,
         fingerprint,
         encrypted,
+        protected,
     })
 }
 
@@ -1068,6 +1001,7 @@ mod tests {
             archives: vec![],
             fingerprint: None,
             encrypted: false,
+            protected: false,
         };
         let names = resolve_snapshot_archives(&profile, &snap);
         assert_eq!(names.len(), 1);

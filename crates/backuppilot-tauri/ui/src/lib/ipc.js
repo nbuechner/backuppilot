@@ -25,9 +25,11 @@ export const listRecentActivity  = (limit)      => ipcCall('list_recent_activity
 export const listRunsForProfile  = (profileId, limit) => ipcCall('list_runs_for_profile', { profile_id: profileId, limit });
 
 // Snapshots & restore
-export const listSnapshots       = (profileId)  => ipcCall('list_snapshots',          { profile_id: profileId });
-export const listCatalog         = (req)        => ipcCall('list_catalog',            { request_json: JSON.stringify(req) });
-export const restoreArchive      = (req)        => ipcCall('restore_archive',         { request_json: JSON.stringify(req) });
+export const listSnapshots                 = (profileId)      => ipcCall('list_snapshots',                    { profile_id: profileId });
+export const deleteSnapshot            = (profileId, snapshotPath) => ipcCall('delete_snapshot',         { profile_id: profileId, snapshot_path: snapshotPath });
+export const checkSnapshotPermissions  = (profileId)               => ipcCall('check_snapshot_permissions', { profile_id: profileId });
+export const listCatalog                   = (req)            => ipcCall('list_catalog',                      { request_json: JSON.stringify(req) });
+export const restoreArchive                = (req)            => ipcCall('restore_archive',                   { request_json: JSON.stringify(req) });
 export const checkFuseAvailable  = ()           => ipcCall('check_fuse_available');
 export const checkWindowsSetup   = ()           => ipcCall('check_windows_setup');
 export const installFuse3        = ()           => ipcCall('install_fuse3');

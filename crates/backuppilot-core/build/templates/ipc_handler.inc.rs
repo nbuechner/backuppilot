@@ -121,6 +121,19 @@ pub async fn dispatch(
             ser(&v)
         }
 
+        "delete_snapshot" => {
+            let id = get_i64(p, "profile_id")?;
+            let path = get_str(p, "snapshot_path")?;
+            service.delete_snapshot(id, path).await.map_err(|e| e.to_string())?;
+            Ok("null".to_string())
+        }
+
+        "check_snapshot_permissions" => {
+            let id = get_i64(p, "profile_id")?;
+            let perms = service.check_snapshot_permissions(id).await.map_err(|e| e.to_string())?;
+            ser(&perms)
+        }
+
         "list_catalog" => {
             let json = get_str(p, "request_json")?;
             let req: backuppilot_core::ListCatalogRequest =

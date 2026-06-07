@@ -90,6 +90,10 @@ struct PageState {
     snapshot_load_seq: u64,
     active_mounts: Vec<ActiveMount>,
     mounting_ids: HashSet<String>,
+    /// Whether the current profile has Datastore.Prune or Datastore.Modify permission.
+    can_delete: bool,
+    /// Whether the current profile has Datastore.Read or Datastore.Modify permission.
+    can_restore: bool,
 }
 
 pub fn build_page(parent: &ApplicationWindow, toast_overlay: &ToastOverlay) -> gtk::Widget {
@@ -117,6 +121,8 @@ pub fn build_page(parent: &ApplicationWindow, toast_overlay: &ToastOverlay) -> g
         snapshot_load_seq: 0,
         active_mounts: Vec::new(),
         mounting_ids: HashSet::new(),
+        can_delete: false,
+        can_restore: true,
     }));
     let suppress_check_toggles = Rc::new(Cell::new(false));
     let suppress_profile_notify = Rc::new(Cell::new(false));
@@ -982,11 +988,17 @@ fn update_action_buttons(page: &gtk::Widget, state: &Rc<RefCell<PageState>>) {
     {
         btn.set_sensitive(
             snap_ok
+                && st.can_restore
                 && target_ok
                 && selected_count > 0
                 && !st.catalog_loading
                 && !st.restore_in_progress,
         );
+        if !st.can_restore {
+            btn.set_tooltip_text(Some(&tr("No Datastore.Read permission on this profile")));
+        } else {
+            btn.set_tooltip_text(None);
+        }
         btn.set_label(&tr_fmt(
             "Restore selected ({count})",
             &[("count", &selected_count.to_string())],
@@ -997,8 +1009,13 @@ fn update_action_buttons(page: &gtk::Widget, state: &Rc<RefCell<PageState>>) {
     {
         let inside = st.browse_mode == BrowseMode::Inside && st.archive.is_some();
         btn.set_sensitive(
-            snap_ok && inside && target_ok && !st.catalog_loading && !st.restore_in_progress,
+            snap_ok && st.can_restore && inside && target_ok && !st.catalog_loading && !st.restore_in_progress,
         );
+        if !st.can_restore {
+            btn.set_tooltip_text(Some(&tr("No Datastore.Read permission on this profile")));
+        } else {
+            btn.set_tooltip_text(None);
+        }
     }
 }
 
@@ -1211,10 +1228,13 @@ fn load_snapshots(
             let proxy = connect().await?;
             let snapshots = dbus_client::list_snapshots(&proxy, profile_id).await?;
             let keys = dbus_client::list_encryption_keys(&proxy).await.unwrap_or_default();
-            Ok((snapshots, keys))
+            let perms = dbus_client::check_snapshot_permissions(&proxy, profile_id)
+                .await
+                .unwrap_or_else(|_| backuppilot_core::DatastorePermissions::none());
+            Ok((snapshots, keys, perms))
         },
         move |result| match result {
-            Ok((snapshots, keys)) => {
+            Ok((snapshots, keys, perms)) => {
                 if state.borrow().snapshot_load_seq != load_seq {
                     return;
                 }
@@ -1222,6 +1242,8 @@ fn load_snapshots(
                 st.snapshots = snapshots.clone();
                 st.encryption_key_by_fingerprint = encryption_fingerprint_name_map(&keys);
                 st.encryption_keys = keys;
+                st.can_delete = perms.can_delete;
+                st.can_restore = perms.can_restore;
                 drop(st);
                 reset_browse_state(&state);
                 clear_list_box(&list);
@@ -1230,10 +1252,16 @@ fn load_snapshots(
                     return;
                 }
                 let st = state.borrow();
+                let cd = st.can_delete;
                 for snap in snapshots {
                     list.append(&snapshot_row(
                         &snap,
                         &snapshot_encryption_for_snap(&snap, &st),
+                        cd,
+                        profile_id,
+                        page.clone(),
+                        toast.clone(),
+                        state.clone(),
                     ));
                 }
                 drop(st);
@@ -1315,7 +1343,15 @@ fn snapshot_disk_tooltip(snap: &PbsSnapshotInfo, enc: &SnapshotEncryptionInfo) -
     })
 }
 
-fn snapshot_row(snap: &PbsSnapshotInfo, enc: &SnapshotEncryptionInfo) -> gtk::ListBoxRow {
+fn snapshot_row(
+    snap: &PbsSnapshotInfo,
+    enc: &SnapshotEncryptionInfo,
+    can_delete: bool,
+    profile_id: i64,
+    page: gtk::Widget,
+    toast: ToastOverlay,
+    state: Rc<RefCell<PageState>>,
+) -> gtk::ListBoxRow {
     let row = gtk::ListBoxRow::new();
     row.set_widget_name(&snapshot_row_key(&snap.path));
     let display = snapshot_display_name(&snap.path);
@@ -1339,8 +1375,109 @@ fn snapshot_row(snap: &PbsSnapshotInfo, enc: &SnapshotEncryptionInfo) -> gtk::Li
     }
     action.add_prefix(&disk_icon);
 
+    // Delete button
+    let delete_btn = gtk::Button::builder()
+        .icon_name("user-trash-symbolic")
+        .valign(gtk::Align::Center)
+        .css_classes(vec!["flat".to_string()])
+        .build();
+
+    let snap_path = snap.path.clone();
+    let snap_protected = snap.protected;
+
+    if snap_protected {
+        delete_btn.set_sensitive(false);
+        delete_btn.set_tooltip_text(Some(&tr("Protected -- cannot delete")));
+    } else if !can_delete {
+        delete_btn.set_sensitive(false);
+        delete_btn.set_tooltip_text(Some(&tr("No Datastore.Prune permission on this profile")));
+    } else {
+        delete_btn.set_tooltip_text(Some(&tr("Delete snapshot")));
+        let snap_path_clone = snap_path.clone();
+        let display_clone = display.clone();
+        let page_clone = page.clone();
+        let toast_clone = toast.clone();
+        let state_clone = state.clone();
+        delete_btn.connect_clicked(move |_| {
+            confirm_and_delete_snapshot(
+                profile_id,
+                snap_path_clone.clone(),
+                display_clone.clone(),
+                page_clone.clone(),
+                toast_clone.clone(),
+                state_clone.clone(),
+            );
+        });
+    }
+    action.add_suffix(&delete_btn);
+
     row.set_child(Some(&action));
     row
+}
+
+fn confirm_and_delete_snapshot(
+    profile_id: i64,
+    snapshot_path: String,
+    display: String,
+    page: gtk::Widget,
+    toast: ToastOverlay,
+    state: Rc<RefCell<PageState>>,
+) {
+    let heading = tr("Delete snapshot?");
+    let body = tr_fmt(
+        "Delete snapshot \"{name}\"? This cannot be undone.",
+        &[("name", &display)],
+    );
+    let alert = libadwaita::AlertDialog::builder()
+        .heading(&heading)
+        .body(&body)
+        .build();
+    alert.add_response("cancel", &tr("Cancel"));
+    alert.add_response("delete", &tr("Delete"));
+    alert.set_response_appearance("delete", libadwaita::ResponseAppearance::Destructive);
+    alert.set_default_response(Some("cancel"));
+    alert.set_close_response("cancel");
+
+    let page_for_present = page.clone();
+    alert.connect_response(None::<&str>, move |_, response| {
+        if response != "delete" {
+            return;
+        }
+        let snap_path = snapshot_path.clone();
+        let page_inner = page.clone();
+        let toast_inner = toast.clone();
+        let state_inner = state.clone();
+        dbus_runtime::spawn(
+            async move {
+                let proxy = connect().await?;
+                dbus_client::delete_snapshot(&proxy, profile_id, &snap_path).await
+            },
+            move |result| {
+                match result {
+                    Ok(()) => {
+                        show_toast(&toast_inner, &tr("Snapshot deleted."));
+                        // Reload snapshot list
+                        if let Some(pid) = state_inner.borrow().profile_id {
+                            load_snapshots(&page_inner, &toast_inner, state_inner.clone(), pid);
+                        }
+                    }
+                    Err(err) => {
+                        show_toast(
+                            &toast_inner,
+                            &tr_fmt("Failed to delete snapshot: {err}", &[("err", &err.to_string())]),
+                        );
+                    }
+                }
+            },
+        );
+    });
+
+    if let Some(window) = page_for_present
+        .root()
+        .and_then(|r| r.downcast::<ApplicationWindow>().ok())
+    {
+        alert.present(Some(&window));
+    }
 }
 
 fn snapshot_row_key(path: &str) -> String {
