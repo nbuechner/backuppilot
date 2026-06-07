@@ -70,9 +70,9 @@ cp data/icons/hicolor/512x512/apps/ch.onesystems.backuppilot.png \
    "$PKG/usr/share/icons/hicolor/512x512/apps/"
 
 printf 'Package: backuppilot\nVersion: %s\nArchitecture: amd64\nMaintainer: BackupPilot Contributors <noreply@buechner.me>\nDepends: fuse3, libwebkit2gtk-4.1-0\nRecommends: proxmox-backup-client\nDescription: BackupPilot - Proxmox Backup Server GUI client\n Provides scheduled backups, restore, snapshot browsing, and\n read-only FUSE mounts of PBS archives.\n' "$VERSION" > "$PKG/DEBIAN/control"
-printf '#!/bin/sh\nset -e\nsystemctl --user daemon-reload 2>/dev/null || true\nsystemctl --user enable backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user start backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/postinst"
+cp data/DEBIAN/postinst "$PKG/DEBIAN/postinst"
 chmod 755 "$PKG/DEBIAN/postinst"
-printf '#!/bin/sh\nset -e\nsystemctl --user stop backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user disable backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/prerm"
+cp data/DEBIAN/prerm "$PKG/DEBIAN/prerm"
 chmod 755 "$PKG/DEBIAN/prerm"
 
 dpkg-deb --build "$PKG"
@@ -134,9 +134,9 @@ cp data/icons/hicolor/512x512/apps/ch.onesystems.backuppilot.png \
    "$PKG/usr/share/icons/hicolor/512x512/apps/"
 
 printf 'Package: backuppilot\nVersion: %s\nArchitecture: amd64\nMaintainer: BackupPilot Contributors <noreply@buechner.me>\nDepends: fuse3, libadwaita-1-0 (>= 1.6)\nRecommends: proxmox-backup-client\nDescription: BackupPilot - Proxmox Backup Server GUI client\n Provides scheduled backups, restore, snapshot browsing, and\n read-only FUSE mounts of PBS archives.\n' "$VERSION" > "$PKG/DEBIAN/control"
-printf '#!/bin/sh\nset -e\nsystemctl --user daemon-reload 2>/dev/null || true\nsystemctl --user enable backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user start backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/postinst"
+cp data/DEBIAN/postinst "$PKG/DEBIAN/postinst"
 chmod 755 "$PKG/DEBIAN/postinst"
-printf '#!/bin/sh\nset -e\nsystemctl --user stop backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user disable backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/prerm"
+cp data/DEBIAN/prerm "$PKG/DEBIAN/prerm"
 chmod 755 "$PKG/DEBIAN/prerm"
 
 dpkg-deb --build "$PKG"
