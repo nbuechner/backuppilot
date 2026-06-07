@@ -103,32 +103,12 @@ jobs:
           cp data/icons/hicolor/512x512/apps/ch.onesystems.backuppilot.png \
              "$PKG/usr/share/icons/hicolor/512x512/apps/"
 
-          cat > "$PKG/DEBIAN/control" << EOF
-Package: backuppilot
-Version: $VERSION
-Architecture: amd64
-Maintainer: BackupPilot Contributors <noreply@buechner.me>
-Depends: proxmox-backup-client, fuse3, libadwaita-1-0 (>= 1.6)
-Description: BackupPilot - Proxmox Backup Server GUI client
- Provides scheduled backups, restore, snapshot browsing, and
- read-only FUSE mounts of PBS archives.
-EOF
+          printf 'Package: backuppilot\nVersion: %s\nArchitecture: amd64\nMaintainer: BackupPilot Contributors <noreply@buechner.me>\nDepends: proxmox-backup-client, fuse3, libadwaita-1-0 (>= 1.6)\nDescription: BackupPilot - Proxmox Backup Server GUI client\n Provides scheduled backups, restore, snapshot browsing, and\n read-only FUSE mounts of PBS archives.\n' "$VERSION" > "$PKG/DEBIAN/control"
 
-          cat > "$PKG/DEBIAN/postinst" << 'EOF'
-#!/bin/sh
-set -e
-systemctl --user daemon-reload 2>/dev/null || true
-systemctl --user enable backuppilot-daemon.service 2>/dev/null || true
-systemctl --user start  backuppilot-daemon.service 2>/dev/null || true
-EOF
+          printf '#!/bin/sh\nset -e\nsystemctl --user daemon-reload 2>/dev/null || true\nsystemctl --user enable backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user start backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/postinst"
           chmod 755 "$PKG/DEBIAN/postinst"
 
-          cat > "$PKG/DEBIAN/prerm" << 'EOF'
-#!/bin/sh
-set -e
-systemctl --user stop    backuppilot-daemon.service 2>/dev/null || true
-systemctl --user disable backuppilot-daemon.service 2>/dev/null || true
-EOF
+          printf '#!/bin/sh\nset -e\nsystemctl --user stop backuppilot-daemon.service 2>/dev/null || true\nsystemctl --user disable backuppilot-daemon.service 2>/dev/null || true\n' > "$PKG/DEBIAN/prerm"
           chmod 755 "$PKG/DEBIAN/prerm"
 
           dpkg-deb --build "$PKG"
