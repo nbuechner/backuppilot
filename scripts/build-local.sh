@@ -26,10 +26,10 @@ if [[ "${BUILD_BACKEND:-}" == "lxd" ]]; then
   BUILDER="lxd"
 elif [[ "${BUILD_BACKEND:-}" == "docker" ]]; then
   BUILDER="docker"
-elif command -v docker &>/dev/null; then
-  BUILDER="docker"
 elif command -v lxc &>/dev/null; then
   BUILDER="lxd"
+elif command -v docker &>/dev/null; then
+  BUILDER="docker"
 else
   echo "ERROR: neither docker nor lxc found in PATH"; exit 1
 fi
