@@ -11,13 +11,18 @@ describe('Activity page', () => {
             { timeout: 30_000, timeoutMsg: 'App body remained empty after navigation' }
         );
 
-        // The app opens on the Profiles page. Wait for it to finish loading before
-        // navigating to Activity — this proves the daemon is alive and IPC is ready.
-        // When activity.spec.ts runs first in the suite, the daemon is cold-starting;
-        // the Profiles spinner clears once the first IPC round-trip completes.
+        // The app opens on the Profiles page. Wait for actual Profiles content to appear
+        // (a profile card, empty-state div, or error box) rather than waiting for the
+        // spinner to disappear — the spinner may not have rendered yet when we first check.
+        // This confirms the daemon completed at least one IPC round-trip before we
+        // navigate to Activity.
         await browser.waitUntil(
-            async () => !(await $('.spinner').isExisting()),
-            { timeout: 90_000, timeoutMsg: 'Profiles page spinner did not clear (daemon not ready)' }
+            async () => {
+                return (await $('.profile-card').isExisting())
+                    || (await $('.empty').isExisting())
+                    || (await $('.error-box').isExisting());
+            },
+            { timeout: 90_000, timeoutMsg: 'Profiles page did not show content (daemon not ready)' }
         );
 
         const activityTab = await $('.nav-item*=Activity');
