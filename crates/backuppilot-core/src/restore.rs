@@ -180,32 +180,53 @@ pub async fn enrich_encryption_keys_usage(
     keys: &mut [EncryptionKey],
     profiles: &[BackupProfile],
 ) {
+    // Only do the expensive PBS probe when at least one key has a fingerprint.
+    // kdf=none keys (Windows) have no fingerprint, so nothing to match.
+    let any_key_fp = keys.iter().any(|k| k.fingerprint.is_some());
+
     let mut snapshot_counts: HashMap<i64, HashMap<String, u32>> = HashMap::new();
 
-    for profile in profiles {
-        let Ok(snapshots) = PbsRestore::list_snapshots(profile).await else {
-            continue;
-        };
-        for snap in snapshots {
-            if !snap.encrypted {
-                continue;
-            }
-            let Some(ref snap_fp) = snap.fingerprint else {
-                continue;
-            };
-            for key in keys.iter() {
-                let Some(ref key_fp) = key.fingerprint else {
-                    continue;
-                };
-                if fingerprints_match(snap_fp, key_fp) {
-                    *snapshot_counts
-                        .entry(key.id)
-                        .or_default()
-                        .entry(profile.name.clone())
-                        .or_insert(0) += 1;
+    if any_key_fp && !profiles.is_empty() {
+        // Query all profiles in parallel; bail out after 5 s so the key list
+        // never hangs if the PBS server is slow or unreachable.
+        const ENRICH_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
+
+        let mut set = tokio::task::JoinSet::new();
+        for profile in profiles {
+            let profile = profile.clone();
+            set.spawn(async move {
+                let snaps = PbsRestore::list_snapshots(&profile).await.unwrap_or_default();
+                (profile.name.clone(), snaps)
+            });
+        }
+
+        let key_fingerprints: Vec<(i64, String)> = keys
+            .iter()
+            .filter_map(|k| k.fingerprint.as_ref().map(|fp| (k.id, fp.clone())))
+            .collect();
+
+        let _ = timeout(ENRICH_TIMEOUT, async {
+            while let Some(Ok((profile_name, snaps))) = set.join_next().await {
+                for snap in snaps {
+                    if !snap.encrypted {
+                        continue;
+                    }
+                    let Some(ref snap_fp) = snap.fingerprint else {
+                        continue;
+                    };
+                    for (key_id, key_fp) in &key_fingerprints {
+                        if fingerprints_match(snap_fp, key_fp) {
+                            *snapshot_counts
+                                .entry(*key_id)
+                                .or_default()
+                                .entry(profile_name.clone())
+                                .or_insert(0) += 1;
+                        }
+                    }
                 }
             }
-        }
+        })
+        .await;
     }
 
     for key in keys.iter_mut() {
