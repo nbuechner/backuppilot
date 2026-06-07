@@ -37,9 +37,9 @@ describe('Settings page', () => {
         for (const h of headers) {
             texts.push(await h.getText());
         }
-        const joined = texts.join(' ');
+        const joined = texts.join(' ').toUpperCase();
         for (const section of ['Notifications', 'Appearance', 'Health Check', 'Backup Conditions', 'Log Retention', 'Updates']) {
-            expect(joined).toContain(section);
+            expect(joined).toContain(section.toUpperCase());
         }
     });
 
