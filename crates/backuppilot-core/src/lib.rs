@@ -105,7 +105,7 @@ pub use pbs::{
 };
 pub use mount_manager::MountManager;
 pub use pbs_mount::{
-    check_fuse, force_unmount, fuse_available, ActiveMount, FuseCheckResult,
+    check_fuse, force_unmount, fuse_available, mount_point_for, ActiveMount, FuseCheckResult,
     MountSnapshotRequest, MountSnapshotResult, UnmountSnapshotResult,
 };
 pub use updates::{

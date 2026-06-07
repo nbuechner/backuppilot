@@ -123,6 +123,10 @@ impl MountManager {
             source_label,
             mount_point: mount_point.display().to_string(),
             started_at: Utc::now(),
+            #[cfg(windows)]
+            windows_path: crate::pbs_mount::wsl_path_to_unc(&mount_point),
+            #[cfg(not(windows))]
+            windows_path: None,
         };
 
         self.sessions

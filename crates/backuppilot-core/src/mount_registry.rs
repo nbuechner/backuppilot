@@ -176,6 +176,12 @@ fn synthetic_mount_for_path(path: &Path) -> Option<ActiveMount> {
         source_label: mount_point_label(arch_slug),
         mount_point: path.display().to_string(),
         started_at: chrono::Utc::now(),
+        windows_path: {
+            #[cfg(windows)]
+            { crate::pbs_mount::wsl_path_to_unc(path) }
+            #[cfg(not(windows))]
+            { None }
+        },
     })
 }
 
