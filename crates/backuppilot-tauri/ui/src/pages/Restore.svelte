@@ -1,6 +1,12 @@
 <script>
   import { listProfiles, listSnapshots, listCatalog, restoreArchive, listActiveMounts, unmountSnapshot } from '../lib/ipc.js';
+  import { open as openDialog } from '@tauri-apps/plugin-dialog';
   import { onDestroy } from 'svelte';
+
+  async function pickTargetDir() {
+    const dir = await openDialog({ directory: true, multiple: false, title: 'Select restore destination' });
+    if (dir) targetDir = dir;
+  }
 
   let profiles    = $state([]);
   let snapshots   = $state([]);
@@ -297,7 +303,8 @@
 
     <div class="field-row">
       <label for="target-dir">Target directory</label>
-      <input id="target-dir" type="text" placeholder="/home/user/restored" bind:value={targetDir} />
+      <input id="target-dir" type="text" placeholder="C:\Users\…\restored" bind:value={targetDir} />
+      <button class="btn-ghost-sm" onclick={pickTargetDir}>Browse…</button>
     </div>
 
     <label class="toggle-row">
