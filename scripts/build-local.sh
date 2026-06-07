@@ -38,6 +38,7 @@ if [ ! -f /root/.cargo/bin/rustup ]; then
     | sh -s -- -y --profile minimal --no-modify-path
 fi
 export PATH="/root/.cargo/bin:$PATH"
+rustup default stable 2>/dev/null || rustup toolchain install stable --no-self-update
 
 if ! command -v node &>/dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
@@ -108,6 +109,7 @@ if [ ! -f /root/.cargo/bin/rustup ]; then
     | sh -s -- -y --profile minimal --no-modify-path
 fi
 export PATH="/root/.cargo/bin:$PATH"
+rustup default stable 2>/dev/null || rustup toolchain install stable --no-self-update
 
 cd /src
 cargo build -p backuppilot-daemon -p backuppilot-gui -p backuppilot-cli --release
