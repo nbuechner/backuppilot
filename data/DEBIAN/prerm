@@ -3,8 +3,3 @@ set -e
 
 systemctl --user stop backuppilot-daemon.service 2>/dev/null || true
 systemctl --user disable backuppilot-daemon.service 2>/dev/null || true
-
-systemctl disable --now backuppilot-install-pbs-client.service 2>/dev/null || true
-rm -f /etc/systemd/system/backuppilot-install-pbs-client.service
-rm -f /usr/lib/backuppilot/install-pbs-client.sh
-systemctl daemon-reload 2>/dev/null || true

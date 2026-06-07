@@ -57,5 +57,6 @@ export const runPreflight        = (profileId)  => ipcCall('run_preflight',     
 export const verifyCredentials   = (input)      => ipcCall('verify_profile_credentials', { input_json: JSON.stringify(input) });
 
 // Misc
-export const resetAllData        = ()           => ipcCall('reset_all_data');
-export const getVersion          = ()           => ipcCall('version');
+export const resetAllData           = ()           => ipcCall('reset_all_data');
+export const getVersion             = ()           => ipcCall('version');
+export const checkPbsClientAvailable = ()          => ipcCall('pbs_client_available').then(r => r === 'true');
