@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Build BackupPilot release packages locally.
-#   Linux .deb  — built inside Docker containers (no host pollution)
+#   Linux .deb  — built inside Docker or LXD containers (no host pollution)
 #   Windows NSIS — built on the Windows host via SSH, installer copied back
 #
-# Cargo and npm caches are kept in named Docker volumes so rebuilds are fast.
+# Cargo, npm, and rustup caches survive between runs (Docker volumes / host dirs).
 #
 # Usage: ./scripts/build-local.sh [ubuntu2404|ubuntu2604|windows|all]
+# BUILD_BACKEND=lxd   force LXD  (default: docker if available, else lxd)
+# BUILD_BACKEND=docker force Docker
 set -euo pipefail
 
 TARGET="${1:-all}"
@@ -18,6 +20,67 @@ mkdir -p "$DIST"
 
 VERSION=$(grep '^version' "$REPO/Cargo.toml" | head -1 | sed 's/.*= *"\(.*\)"/\1/')
 echo "BackupPilot v${VERSION}"
+
+# ── Build backend detection ───────────────────────────────────────────────────
+if [[ "${BUILD_BACKEND:-}" == "lxd" ]]; then
+  BUILDER="lxd"
+elif [[ "${BUILD_BACKEND:-}" == "docker" ]]; then
+  BUILDER="docker"
+elif command -v docker &>/dev/null; then
+  BUILDER="docker"
+elif command -v lxc &>/dev/null; then
+  BUILDER="lxd"
+else
+  echo "ERROR: neither docker nor lxc found in PATH"; exit 1
+fi
+echo "Build backend: $BUILDER"
+
+# ── LXD helper ───────────────────────────────────────────────────────────────
+# Persistent host-side cache dirs (survive container deletion, like Docker volumes)
+LXD_CACHE="${HOME}/.cache/backuppilot-build"
+
+lxd_run() {
+  local label="$1"   # e.g. "2404"
+  local image="$2"   # e.g. "ubuntu:24.04"
+  local script="$3"  # build script content
+  local extra_devs="${4:-}"  # optional extra lxc config device add lines
+  local cname="bp-build-${label}-$$"
+
+  mkdir -p \
+    "$LXD_CACHE/cargo-${label}" \
+    "$LXD_CACHE/target-${label}"
+
+  echo "  Launching LXD container $cname ($image)..."
+  lxc launch "$image" "$cname"
+  # Always clean up the container, even on error
+  # shellcheck disable=SC2064
+  trap "echo '  Cleaning up $cname...'; lxc delete --force '$cname' 2>/dev/null || true" EXIT INT TERM
+
+  # Wait until the container is fully booted
+  lxc exec "$cname" -- cloud-init status --wait 2>/dev/null || sleep 5
+
+  # Source: read-only; world-readable so no UID shift needed
+  lxc config device add "$cname" src  disk source="$REPO" path=/src readonly=true
+  # Output dir: shift=true maps container root UID to host dir owner
+  lxc config device add "$cname" dist disk source="$DIST"                      path=/dist         shift=true
+  # Persistent build caches (cargo registry + compiled artifacts)
+  lxc config device add "$cname" cargo disk source="$LXD_CACHE/cargo-${label}" path=/root/.cargo  shift=true
+  lxc config device add "$cname" tgt   disk source="$LXD_CACHE/target-${label}" path=/build/target shift=true
+
+  # Extra per-build devices (e.g. node_modules cache)
+  if [[ -n "$extra_devs" ]]; then
+    eval "$extra_devs"
+  fi
+
+  lxc exec "$cname" \
+    --env CARGO_TARGET_DIR=/build/target \
+    --env DEBIAN_FRONTEND=noninteractive \
+    -- bash -c "$script"
+
+  echo "  Deleting $cname..."
+  lxc delete --force "$cname"
+  trap - EXIT INT TERM
+}
 
 # ── ubuntu-24.04: Tauri / WebKitGTK ─────────────────────────────────────────
 build_2404() {
@@ -80,15 +143,22 @@ cp "${PKG}.deb" /dist/
 echo "Done: backuppilot_${VERSION}_ubuntu2404_amd64.deb"
 EOF
 
-  docker run --rm \
-    -v "$REPO:/src" \
-    -v "backuppilot-target-2404:/build/target" \
-    -v "backuppilot-cargo-2404:/root/.cargo" \
-    -v "backuppilot-node-2404:/src/crates/backuppilot-tauri/ui/node_modules" \
-    -v "$DIST:/dist" \
-    -e CARGO_TARGET_DIR=/build/target \
-    ubuntu:24.04 \
-    bash -c "$SCRIPT"
+  if [[ "$BUILDER" == "lxd" ]]; then
+    mkdir -p "$LXD_CACHE/node-2404"
+    # Capture cname for the extra_devs eval (lxd_run sets cname before calling eval)
+    EXTRA='lxc config device add "$cname" node disk source="'"$LXD_CACHE"'/node-2404" path=/src/crates/backuppilot-tauri/ui/node_modules shift=true'
+    lxd_run "2404" "ubuntu:24.04" "$SCRIPT" "$EXTRA"
+  else
+    docker run --rm \
+      -v "$REPO:/src" \
+      -v "backuppilot-target-2404:/build/target" \
+      -v "backuppilot-cargo-2404:/root/.cargo" \
+      -v "backuppilot-node-2404:/src/crates/backuppilot-tauri/ui/node_modules" \
+      -v "$DIST:/dist" \
+      -e CARGO_TARGET_DIR=/build/target \
+      ubuntu:24.04 \
+      bash -c "$SCRIPT"
+  fi
 }
 
 # ── ubuntu-26.04: GTK native ─────────────────────────────────────────────────
@@ -144,14 +214,18 @@ cp "${PKG}.deb" /dist/
 echo "Done: backuppilot_${VERSION}_ubuntu2604_amd64.deb"
 EOF
 
-  docker run --rm \
-    -v "$REPO:/src" \
-    -v "backuppilot-target-2604:/build/target" \
-    -v "backuppilot-cargo-2604:/root/.cargo" \
-    -v "$DIST:/dist" \
-    -e CARGO_TARGET_DIR=/build/target \
-    ubuntu:26.04 \
-    bash -c "$SCRIPT"
+  if [[ "$BUILDER" == "lxd" ]]; then
+    lxd_run "2604" "ubuntu:26.04" "$SCRIPT"
+  else
+    docker run --rm \
+      -v "$REPO:/src" \
+      -v "backuppilot-target-2604:/build/target" \
+      -v "backuppilot-cargo-2604:/root/.cargo" \
+      -v "$DIST:/dist" \
+      -e CARGO_TARGET_DIR=/build/target \
+      ubuntu:26.04 \
+      bash -c "$SCRIPT"
+  fi
 }
 
 # ── Windows: NSIS installer via SSH ──────────────────────────────────────────
@@ -172,7 +246,6 @@ build_windows() {
   ssh "$WIN_HOST" "cd /d ${WIN_REPO} && cargo build -p backuppilot-daemon --release"
 
   # Build Tauri NSIS installer
-  # Uses npx so no global install is required; @tauri-apps/cli is cached by npm after first run
   ssh "$WIN_HOST" "cd /d ${WIN_REPO}\\crates\\backuppilot-tauri && npx --yes @tauri-apps/cli@v2 build --bundles nsis"
 
   # Copy installer back to local dist/
