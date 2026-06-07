@@ -21,13 +21,19 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
         VERSION_ID="${VERSION_ID:-}"
     fi
 
-    # Resolve Ubuntu version numbers to a Proxmox repo codename
+    # Resolve Ubuntu version numbers to a Proxmox repo codename.
+    # Ubuntu 26.04+ ships libfuse3-4 but the Proxmox trixie packages still
+    # depend on libfuse3-3, so flag those as incompatible for now.
     PBS_REPO=""
+    PBS_FUSE_CONFLICT=""
     if [ "$ID" = "ubuntu" ] && [ -n "$VERSION_ID" ]; then
-        # Compare as integers by stripping the dot (24.04 -> 2404, 24.10 -> 2410)
+        # Compare as integers by stripping the dot (24.04 -> 2404, 26.04 -> 2604)
         VER_INT=$(echo "$VERSION_ID" | awk -F. '{printf "%d%02d", $1, $2}')
         if [ "$VER_INT" -le 2404 ]; then
             PBS_REPO="bookworm"
+        elif [ "$VER_INT" -ge 2604 ]; then
+            PBS_REPO="trixie"
+            PBS_FUSE_CONFLICT="yes"
         else
             PBS_REPO="trixie"
         fi
@@ -60,15 +66,37 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
             echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
             ;;
         trixie)
-            echo "  Install it with:"
-            echo ""
-            echo "    sudo mkdir -p /etc/apt/keyrings"
-            echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg \\"
-            echo "      | sudo tee /etc/apt/keyrings/proxmox-release-trixie.gpg >/dev/null"
-            echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-trixie.gpg]" \
-                 "http://download.proxmox.com/debian/pbs-client trixie main' \\"
-            echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
-            echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
+            if [ -n "$PBS_FUSE_CONFLICT" ]; then
+                echo "  NOTE: The Proxmox trixie packages depend on libfuse3-3, which is"
+                echo "  not available on Ubuntu $VERSION_ID (libfuse3-4 replaced it)."
+                echo "  Proxmox has not yet released updated packages for this Ubuntu version."
+                echo ""
+                echo "  You can still add the repo and force-install, accepting that the"
+                echo "  proxmox-backup-client mount subcommand will not work (BackupPilot's"
+                echo "  own FUSE mount is unaffected -- it links libfuse3 directly):"
+                echo ""
+                echo "    sudo mkdir -p /etc/apt/keyrings"
+                echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg \\"
+                echo "      | sudo tee /etc/apt/keyrings/proxmox-release-trixie.gpg >/dev/null"
+                echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-trixie.gpg]" \
+                     "http://download.proxmox.com/debian/pbs-client trixie main' \\"
+                echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
+                echo "    sudo apt-get update"
+                echo "    sudo apt-get install -y --no-install-recommends proxmox-backup-client \\"
+                echo "      || sudo apt-get install -y --ignore-missing proxmox-backup-client"
+                echo ""
+                echo "  Or wait for Proxmox to publish updated packages for Ubuntu $VERSION_ID."
+            else
+                echo "  Install it with:"
+                echo ""
+                echo "    sudo mkdir -p /etc/apt/keyrings"
+                echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg \\"
+                echo "      | sudo tee /etc/apt/keyrings/proxmox-release-trixie.gpg >/dev/null"
+                echo "    echo 'deb [signed-by=/etc/apt/keyrings/proxmox-release-trixie.gpg]" \
+                     "http://download.proxmox.com/debian/pbs-client trixie main' \\"
+                echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
+                echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
+            fi
             ;;
         *)
             echo "  Your system (${CODENAME:-unknown}) may not have official Proxmox packages."
