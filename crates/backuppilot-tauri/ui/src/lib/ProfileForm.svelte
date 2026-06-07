@@ -1,5 +1,6 @@
 <script>
   import { ipcCall, verifyCredentials } from './ipc.js';
+  import { open as openDialog } from '@tauri-apps/plugin-dialog';
 
   let { onSaved, onCancel, profile = null, advancedMode = false } = $props();
 
@@ -23,10 +24,12 @@
   let pbsFingerprint = $state(profile?.server_fingerprint ?? '');
 
   // Backup config
-  let backupId  = $state(isEdit ? (profile.backup_id ?? '') : '');
-  let namespace = $state(isEdit ? (profile.namespace ?? '') : '');
-  let pathInput = $state('');
-  let paths     = $state(isEdit ? [...(profile.paths ?? [])] : []);
+  let backupId     = $state(isEdit ? (profile.backup_id ?? '') : '');
+  let namespace    = $state(isEdit ? (profile.namespace ?? '') : '');
+  let pathInput    = $state('');
+  let paths        = $state(isEdit ? [...(profile.paths ?? [])] : []);
+  let excludeInput = $state('');
+  let excludes     = $state(isEdit ? [...(profile.excludes ?? [])] : []);
 
   // Schedule
   function parseSchedule(s) {
@@ -88,6 +91,25 @@
     paths = paths.filter(x => x !== p);
   }
 
+  async function pickPath() {
+    const selected = await openDialog({ directory: true, multiple: true });
+    if (!selected) return;
+    const picked = Array.isArray(selected) ? selected : [selected];
+    for (const p of picked) {
+      if (p && !paths.includes(p)) paths = [...paths, p];
+    }
+  }
+
+  function addExclude() {
+    const e = excludeInput.trim();
+    if (e && !excludes.includes(e)) excludes = [...excludes, e];
+    excludeInput = '';
+  }
+
+  function removeExclude(e) {
+    excludes = excludes.filter(x => x !== e);
+  }
+
   function buildSchedule() {
     const s = { type: scheduleType };
     if (scheduleType === 'daily')  s.time = scheduleTime;
@@ -117,7 +139,7 @@
       namespace: namespace.trim() || null,
       backup_id: backupId.trim() || 'localhost',
       paths,
-      excludes: profile?.excludes ?? [],
+      excludes,
       schedule: buildSchedule(),
       conditions: profile?.conditions ?? {
         execution_context: 'desktop',
@@ -228,6 +250,7 @@
             <input type="text" placeholder="C:\Users\user\Documents" bind:value={pathInput}
               onkeydown={e => e.key === 'Enter' && addPath()} />
             <button class="btn-ghost-sm" onclick={addPath}>Add</button>
+            <button class="btn-ghost-sm" onclick={pickPath}>Browse…</button>
           </div>
         </div>
         {#if paths.length > 0}
@@ -236,6 +259,25 @@
               <div class="path-tag">
                 <span class="mono">{p}</span>
                 <button onclick={() => removePath(p)}>×</button>
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        <div class="field">
+          <label>Excludes</label>
+          <div class="path-input-row">
+            <input type="text" placeholder="*.tmp or C:\path\to\skip" bind:value={excludeInput}
+              onkeydown={e => e.key === 'Enter' && addExclude()} />
+            <button class="btn-ghost-sm" onclick={addExclude}>Add</button>
+          </div>
+        </div>
+        {#if excludes.length > 0}
+          <div class="path-list">
+            {#each excludes as ex}
+              <div class="path-tag">
+                <span class="mono">{ex}</span>
+                <button onclick={() => removeExclude(ex)}>×</button>
               </div>
             {/each}
           </div>

@@ -29,6 +29,7 @@ describe('Activity page', () => {
         await activityTab.waitForClickable({ timeout: 10_000 });
         await activityTab.click();
 
+
         // Activity.svelte calls listRecentActivity + listProfiles via Promise.all on mount.
         // On cold daemon start the first IPC round-trip can take 15–60s; the setInterval
         // at T+15s provides a second attempt. Use 90s to cover both.
