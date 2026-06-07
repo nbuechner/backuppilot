@@ -156,6 +156,10 @@ impl PbsClient {
                     }
                     Err(e) => {
                         error!("Failed to regenerate WSL wrapper: {e}");
+                        let _ = std::fs::write(
+                            std::env::temp_dir().join("backuppilot_wrapper_err.txt"),
+                            format!("binary={binary:?} err={e}"),
+                        );
                         binary.clone()
                     }
                 }
