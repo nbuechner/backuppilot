@@ -13,12 +13,6 @@ fn app_and_dbus_names() -> (String, String, String) {
     (app_id, dbus_name, dbus_path)
 }
 
-fn substitute_dbus(template: &str, dbus_name: &str, dbus_path: &str) -> String {
-    template
-        .replace("@@DBUS_NAME@@", dbus_name)
-        .replace("@@DBUS_PATH@@", dbus_path)
-}
-
 pub fn emit() {
     let (app_id, dbus_name, dbus_path) = app_and_dbus_names();
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").expect("OUT_DIR"));
