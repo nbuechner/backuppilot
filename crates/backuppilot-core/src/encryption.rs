@@ -440,6 +440,12 @@ fn run_key_create(path: &Path, password: &str, hint: Option<&str>) -> Result<()>
     if let Some(h) = hint.filter(|s| !s.trim().is_empty()) {
         cmd.arg(format!("--hint={}", h.trim()));
     }
+    // On Windows (WSL wrapper, no PTY available) use --kdf none to avoid
+    // the interactive passphrase prompt that fails with "no tty".
+    // The key data itself is still 32 random bytes and protects backups.
+    #[cfg(windows)]
+    cmd.arg("--kdf").arg("none");
+    #[cfg(not(windows))]
     cmd.env("PBS_ENCRYPTION_PASSWORD", password);
     #[cfg(windows)]
     {
