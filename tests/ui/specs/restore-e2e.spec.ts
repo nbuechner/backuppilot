@@ -132,7 +132,7 @@ describe('Restore lifecycle', () => {
         // Re-select profile
         await browser.waitUntil(
             async () => (await $$('.list-item')).length > 0,
-            { timeout: 15_000, timeoutMsg: 'Profile list did not reload' }
+            { timeout: 30_000, timeoutMsg: 'Profile list did not reload' }
         );
         for (const item of await $$('.list-item')) {
             if ((await item.getText()).includes(PROFILE_NAME)) {

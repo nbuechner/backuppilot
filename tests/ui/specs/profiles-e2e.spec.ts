@@ -89,7 +89,7 @@ describe('Profile lifecycle', () => {
         // Add backup path
         const pathInput = await $('input[placeholder*="Users"]');
         await pathInput.setValue(PROFILE.path);
-        const addPathBtn = await $('button*=Add');
+        const addPathBtn = await $('.path-input-row button');
         await addPathBtn.click();
         await browser.pause(200);
 

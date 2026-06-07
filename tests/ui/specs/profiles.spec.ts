@@ -74,6 +74,7 @@ describe('Profiles page', () => {
         expect(errorText.toLowerCase()).toMatch(/required|name|fill/);
 
         await browser.keys('Escape');
+        await dialog.waitForDisplayed({ timeout: 5_000, reverse: true });
     });
 
     it('creates and deletes a test profile', async () => {
@@ -93,7 +94,7 @@ describe('Profiles page', () => {
         // Add a backup path (required)
         const pathInput = await $('input[placeholder*="Documents"]');
         await pathInput.setValue('C:\\Users\\user\\Desktop');
-        await $('button*=Add').click();
+        await $('.path-input-row button').click();
 
         const saveBtn = await $('button*=Create Profile');
         await saveBtn.click();
