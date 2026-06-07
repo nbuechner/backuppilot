@@ -42,6 +42,36 @@ describe('Activity page', () => {
         await browser.pause(300);
     });
 
+    it('activity list loads within 15 seconds without blocking', async () => {
+        // Reload fresh to simulate the user opening the Activity tab cold.
+        await browser.execute(() => window.location.reload());
+        await browser.waitUntil(
+            async () => (await $('.nav-item*=Activity').isExisting()),
+            { timeout: 30_000, timeoutMsg: 'Nav bar not visible after reload' }
+        );
+        await $('.nav-item*=Activity').click();
+
+        // If the running_profiles / db deadlock is present the spinner NEVER clears.
+        // 15 s is tight enough to catch the bug while being well above normal load time.
+        await browser.waitUntil(
+            async () => {
+                if (await $('.error-box').isExisting()) return true;
+                return !(await $('.spinner').isExisting());
+            },
+            { timeout: 15_000, timeoutMsg: 'Activity spinner still visible after 15 s — possible deadlock' }
+        );
+
+        const errorBox = await $('.error-box');
+        if (await errorBox.isExisting()) {
+            const msg = await errorBox.getText();
+            throw new Error(`Activity loaded with error: ${msg}`);
+        }
+
+        const hasRows  = (await $$('.log-row')).length > 0;
+        const hasEmpty = await $('.empty').isExisting();
+        expect(hasRows || hasEmpty).toBe(true);
+    });
+
     it('renders the filters bar', async () => {
         const filters = await $('.filters');
         await filters.waitForDisplayed({ timeout: 5_000 });

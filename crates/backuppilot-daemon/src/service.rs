@@ -313,9 +313,13 @@ impl DaemonService {
     }
 
     pub async fn status_for_profile(&self, profile: &BackupProfile) -> Result<ProfileStatus> {
-        let db = self.db.lock().await;
-        let last_run = db.latest_run_for_profile(profile.id)?;
-        let last_success = db.latest_successful_run(profile.id)?;
+        let (last_run, last_success) = {
+            let db = self.db.lock().await;
+            (
+                db.latest_run_for_profile(profile.id)?,
+                db.latest_successful_run(profile.id)?,
+            )
+        }; // db lock released before acquiring running_profiles
         let in_progress = self.running_profiles.lock().await.contains(&profile.id)
             || backup_process_running(profile.id);
         let progress_message = self
@@ -413,6 +417,9 @@ impl DaemonService {
         {
             let mut running = self.running_profiles.lock().await;
             if !running.insert(profile_id) {
+                // Drop the lock before awaiting — backup_already_running_result
+                // also acquires running_profiles, and tokio Mutex is not reentrant.
+                drop(running);
                 return Ok(
                     self.backup_already_running_result(profile_id)
                         .await
