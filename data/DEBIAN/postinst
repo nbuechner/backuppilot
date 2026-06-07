@@ -6,11 +6,36 @@ systemctl --user enable backuppilot-daemon.service 2>/dev/null || true
 systemctl --user start backuppilot-daemon.service 2>/dev/null || true
 
 if ! command -v proxmox-backup-client >/dev/null 2>&1; then
-    # Detect distro codename
+    # Detect distro and map to the appropriate Proxmox PBS client repo.
+    # Proxmox ships two repos: bookworm (PVE 8) and trixie (PVE 9).
+    # For Ubuntu we use the version number so new releases are handled automatically:
+    #   Ubuntu <= 24.04 (noble)   -> bookworm packages
+    #   Ubuntu >= 24.10 (oracular and later) -> trixie packages
     CODENAME=""
+    ID=""
+    VERSION_ID=""
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         CODENAME="${VERSION_CODENAME:-}"
+        ID="${ID:-}"
+        VERSION_ID="${VERSION_ID:-}"
+    fi
+
+    # Resolve Ubuntu version numbers to a Proxmox repo codename
+    PBS_REPO=""
+    if [ "$ID" = "ubuntu" ] && [ -n "$VERSION_ID" ]; then
+        # Compare as integers by stripping the dot (24.04 -> 2404, 24.10 -> 2410)
+        VER_INT=$(echo "$VERSION_ID" | awk -F. '{printf "%d%02d", $1, $2}')
+        if [ "$VER_INT" -le 2404 ]; then
+            PBS_REPO="bookworm"
+        else
+            PBS_REPO="trixie"
+        fi
+    else
+        case "$CODENAME" in
+            bookworm) PBS_REPO="bookworm" ;;
+            trixie)   PBS_REPO="trixie"   ;;
+        esac
     fi
 
     echo ""
@@ -22,9 +47,8 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
     echo "  and restores."
     echo ""
 
-    case "$CODENAME" in
-        bookworm|noble)
-            # Debian 12 / Ubuntu 24.04 -- use Proxmox 8 (bookworm) packages
+    case "$PBS_REPO" in
+        bookworm)
             echo "  Install it with:"
             echo ""
             echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg \\"
@@ -33,8 +57,7 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
             echo "      | sudo tee /etc/apt/sources.list.d/pbs-client.list"
             echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
             ;;
-        trixie|resolute)
-            # Debian 13 / Ubuntu 26.04 -- use Proxmox 9 (trixie) packages
+        trixie)
             echo "  Install it with:"
             echo ""
             echo "    curl -fsSL https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg \\"
@@ -44,7 +67,7 @@ if ! command -v proxmox-backup-client >/dev/null 2>&1; then
             echo "    sudo apt-get update && sudo apt-get install -y proxmox-backup-client"
             ;;
         *)
-            echo "  Your system ($CODENAME) may not have official Proxmox packages."
+            echo "  Your system (${CODENAME:-unknown}) may not have official Proxmox packages."
             echo "  Please check the Proxmox download page for your distribution:"
             echo ""
             echo "    https://www.proxmox.com/en/downloads/proxmox-backup-client"
