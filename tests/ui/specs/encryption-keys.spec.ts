@@ -119,8 +119,9 @@ describe('Encryption Keys page', () => {
             throw new Error(`Create key failed with UI error: ${msg}`);
         }
 
-        // Form closes and new row appears
-        await form.waitForDisplayed({ timeout: 10_000, reverse: true });
+        // Form closes and new row appears.
+        // Allow 30s: WSL cold-start on first invocation can take 10-15s.
+        await form.waitForDisplayed({ timeout: 30_000, reverse: true });
         await browser.waitUntil(
             async () => (await $$('.key-row')).length > countBefore,
             { timeout: 10_000, timeoutMsg: `Key row for "${testName}" did not appear` }
