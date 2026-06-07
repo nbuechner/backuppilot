@@ -107,11 +107,14 @@ pub fn mount_point_for(profile_id: i64, snapshot: &str, archive_name: &str) -> P
 
 #[cfg(windows)]
 pub fn mount_point_for(profile_id: i64, snapshot: &str, archive_name: &str) -> PathBuf {
-    let snap_slug = snapshot.replace('/', "_");
+    // Colons are valid in Linux paths but forbidden in Windows UNC path components,
+    // so strip them to keep the \\wsl.localhost\... path openable in Explorer.
+    let snap_slug = snapshot.replace('/', "_").replace(':', "-");
     let arch_slug = archive_name
         .strip_suffix(".pxar")
         .unwrap_or(archive_name)
-        .replace('/', "_");
+        .replace('/', "_")
+        .replace(':', "-");
     // Forward-slash path — valid inside WSL, passes through the PowerShell wrapper unchanged.
     PathBuf::from(format!(
         "/tmp/backuppilot-mounts/{profile_id}/{snap_slug}/{arch_slug}"
