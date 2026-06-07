@@ -840,6 +840,7 @@ fn collect_pbs_credentials(w: &EditorWidgets) -> Result<CredentialVerifyInput, S
         repository,
         namespace,
         server_fingerprint,
+        profile_id: None,
     })
 }
 
@@ -1340,5 +1341,6 @@ fn schedule_type_label(t: ScheduleType) -> String {
         ScheduleType::Weekly => tr("Once a week"),
         ScheduleType::OnLogin => tr("When you sign in"),
         ScheduleType::Custom => tr("Advanced"),
+        ScheduleType::Manual => tr("Manual"),
     }
 }

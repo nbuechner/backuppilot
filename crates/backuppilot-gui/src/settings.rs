@@ -783,6 +783,7 @@ fn collect_and_save(widgets: &SettingsWidgets) -> Result<AppSettings, String> {
         show_tray_icon: widgets.show_tray.is_active(),
         pause_all_backups: widgets.pause_all.is_active(),
         close_to_tray: widgets.close_to_tray.is_active(),
+        ask_unmount_on_quit: settings.tray.ask_unmount_on_quit,
     };
     settings.appearance.language =
         settings_apply::language_from_dropdown(widgets.language_row.selected());
