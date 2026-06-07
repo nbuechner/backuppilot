@@ -7,7 +7,9 @@ use std::time::Duration;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tokio::time::timeout;
-use tracing::{debug, error, warn};
+#[cfg(windows)]
+use tracing::error;
+use tracing::{debug, warn};
 
 use crate::encryption::{apply_encryption_to_command, normalize_fingerprint, EncryptionCliMode};
 use crate::error::{CoreError, Result};
