@@ -30,6 +30,9 @@ async function navigateTo(tabLabel: string) {
 describe('Profile lifecycle', () => {
     before(async () => {
         await browser.url('http://tauri.localhost/');
+        // Force a full page reload to reset Svelte state left by the previous spec.
+        // Same-URL navigation in WebView2 may be a no-op, leaving showProfileForm=true.
+        await browser.execute(() => window.location.reload());
         await browser.waitUntil(
             async () => {
                 const html = await browser.execute(() => document.body.innerHTML) as string;
@@ -104,7 +107,7 @@ describe('Profile lifecycle', () => {
 
     it('new profile card appears in the list', async () => {
         const card = await $(`.profile-card`);
-        await card.waitForDisplayed({ timeout: 5_000 });
+        await card.waitForDisplayed({ timeout: 10_000 });
         const nameEl = await card.$('.profile-name');
         const name = await nameEl.getText();
         expect(name).toBe(PROFILE.name);

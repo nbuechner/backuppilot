@@ -2,9 +2,8 @@
 
 describe('Profiles page', () => {
     before(async () => {
-        // The Tauri window starts hidden; navigate explicitly to trigger content load.
         await browser.url('http://tauri.localhost/');
-        // Wait for Svelte to mount (body innerHTML grows past the empty skeleton)
+        await browser.execute(() => window.location.reload());
         await browser.waitUntil(
             async () => {
                 const html = await browser.execute(() => document.body.innerHTML) as string;

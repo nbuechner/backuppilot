@@ -15,9 +15,9 @@ export const config: Options.Testrunner = {
     // pipe pool, causing Activity's IPC load() to hang and the spinner never to clear.
     specs: [[
         './specs/activity.spec.ts',
+        './specs/profiles-e2e.spec.ts',
         './specs/cli.spec.ts',
         './specs/encryption-keys.spec.ts',
-        './specs/profiles-e2e.spec.ts',
         './specs/profiles.spec.ts',
         './specs/restore-e2e.spec.ts',
         './specs/restore.spec.ts',

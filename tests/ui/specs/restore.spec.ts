@@ -2,8 +2,8 @@
 
 describe('Restore page', () => {
     before(async () => {
-        // Navigate to app content, then go to Restore tab
         await browser.url('http://tauri.localhost/');
+        await browser.execute(() => window.location.reload());
         await browser.waitUntil(
             async () => {
                 const html = await browser.execute(() => document.body.innerHTML) as string;

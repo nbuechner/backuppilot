@@ -21,6 +21,7 @@ describe('backuppilot-cli', () => {
     before(async () => {
         // Navigate so the wdio session has an active page; CLI tests themselves use execSync.
         await browser.url('http://tauri.localhost/');
+        await browser.execute(() => window.location.reload());
         await browser.waitUntil(
             async () => {
                 const html = await browser.execute(() => document.body.innerHTML) as string;

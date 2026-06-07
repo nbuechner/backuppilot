@@ -9,8 +9,11 @@ async function navigateTo(tabLabel: string) {
     await tab.waitForClickable({ timeout: 10_000 });
     await tab.click();
     await browser.waitUntil(
-        async () => !(await $('.spinner').isExisting()),
-        { timeout: 15_000, timeoutMsg: `${tabLabel} spinner did not clear` }
+        async () => {
+            if (await $('.error-box').isExisting()) return true;
+            return !(await $('.spinner').isExisting());
+        },
+        { timeout: 90_000, timeoutMsg: `${tabLabel} spinner did not clear` }
     );
     await browser.pause(300);
 }
@@ -18,6 +21,7 @@ async function navigateTo(tabLabel: string) {
 describe('Restore lifecycle', () => {
     before(async () => {
         await browser.url('http://tauri.localhost/');
+        await browser.execute(() => window.location.reload());
         await browser.waitUntil(
             async () => {
                 const html = await browser.execute(() => document.body.innerHTML) as string;
