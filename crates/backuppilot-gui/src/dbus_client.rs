@@ -80,14 +80,6 @@ pub async fn update_profile(
     parse(&call("update_profile", json!({"profile_id": profile_id, "profile_json": pj})).await?)
 }
 
-pub async fn set_profile_enabled(
-    _: &DaemonClient,
-    profile_id: i64,
-    enabled: bool,
-) -> IpcResult<BackupProfile> {
-    parse(&call("set_profile_enabled", json!({"profile_id": profile_id, "enabled": enabled})).await?)
-}
-
 pub async fn delete_profile(_: &DaemonClient, profile_id: i64) -> IpcResult<()> {
     call("delete_profile", json!({"profile_id": profile_id})).await?;
     Ok(())
@@ -203,13 +195,6 @@ pub async fn mark_encryption_key_exported(_: &DaemonClient, key_id: i64) -> IpcR
     Ok(())
 }
 
-pub async fn profiles_using_encryption_key(
-    _: &DaemonClient,
-    key_id: i64,
-) -> IpcResult<Vec<String>> {
-    parse(&call("profiles_using_encryption_key", json!({"key_id": key_id})).await?)
-}
-
 pub async fn reset_all_data(_: &DaemonClient) -> IpcResult<()> {
     call("reset_all_data", json!(null)).await?;
     Ok(())
@@ -224,15 +209,6 @@ pub async fn check_for_updates(
         UpdateChannel::Beta => "beta",
     };
     parse(&call("check_for_updates", json!({"channel": ch})).await?)
-}
-
-pub async fn get_update_state(_: &DaemonClient) -> IpcResult<backuppilot_core::UpdateState> {
-    parse(&call("get_update_state", json!(null)).await?)
-}
-
-pub async fn dismiss_available_update(_: &DaemonClient) -> IpcResult<()> {
-    call("dismiss_available_update", json!(null)).await?;
-    Ok(())
 }
 
 pub async fn toggle_pause_all_backups(_: &DaemonClient) -> IpcResult<bool> {
